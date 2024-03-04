@@ -1,0 +1,157 @@
+'use client';
+
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { ColumnDef } from '@tanstack/react-table';
+import {
+  differenceInYears,
+  parseISO,
+  format,
+  formatDistanceToNow,
+} from 'date-fns';
+import { Eye, MoreHorizontal, Pencil, Sparkles, Trash } from 'lucide-react';
+import Image from 'next/image';
+
+export type Doctor = {
+  id: string | number;
+  name: string;
+  email: string;
+  birthDate: string;
+  gender: 'Male' | 'Female';
+  specialty: string;
+  joinedAt: string;
+  avatar: string;
+};
+
+export const columns: ColumnDef<Doctor>[] = [
+  {
+    id: 'name',
+    header: 'Name',
+    cell: ({ row }) => {
+      const name = row.original.name;
+      const avatar = row.original.avatar;
+
+      return (
+        <div className="flex items-center gap-3">
+          <Avatar className="h-10 w-10 bg-primary">
+            {avatar ? (
+              <div className="relative aspect-square h-full w-full">
+                <Image
+                  src={avatar}
+                  alt={`${name} profile picture`}
+                  referrerPolicy="no-referrer"
+                  fill
+                />
+              </div>
+            ) : (
+              <AvatarFallback>
+                <span>{name}</span>
+              </AvatarFallback>
+            )}
+          </Avatar>
+          <p className="text-foreground font-medium">{name}</p>
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: 'gender',
+    header: 'Gender',
+    cell: ({ row }) => {
+      const gender: string = row.original.gender;
+      return (
+        <Badge variant={gender === 'Male' ? 'default' : 'female'}>
+          {gender}
+        </Badge>
+      );
+    },
+  },
+  {
+    accessorKey: 'specialty',
+    header: 'Speciality',
+    cell: ({ row }) => {
+      const speciality = row.original.specialty;
+      return <Badge variant="outline">{speciality}</Badge>;
+    },
+  },
+  {
+    accessorKey: 'email',
+    header: 'Email',
+  },
+  {
+    accessorKey: 'birthDate',
+    header: 'Age',
+    cell: ({ row }) => {
+      const birthDate: string = row.getValue('birthDate');
+
+      return (
+        <div className="flex flex-col whitespace-nowrap">
+          <span>
+            {differenceInYears(new Date(), parseISO(birthDate))} years old.
+          </span>
+          <span className="text-muted-foreground text-sm">
+            {format(parseISO(birthDate), 'MMM dd, yyyy')}
+          </span>
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: 'joinedAt',
+    header: 'Joined at',
+    cell: ({ row }) => {
+      const joinedAt: string = row.getValue('joinedAt');
+
+      return (
+        <div className="flex flex-col whitespace-nowrap">
+          <span>{format(parseISO(joinedAt), 'MMM dd, yyyy')}</span>
+          <span className="text-muted-foreground text-sm">
+            {formatDistanceToNow(parseISO(joinedAt), {
+              addSuffix: true,
+            })}
+          </span>
+        </div>
+      );
+    },
+  },
+  {
+    id: 'actions',
+    cell: ({ row }) => {
+      const admin = row.original;
+
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="h-8 w-8 p-0">
+              <span className="sr-only">Open menu</span>
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuItem>
+              <Pencil className="h-4 w-4 mr-2" /> Edit
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <Trash className="h-4 w-4 mr-2" /> Delete
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem>
+              <Eye className="h-4 w-4 mr-2" />
+              View profile
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      );
+    },
+  },
+];
