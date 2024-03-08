@@ -3,7 +3,6 @@
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -34,6 +33,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
 import ImageUpload from '@/components/ImageUpload';
 import { useState } from 'react';
+import { useUploadThing } from '@/lib/uploadthing';
 
 const formSchema = z.object({
   firstName: z.string().min(1, {
@@ -64,13 +64,14 @@ const formSchema = z.object({
       message: 'Birth date cannot be in the future.',
     }),
   speciality: z.string().optional(),
-  avatar: z.string().optional(),
+  avatar: z.instanceof(File).optional(),
 });
 
 export default function UserForm() {
   const searchParams = useSearchParams();
   const role = searchParams.get('role')?.toLocaleLowerCase();
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const { startUpload } = useUploadThing('imageUploader');
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -83,11 +84,23 @@ export default function UserForm() {
   });
   const isLoading = form.formState.isSubmitting;
 
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    console.log(values);
+    if (values.avatar) {
+      const res = await startUpload([values.avatar]);
+      if (res) {
+        const [fileResponse] = res;
+        const url = fileResponse.url;
+        console.log(url);
+      }
+    }
+  };
+
   return (
     <div className="mx-auto h-full max-w-3xl space-y-2 p-4">
       <Form {...form}>
         <form
-          // onSubmit={form.handleSubmit(onSubmit)}
+          onSubmit={form.handleSubmit(onSubmit)}
           className="space-y-8 pb-10"
         >
           <div className="w-full space-y-2">
@@ -104,7 +117,11 @@ export default function UserForm() {
             render={({ field }) => (
               <FormItem className="flex flex-col items-center justify-center space-y-4">
                 <FormControl>
-                  <ImageUpload />
+                  <ImageUpload
+                    value={field.value}
+                    onChange={field.onChange}
+                    disabled={isLoading}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -356,6 +373,8 @@ export default function UserForm() {
               <Wand2 className='w-4 h-4 ml-2' />
             </Button>
           </div> */}
+
+          <Button type="submit">Submit</Button>
         </form>
       </Form>
     </div>
