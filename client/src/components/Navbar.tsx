@@ -21,7 +21,7 @@ export default function Navbar() {
   const router = useRouter();
 
   return (
-    <div className="fixed w-full z-50 flex justify-between items-center py-2 px-4 border-b border-primary/10 bg-secondary h-16">
+    <div className="fixed z-50 flex h-16 w-full items-center justify-between border-b border-primary/10 bg-secondary px-4 py-2">
       <div className="flex items-center">
         {/* <MobileSidebar isPro={isPro} /> */}
         <Link href="/">

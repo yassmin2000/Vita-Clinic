@@ -84,13 +84,13 @@ export default function UserForm() {
   const isLoading = form.formState.isSubmitting;
 
   return (
-    <div className="h-full p-4 space-y-2 max-w-3xl mx-auto">
+    <div className="mx-auto h-full max-w-3xl space-y-2 p-4">
       <Form {...form}>
         <form
           // onSubmit={form.handleSubmit(onSubmit)}
           className="space-y-8 pb-10"
         >
-          <div className="space-y-2 w-full">
+          <div className="w-full space-y-2">
             <div>
               <h3 className="text-lg font-medium">General Information</h3>
               <p className="text-sm text-muted-foreground">
@@ -110,7 +110,7 @@ export default function UserForm() {
               </FormItem>
             )}
           />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <FormField
               name="firstName"
               control={form.control}
@@ -202,7 +202,7 @@ export default function UserForm() {
               control={form.control}
               name="birthDate"
               render={({ field }) => (
-                <FormItem className="flex flex-col col-span-2 md:col-span-1">
+                <FormItem className="col-span-2 flex flex-col md:col-span-1">
                   <FormLabel>Date of birth</FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
@@ -241,7 +241,7 @@ export default function UserForm() {
             />
           </div>
 
-          <div className="space-y-2 w-full">
+          <div className="w-full space-y-2">
             <div>
               <h3 className="text-lg font-medium">Credentials</h3>
               <p className="text-sm text-muted-foreground">
@@ -288,7 +288,7 @@ export default function UserForm() {
                       variant="ghost"
                       size="icon"
                       type="button"
-                      className="absolute h-[80%] right-1 top-1/2 transform -translate-y-1/2"
+                      className="absolute right-1 top-1/2 h-[80%] -translate-y-1/2 transform"
                       onMouseDown={() => setIsPasswordVisible(true)}
                       onMouseUp={() => setIsPasswordVisible(false)}
                       onMouseLeave={() => setIsPasswordVisible(false)}

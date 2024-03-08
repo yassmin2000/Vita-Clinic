@@ -29,11 +29,11 @@ export default function RootLayout({
           {modal}
           <div className="h-full">
             <Navbar />
-            <div className="hidden md:flex mt-16 w-16 flex-col fixed inset-y-0">
+            <div className="fixed inset-y-0 mt-16 hidden w-16 flex-col md:flex">
               <Sidebar />
             </div>
-            <main className="pt-16 h-full md:pl-16">
-              <div className="h-full p-4 space-y-2">{children}</div>
+            <main className="h-full pt-16 md:pl-16">
+              <div className="h-full space-y-2 p-4">{children}</div>
             </main>
           </div>
         </Providers>

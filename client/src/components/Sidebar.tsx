@@ -55,8 +55,8 @@ export default function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <div className="space-y-4 flex flex-col h-full text-primary bg-secondary overflow-y-auto border-r border-primary/10">
-      <div className="p-3 flex flex-1 justify-center">
+    <div className="flex h-full flex-col space-y-4 overflow-y-auto border-r border-primary/10 bg-secondary text-primary">
+      <div className="flex flex-1 justify-center p-3">
         <div className="space-y-2">
           {routes.map((route) => (
             <TooltipProvider key={route.href}>
@@ -64,7 +64,7 @@ export default function Sidebar() {
                 <TooltipTrigger>
                   <div
                     className={cn(
-                      'text-muted-foreground text-xs group flex p-3 w-full justify-start font-medium cursor-pointer hover:text-primary hover:bg-primary/10 rounded-lg transition',
+                      'group flex w-full cursor-pointer justify-start rounded-lg p-3 text-xs font-medium text-muted-foreground transition hover:bg-primary/10 hover:text-primary',
                       pathname === route.href && 'bg-primary/10 text-primary'
                     )}
                   >

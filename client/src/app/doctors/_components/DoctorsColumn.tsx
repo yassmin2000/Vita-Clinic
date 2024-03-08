@@ -58,7 +58,7 @@ export const columns: ColumnDef<Doctor>[] = [
               </AvatarFallback>
             )}
           </Avatar>
-          <p className="text-foreground font-medium">{name}</p>
+          <p className="font-medium text-foreground">{name}</p>
         </div>
       );
     },
@@ -98,7 +98,7 @@ export const columns: ColumnDef<Doctor>[] = [
           <span>
             {differenceInYears(new Date(), parseISO(birthDate))} years old.
           </span>
-          <span className="text-muted-foreground text-sm">
+          <span className="text-sm text-muted-foreground">
             {format(parseISO(birthDate), 'MMM dd, yyyy')}
           </span>
         </div>
@@ -114,7 +114,7 @@ export const columns: ColumnDef<Doctor>[] = [
       return (
         <div className="flex flex-col whitespace-nowrap">
           <span>{format(parseISO(joinedAt), 'MMM dd, yyyy')}</span>
-          <span className="text-muted-foreground text-sm">
+          <span className="text-sm text-muted-foreground">
             {formatDistanceToNow(parseISO(joinedAt), {
               addSuffix: true,
             })}
@@ -139,14 +139,14 @@ export const columns: ColumnDef<Doctor>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem>
-              <Pencil className="h-4 w-4 mr-2" /> Edit
+              <Pencil className="mr-2 h-4 w-4" /> Edit
             </DropdownMenuItem>
             <DropdownMenuItem>
-              <Trash className="h-4 w-4 mr-2" /> Delete
+              <Trash className="mr-2 h-4 w-4" /> Delete
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
-              <Eye className="h-4 w-4 mr-2" />
+              <Eye className="mr-2 h-4 w-4" />
               View profile
             </DropdownMenuItem>
           </DropdownMenuContent>

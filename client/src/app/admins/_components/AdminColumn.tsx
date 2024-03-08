@@ -65,13 +65,13 @@ export const columns: ColumnDef<Admin>[] = [
               </AvatarFallback>
             )}
           </Avatar>
-          <p className="text-foreground font-medium flex items-center gap-1.5">
+          <p className="flex items-center gap-1.5 font-medium text-foreground">
             <span>{name}</span>
             {isSuperAdmin && (
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger>
-                    <div className="dark:bg-white p-0.5 rounded-full flex items-center justify-center">
+                    <div className="flex items-center justify-center rounded-full p-0.5 dark:bg-white">
                       <Sparkles className="h-5 w-5 fill-yellow-500 text-gray-900" />
                     </div>
                   </TooltipTrigger>
@@ -111,7 +111,7 @@ export const columns: ColumnDef<Admin>[] = [
           <span>
             {differenceInYears(new Date(), parseISO(birthDate))} years old.
           </span>
-          <span className="text-muted-foreground text-sm">
+          <span className="text-sm text-muted-foreground">
             {format(parseISO(birthDate), 'MMM dd, yyyy')}
           </span>
         </div>
@@ -127,7 +127,7 @@ export const columns: ColumnDef<Admin>[] = [
       return (
         <div className="flex flex-col whitespace-nowrap">
           <span>{format(parseISO(joinedAt), 'MMM dd, yyyy')}</span>
-          <span className="text-muted-foreground text-sm">
+          <span className="text-sm text-muted-foreground">
             {formatDistanceToNow(parseISO(joinedAt), {
               addSuffix: true,
             })}
@@ -152,14 +152,14 @@ export const columns: ColumnDef<Admin>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem>
-              <Pencil className="h-4 w-4 mr-2" /> Edit
+              <Pencil className="mr-2 h-4 w-4" /> Edit
             </DropdownMenuItem>
             <DropdownMenuItem>
-              <Trash className="h-4 w-4 mr-2" /> Delete
+              <Trash className="mr-2 h-4 w-4" /> Delete
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
-              <Eye className="h-4 w-4 mr-2" />
+              <Eye className="mr-2 h-4 w-4" />
               View profile
             </DropdownMenuItem>
           </DropdownMenuContent>

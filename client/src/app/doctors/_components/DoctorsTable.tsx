@@ -101,8 +101,8 @@ export default function DoctorsTable() {
 
   return (
     <>
-      <div className="flex flex-col md:flex-row justify-between gap-8">
-        <div className="flex flex-col sm:flex-row gap-2">
+      <div className="flex flex-col justify-between gap-8 md:flex-row">
+        <div className="flex flex-col gap-2 sm:flex-row">
           <Tabs
             value={currentGender}
             onValueChange={(value) => {
@@ -143,7 +143,7 @@ export default function DoctorsTable() {
           </Select>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-2 flex-1">
+        <div className="flex flex-1 flex-col gap-2 sm:flex-row">
           <Input
             placeholder="Search by name or email address"
             value={searchValue}
@@ -155,7 +155,7 @@ export default function DoctorsTable() {
           <Link
             href="/user/new?role=doctor"
             className={buttonVariants({
-              className: 'w-[150px] flex items-center gap-1',
+              className: 'flex w-[150px] items-center gap-1',
             })}
           >
             <Plus />
@@ -164,7 +164,7 @@ export default function DoctorsTable() {
         </div>
       </div>
       <DataTable columns={columns} data={doctors || []} isLoading={isLoading} />
-      <div className="flex flex-col-reverse sm:flex-row md:items-center justify-between gap-2">
+      <div className="flex flex-col-reverse justify-between gap-2 sm:flex-row md:items-center">
         <Select>
           <SelectTrigger className="w-[200px]">
             <SelectValue placeholder="Count per page" />
@@ -179,7 +179,7 @@ export default function DoctorsTable() {
             </SelectGroup>
           </SelectContent>
         </Select>
-        <div className="flex gap-2 justify-between">
+        <div className="flex justify-between gap-2">
           <Button
             className="flex items-center gap-2"
             size="sm"
