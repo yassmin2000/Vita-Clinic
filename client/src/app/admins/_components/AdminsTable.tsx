@@ -5,7 +5,7 @@ import { admins as adminsData } from './adminsData';
 import { useCallback, useEffect, useState } from 'react';
 import { differenceInYears, parseISO, format } from 'date-fns';
 import { Button, buttonVariants } from '@/components/ui/button';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Plus } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { DataTable } from '@/components/DataTable';
 import { columns } from './AdminColumn';
@@ -125,17 +125,22 @@ export default function AdminsTable() {
           </Select>
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2 flex-1">
           <Input
             placeholder="Search by name or email address"
-            className="w-[300px] md:w-[400px]"
             value={searchValue}
             onChange={(e) => {
               setSearchValue(e.target.value);
               debounceRequest();
             }}
           />
-          <Link href="/user/new?role=admin" className={buttonVariants()}>
+          <Link
+            href="/user/new?role=admin"
+            className={buttonVariants({
+              className: 'w-[150px] flex items-center gap-1',
+            })}
+          >
+            <Plus />
             New Admin
           </Link>
         </div>

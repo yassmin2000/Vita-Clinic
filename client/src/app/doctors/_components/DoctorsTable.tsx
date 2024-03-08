@@ -4,8 +4,8 @@ import { useQuery } from '@tanstack/react-query';
 import { doctors as doctorsData } from './doctorsData';
 import { useCallback, useEffect, useState } from 'react';
 import { differenceInYears, parseISO, format } from 'date-fns';
-import { Button } from '@/components/ui/button';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { Button, buttonVariants } from '@/components/ui/button';
+import { ArrowLeft, ArrowRight, Plus } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { DataTable } from '@/components/DataTable';
 import { columns } from './DoctorsColumn';
@@ -31,6 +31,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Checkbox } from '@/components/ui/checkbox';
+import Link from 'next/link';
 
 const specialties = [
   'Neuroradiology',
@@ -142,15 +143,25 @@ export default function DoctorsTable() {
           </Select>
         </div>
 
-        <Input
-          placeholder="Search by name or email address"
-          className="w-[300px] md:w-[400px]"
-          value={searchValue}
-          onChange={(e) => {
-            setSearchValue(e.target.value);
-            debounceRequest();
-          }}
-        />
+        <div className="flex flex-col sm:flex-row gap-2 flex-1">
+          <Input
+            placeholder="Search by name or email address"
+            value={searchValue}
+            onChange={(e) => {
+              setSearchValue(e.target.value);
+              debounceRequest();
+            }}
+          />
+          <Link
+            href="/user/new?role=doctor"
+            className={buttonVariants({
+              className: 'w-[150px] flex items-center gap-1',
+            })}
+          >
+            <Plus />
+            New Doctor
+          </Link>
+        </div>
       </div>
       <DataTable columns={columns} data={doctors || []} isLoading={isLoading} />
       <div className="flex flex-col-reverse sm:flex-row md:items-center justify-between gap-2">

@@ -12,7 +12,7 @@ export default function Modal({ children }: ModalProps) {
 
   return (
     <Dialog open={true} onOpenChange={() => router.back()}>
-      <DialogContent className="h-[80%] max-w-2xl">
+      <DialogContent className="h-[80%] max-w-2xl px-2">
         <DialogDescription className="overflow-y-auto">
           {children}
         </DialogDescription>
