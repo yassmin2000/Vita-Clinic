@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { admins as adminsData } from './adminsData';
 import { useCallback, useEffect, useState } from 'react';
 import { differenceInYears, parseISO, format } from 'date-fns';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { DataTable } from '@/components/DataTable';
@@ -23,6 +23,7 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 // @ts-ignore
 import debounce from 'lodash.debounce';
+import Link from 'next/link';
 
 export default function AdminsTable() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -124,15 +125,20 @@ export default function AdminsTable() {
           </Select>
         </div>
 
-        <Input
-          placeholder="Search by name or email address"
-          className="w-[300px] md:w-[400px]"
-          value={searchValue}
-          onChange={(e) => {
-            setSearchValue(e.target.value);
-            debounceRequest();
-          }}
-        />
+        <div className="flex gap-2">
+          <Input
+            placeholder="Search by name or email address"
+            className="w-[300px] md:w-[400px]"
+            value={searchValue}
+            onChange={(e) => {
+              setSearchValue(e.target.value);
+              debounceRequest();
+            }}
+          />
+          <Link href="/user/new?role=admin" className={buttonVariants()}>
+            New Admin
+          </Link>
+        </div>
       </div>
       <DataTable columns={columns} data={admins || []} isLoading={isLoading} />
       <div className="flex flex-col-reverse sm:flex-row md:items-center justify-between gap-2">

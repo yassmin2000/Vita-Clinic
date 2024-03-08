@@ -16,14 +16,17 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
+  modal,
 }: Readonly<{
   children: React.ReactNode;
+  modal: React.ReactNode;
 }>) {
   return (
     <html lang="en">
       <body className={cn('bg-background', inter.className)}>
         <Providers>
           <NextTopLoader color="#2563eb" />
+          {modal}
           <div className="h-full">
             <Navbar />
             <div className="hidden md:flex mt-16 w-16 flex-col fixed inset-y-0">
