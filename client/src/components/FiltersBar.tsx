@@ -33,12 +33,15 @@ const specialties = [
 
 interface FiltersBarProps {
   genderFilter?: boolean;
+  statusFilter?: boolean;
   specialtyFilter?: boolean;
   searchFilter?: boolean;
   sortingEnabled?: boolean;
   sortByNameEnabled?: boolean;
   sortByAgeEnabled?: boolean;
   sortByDateEnabled?: boolean;
+  sortByLastMaintenanceDateEnabled?: boolean;
+  sortByPurchaseDateEnabled?: boolean;
   searchPlaceholder?: string;
   addNewButton?: boolean;
   addNewRoute: string;
@@ -48,12 +51,15 @@ interface FiltersBarProps {
 
 export default function FiltersBar({
   genderFilter = false,
+  statusFilter = false,
   specialtyFilter = false,
   searchFilter = false,
   sortingEnabled = false,
   sortByNameEnabled = false,
   sortByAgeEnabled = false,
   sortByDateEnabled = false,
+  sortByLastMaintenanceDateEnabled = false,
+  sortByPurchaseDateEnabled = false,
   searchPlaceholder,
   addNewButton = true,
   addNewRoute,
@@ -69,6 +75,8 @@ export default function FiltersBar({
     setSearchValue,
     currentGender,
     setCurrentGender,
+    currentStatus,
+    setCurrentStatus,
   } = useTableOptions();
 
   const request = debounce(async () => {
@@ -97,6 +105,29 @@ export default function FiltersBar({
               <TabsTrigger value="all">All</TabsTrigger>
               <TabsTrigger value="male">Male</TabsTrigger>
               <TabsTrigger value="female">Female</TabsTrigger>
+            </TabsList>
+          </Tabs>
+        )}
+
+        {statusFilter && (
+          <Tabs
+            value={currentStatus}
+            onValueChange={(value) => {
+              if (
+                value === 'all' ||
+                value === 'active' ||
+                value === 'inactive'
+              ) {
+                setCurrentPage(1);
+                setCurrentStatus(value);
+              }
+            }}
+            className="w-[200px]"
+          >
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="all">All</TabsTrigger>
+              <TabsTrigger value="active">Active</TabsTrigger>
+              <TabsTrigger value="inactive">Inactive</TabsTrigger>
             </TabsList>
           </Tabs>
         )}
@@ -132,6 +163,26 @@ export default function FiltersBar({
                   <SelectLabel>Joined at</SelectLabel>
                   <SelectItem value="joinedAt-asc">Oldest first</SelectItem>
                   <SelectItem value="joinedAt-desc">Newest first</SelectItem>
+                </SelectGroup>
+              )}
+              {sortByLastMaintenanceDateEnabled && (
+                <SelectGroup>
+                  <SelectLabel>Last maintenance date</SelectLabel>
+                  <SelectItem value="lastMaintenanceDate-asc">
+                    Last maintained last
+                  </SelectItem>
+                  <SelectItem value="lastMaintenanceDate-desc">
+                    Last maintained first
+                  </SelectItem>
+                </SelectGroup>
+              )}
+              {sortByPurchaseDateEnabled && (
+                <SelectGroup>
+                  <SelectLabel>Purchase date</SelectLabel>
+                  <SelectItem value="purchaseDate-asc">Oldest first</SelectItem>
+                  <SelectItem value="purchaseDate-desc">
+                    Newest first
+                  </SelectItem>
                 </SelectGroup>
               )}
             </SelectContent>

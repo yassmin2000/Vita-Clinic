@@ -12,6 +12,10 @@ const badgeVariants = cva(
           'border-transparent bg-blue-600 text-gray-100 hover:bg-blue-500/90',
         female:
           'border-transparent bg-rose-300 text-rose-800 hover:bg-rose-200',
+        active:
+          'border-transparent bg-green-800 text-gray-100 hover:bg-green-700',
+        inactive:
+          'border-transparent bg-gray-300 text-gray-800 hover:bg-gray-200',
         secondary:
           'border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80',
         destructive:

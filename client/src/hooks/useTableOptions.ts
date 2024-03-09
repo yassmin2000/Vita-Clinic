@@ -11,6 +11,8 @@ type UseTableOptions = {
   setSearchValue: (searchValue: string) => void;
   currentGender: string;
   setCurrentGender: (gender: 'all' | 'male' | 'female') => void;
+  currentStatus: string;
+  setCurrentStatus: (status: 'all' | 'active' | 'inactive') => void;
   reset: () => void;
 };
 
@@ -25,6 +27,8 @@ export const useTableOptions = create<UseTableOptions>((set) => ({
   setSearchValue: (searchValue) => set({ searchValue }),
   currentGender: 'all',
   setCurrentGender: (gender) => set({ currentGender: gender }),
+  currentStatus: 'all',
+  setCurrentStatus: (status) => set({ currentStatus: status }),
   reset: () =>
     set({
       currentPage: 1,
@@ -32,5 +36,6 @@ export const useTableOptions = create<UseTableOptions>((set) => ({
       sortBy: 'joinedAt-desc',
       searchValue: '',
       currentGender: 'all',
+      currentStatus: 'all',
     }),
 }));
