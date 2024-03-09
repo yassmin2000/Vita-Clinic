@@ -8,7 +8,7 @@ import {
   format,
   formatDistanceToNow,
 } from 'date-fns';
-import { Eye, MoreHorizontal, Pencil, Sparkles, Trash } from 'lucide-react';
+import { Eye, MoreHorizontal, Pencil, Trash } from 'lucide-react';
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -21,32 +21,25 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
 
-export type Admin = {
+export type Patient = {
   id: string | number;
   name: string;
   email: string;
   birthDate: string;
   gender: 'Male' | 'Female';
-  isSuperAdmin: boolean;
+  bloodType: string;
   joinedAt: string;
   avatar: string;
 };
 
-export const columns: ColumnDef<Admin>[] = [
+export const columns: ColumnDef<Patient>[] = [
   {
     id: 'name',
     header: 'Name',
     cell: ({ row }) => {
       const name = row.original.name;
       const avatar = row.original.avatar;
-      const isSuperAdmin = row.original.isSuperAdmin;
 
       return (
         <div className="flex items-center gap-3">
@@ -66,21 +59,7 @@ export const columns: ColumnDef<Admin>[] = [
               </AvatarFallback>
             )}
           </Avatar>
-          <p className="flex items-center gap-1.5 font-medium text-foreground">
-            <span>{name}</span>
-            {isSuperAdmin && (
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger>
-                    <div className="flex items-center justify-center rounded-full p-0.5 dark:bg-white">
-                      <Sparkles className="h-5 w-5 fill-yellow-500 text-gray-900" />
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent>System Admin</TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            )}
-          </p>
+          <p className="font-medium text-foreground">{name}</p>
         </div>
       );
     },
@@ -95,6 +74,14 @@ export const columns: ColumnDef<Admin>[] = [
           {gender}
         </Badge>
       );
+    },
+  },
+  {
+    accessorKey: 'bloodType',
+    header: 'Blood type',
+    cell: ({ row }) => {
+      const bloodType = row.original.bloodType;
+      return <Badge variant="outline">{bloodType}</Badge>;
     },
   },
   {

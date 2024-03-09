@@ -1,5 +1,15 @@
 'use client';
 
+import Image from 'next/image';
+import { ColumnDef } from '@tanstack/react-table';
+import {
+  differenceInYears,
+  parseISO,
+  format,
+  formatDistanceToNow,
+} from 'date-fns';
+import { Eye, MoreHorizontal, Pencil, Trash } from 'lucide-react';
+
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -11,15 +21,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { ColumnDef } from '@tanstack/react-table';
-import {
-  differenceInYears,
-  parseISO,
-  format,
-  formatDistanceToNow,
-} from 'date-fns';
-import { Eye, MoreHorizontal, Pencil, Sparkles, Trash } from 'lucide-react';
-import Image from 'next/image';
 
 export type Doctor = {
   id: string | number;

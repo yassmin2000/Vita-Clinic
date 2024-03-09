@@ -3,16 +3,16 @@
 import { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
-import { doctors as doctorsData } from './doctorsData';
+import { patients as patientsData } from './patientsData';
 
 import { DataTable } from '@/components/DataTable';
-import { columns } from './DoctorsColumn';
+import { columns } from './PatientsColumn';
 import FiltersBar from '@/components/FiltersBar';
 import Pagination from '@/components/Pagination';
 
 import { useTableOptions } from '@/hooks/useTableOptions';
 
-export default function DoctorsTable() {
+export default function PatientsTable() {
   const {
     sortBy,
     searchValue,
@@ -23,12 +23,12 @@ export default function DoctorsTable() {
   } = useTableOptions();
 
   const {
-    data: doctors,
+    data: patients,
     refetch,
     isLoading,
   } = useQuery({
     queryKey: [
-      `doctors_page_${currentPage}_count_${countPerPage}_gender_${currentGender}_sort_${sortBy}_search_${searchValue}_count_${countPerPage}`,
+      `patients_page_${currentPage}_count_${countPerPage}_gender_${currentGender}_sort_${sortBy}_search_${searchValue}_count_${countPerPage}`,
     ],
     queryFn: async () => {
       await new Promise((resolve) => setTimeout(resolve, 500));
@@ -40,13 +40,13 @@ export default function DoctorsTable() {
       )
         return null;
 
-      return doctorsData
+      return patientsData
         .filter(
-          (doctor) =>
+          (patient) =>
             (currentGender === 'all' ||
-              doctor.gender.toLowerCase() === currentGender) &&
-            (doctor.name.toLowerCase().includes(searchValue.toLowerCase()) ||
-              doctor.email.toLowerCase().includes(searchValue.toLowerCase()))
+              patient.gender.toLowerCase() === currentGender) &&
+            (patient.name.toLowerCase().includes(searchValue.toLowerCase()) ||
+              patient.email.toLowerCase().includes(searchValue.toLowerCase()))
         )
         .sort((a, b) => {
           if (a[sortWith] < b[sortWith]) {
@@ -70,7 +70,6 @@ export default function DoctorsTable() {
       <FiltersBar
         refetch={refetch}
         genderFilter
-        specialtyFilter
         searchFilter
         searchPlaceholder="Search by name or email address"
         sortingEnabled
@@ -78,13 +77,17 @@ export default function DoctorsTable() {
         sortByAgeEnabled
         sortByDateEnabled
         addNewButton
-        addNewRoute="/user/new?role=doctor"
-        addNewContent="New Doctor"
+        addNewRoute="/user/new?role=patient"
+        addNewContent="New Patient"
       />
-      <DataTable columns={columns} data={doctors || []} isLoading={isLoading} />
+      <DataTable
+        columns={columns}
+        data={patients || []}
+        isLoading={isLoading}
+      />
       <Pagination
         previousDisabled={currentPage === 1 || isLoading}
-        nextDisabled={(doctors && doctors.length < countPerPage) || isLoading}
+        nextDisabled={(patients && patients.length < countPerPage) || isLoading}
       />
     </>
   );

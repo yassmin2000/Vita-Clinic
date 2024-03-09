@@ -1,6 +1,8 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
+import { User } from 'lucide-react';
 
 import {
   DropdownMenu,
@@ -9,9 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
-import Image from 'next/image';
 import { Avatar, AvatarFallback } from './ui/avatar';
-import { User } from 'lucide-react';
 
 interface UserButtonProps {
   user: {

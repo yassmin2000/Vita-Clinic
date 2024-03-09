@@ -1,16 +1,12 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Poppins } from 'next/font/google';
-import { useTheme } from 'next-themes';
-import { Sparkle } from 'lucide-react';
 
-import { Button } from './ui/button';
-import { cn } from '@/lib/utils';
-import ModeToggle from './ModeToggle';
 import UserButton from './UserButton';
+import ModeToggle from './ModeToggle';
+import { cn } from '@/lib/utils';
 
 const poppins = Poppins({
   weight: '600',

@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { useUploadThing } from '@/lib/uploadthing';
 import Image from 'next/image';
+
 import { cn } from '@/lib/utils';
 
 interface ImageUploadProps {

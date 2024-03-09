@@ -14,7 +14,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from './ui/table';
 import { Skeleton } from './ui/skeleton';
 
 interface DataTableProps<TData, TValue> {

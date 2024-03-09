@@ -1,5 +1,13 @@
 'use client';
 
+import { useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { format } from 'date-fns';
+import { CalendarIcon, Eye, EyeOff } from 'lucide-react';
+
 import {
   Form,
   FormControl,
@@ -8,11 +16,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { useSearchParams } from 'next/navigation';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Separator } from '@/components/ui/separator';
+import ImageUpload from '@/components/ImageUpload';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -26,14 +30,12 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
-import { format } from 'date-fns';
-import { CalendarIcon, Eye, EyeOff } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
-import { cn } from '@/lib/utils';
-import ImageUpload from '@/components/ImageUpload';
-import { useState } from 'react';
+
 import { useUploadThing } from '@/lib/uploadthing';
+import { cn } from '@/lib/utils';
 
 const formSchema = z.object({
   firstName: z.string().min(1, {

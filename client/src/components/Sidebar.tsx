@@ -1,16 +1,26 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
-import { CalendarCheck, Home, Plus, Settings, ShieldPlus } from 'lucide-react';
-
-import { cn } from '@/lib/utils';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import {
+  ClipboardPlus,
+  CalendarCheck,
+  Home,
+  Settings,
+  ShieldPlus,
+  UserIcon,
+  Cable,
+  View,
+  Trash2,
+} from 'lucide-react';
+
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from './ui/tooltip';
+import { cn } from '@/lib/utils';
 
 const routes = [
   {
@@ -29,26 +39,27 @@ const routes = [
     label: 'Admins',
   },
   {
-    icon: Plus,
+    icon: ClipboardPlus,
     href: '/doctors',
     label: 'Doctors',
   },
   {
-    icon: Plus,
+    icon: UserIcon,
     href: '/patients',
     label: 'Patients',
   },
   {
-    icon: Plus,
+    icon: Cable,
     href: '/devices',
     label: 'Devices',
   },
   {
-    icon: Plus,
+    icon: View,
     href: '/viewier',
     label: 'DICOM Viewer',
   },
-  { icon: Settings, href: '/settings', label: 'Settings', pro: false },
+  { icon: Trash2, href: '/trash', label: 'Trash', super: true },
+  { icon: Settings, href: '/settings', label: 'Settings', super: true },
 ];
 
 export default function Sidebar() {
@@ -57,28 +68,59 @@ export default function Sidebar() {
   return (
     <div className="flex h-full flex-col space-y-4 overflow-y-auto border-r border-primary/10 bg-secondary text-primary">
       <div className="flex flex-1 justify-center p-3">
-        <div className="space-y-2">
-          {routes.map((route) => (
-            <TooltipProvider key={route.href}>
-              <Tooltip>
-                <TooltipTrigger>
-                  <div
-                    className={cn(
-                      'group flex w-full cursor-pointer justify-start rounded-lg p-3 text-xs font-medium text-muted-foreground transition hover:bg-primary/10 hover:text-primary',
-                      pathname === route.href && 'bg-primary/10 text-primary'
-                    )}
-                  >
-                    <Link href={route.href}>
-                      <route.icon className="h-5 w-5" />
-                    </Link>
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent side="right" align="start">
-                  <p>{route.label}</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          ))}
+        <div className="flex flex-col justify-between">
+          <div className="flex flex-col gap-2">
+            {routes
+              .filter((route) => !route.super)
+              .map((route) => (
+                <TooltipProvider key={route.href}>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <div
+                        className={cn(
+                          'group flex w-full cursor-pointer justify-start rounded-lg p-3 text-xs font-medium text-muted-foreground transition hover:bg-primary/10 hover:text-primary',
+                          pathname === route.href &&
+                            'bg-primary/10 text-primary'
+                        )}
+                      >
+                        <Link href={route.href}>
+                          <route.icon className="h-5 w-5" />
+                        </Link>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent side="right" align="start">
+                      <p>{route.label}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              ))}
+          </div>
+          <div className="flex flex-col gap-2">
+            {routes
+              .filter((route) => route.super)
+              .map((route) => (
+                <TooltipProvider key={route.href}>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <div
+                        className={cn(
+                          'group flex w-full cursor-pointer justify-start rounded-lg p-3 text-xs font-medium text-muted-foreground transition hover:bg-primary/10 hover:text-primary',
+                          pathname === route.href &&
+                            'bg-primary/10 text-primary'
+                        )}
+                      >
+                        <Link href={route.href}>
+                          <route.icon className="h-5 w-5" />
+                        </Link>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent side="right" align="start">
+                      <p>{route.label}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              ))}
+          </div>
         </div>
       </div>
     </div>
