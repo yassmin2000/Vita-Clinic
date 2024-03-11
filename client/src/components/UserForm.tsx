@@ -321,61 +321,6 @@ export default function UserForm() {
             )}
           />
 
-          {/* 
-          <FormField
-            name='instructions'
-            control={form.control}
-            render={({ field }) => (
-              <FormItem className='col-span-2 md:col-span-1'>
-                <FormLabel>Instructions</FormLabel>
-                <FormControl>
-                  <Textarea
-                    className='bg-background resize-none'
-                    rows={7}
-                    disabled={isLoading}
-                    placeholder={PREAMBLE}
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-                <FormDescription>
-                  Describe in details your amigo&appos;s background and relevant
-                  details.
-                </FormDescription>
-              </FormItem>
-            )}
-          />
-          <FormField
-            name='seed'
-            control={form.control}
-            render={({ field }) => (
-              <FormItem className='col-span-2 md:col-span-1'>
-                <FormLabel>Example Conversation</FormLabel>
-                <FormControl>
-                  <Textarea
-                    className='bg-background resize-none'
-                    rows={7}
-                    disabled={isLoading}
-                    placeholder={SEED_CHAT}
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-                <FormDescription>
-                  Describe in details your amigo&appos;s background and relevant
-                  details.
-                </FormDescription>
-              </FormItem>
-            )}
-          />
-
-          <div className='w-full flex justify-center'>
-            <Button size='lg' disabled={isLoading}>
-              {initialData ? 'Edit your amigo' : 'Create your amigo'}
-              <Wand2 className='w-4 h-4 ml-2' />
-            </Button>
-          </div> */}
-
           <Button type="submit">Submit</Button>
         </form>
       </Form>

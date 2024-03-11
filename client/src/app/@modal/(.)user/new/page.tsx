@@ -1,5 +1,5 @@
 import Modal from '@/components/Modal';
-import UserForm from '@/app/user/new/_components/UserForm';
+import UserForm from '@/components/UserForm';
 
 export default function CrateUserModal() {
   return (
