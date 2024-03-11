@@ -17,7 +17,6 @@ export default function DeviceCardsGrid() {
     sortBy,
     setSortBy,
     searchValue,
-    currentGender,
     currentPage,
     countPerPage,
     currentStatus,

@@ -34,14 +34,17 @@ const specialties = [
 interface FiltersBarProps {
   genderFilter?: boolean;
   statusFilter?: boolean;
-  specialtyFilter?: boolean;
+  bookingStatusFilter?: boolean;
   searchFilter?: boolean;
   sortingEnabled?: boolean;
   sortByNameEnabled?: boolean;
+  sortByPatientNameEnabled?: boolean;
+  sortByDoctorNameEnabled?: boolean;
   sortByAgeEnabled?: boolean;
   sortByDateEnabled?: boolean;
   sortByLastMaintenanceDateEnabled?: boolean;
   sortByPurchaseDateEnabled?: boolean;
+  sortByBookingDateEnabled?: boolean;
   searchPlaceholder?: string;
   addNewButton?: boolean;
   addNewRoute: string;
@@ -52,14 +55,17 @@ interface FiltersBarProps {
 export default function FiltersBar({
   genderFilter = false,
   statusFilter = false,
-  specialtyFilter = false,
+  bookingStatusFilter = false,
   searchFilter = false,
   sortingEnabled = false,
   sortByNameEnabled = false,
+  sortByPatientNameEnabled = false,
+  sortByDoctorNameEnabled = false,
   sortByAgeEnabled = false,
   sortByDateEnabled = false,
   sortByLastMaintenanceDateEnabled = false,
   sortByPurchaseDateEnabled = false,
+  sortByBookingDateEnabled = false,
   searchPlaceholder,
   addNewButton = true,
   addNewRoute,
@@ -67,7 +73,6 @@ export default function FiltersBar({
   refetch,
 }: FiltersBarProps) {
   const {
-    currentPage,
     setCurrentPage,
     sortBy,
     setSortBy,
@@ -77,6 +82,8 @@ export default function FiltersBar({
     setCurrentGender,
     currentStatus,
     setCurrentStatus,
+    currentBookingStatus,
+    setCurrentBookingStatus,
   } = useTableOptions();
 
   const request = debounce(async () => {
@@ -132,6 +139,31 @@ export default function FiltersBar({
           </Tabs>
         )}
 
+        {bookingStatusFilter && (
+          <Tabs
+            value={currentBookingStatus}
+            onValueChange={(value) => {
+              if (
+                value === 'all' ||
+                value === 'completed' ||
+                value === 'pending' ||
+                value === 'cancelled'
+              ) {
+                setCurrentPage(1);
+                setCurrentBookingStatus(value);
+              }
+            }}
+            className="w-[350px]"
+          >
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="all">All</TabsTrigger>
+              <TabsTrigger value="completed">Completed</TabsTrigger>
+              <TabsTrigger value="pending">Pending</TabsTrigger>
+              <TabsTrigger value="cancelled">Cancelled</TabsTrigger>
+            </TabsList>
+          </Tabs>
+        )}
+
         {sortingEnabled && (
           <Select value={sortBy} onValueChange={(value) => setSortBy(value)}>
             <SelectTrigger className="w-[200px]">
@@ -146,6 +178,33 @@ export default function FiltersBar({
                   <SelectSeparator />
                 </SelectGroup>
               )}
+
+              {sortByPatientNameEnabled && (
+                <SelectGroup>
+                  <SelectLabel>Patient Name</SelectLabel>
+                  <SelectItem value="patientName-asc">
+                    Sort by patient name (A-Z)
+                  </SelectItem>
+                  <SelectItem value="patientName-desc">
+                    Sort by patient name (Z-A)
+                  </SelectItem>
+                  <SelectSeparator />
+                </SelectGroup>
+              )}
+
+              {sortByDoctorNameEnabled && (
+                <SelectGroup>
+                  <SelectLabel>Doctor Name</SelectLabel>
+                  <SelectItem value="doctorName-asc">
+                    Sort by doctor name (A-Z)
+                  </SelectItem>
+                  <SelectItem value="doctorName-desc">
+                    Sort by doctor name (Z-A)
+                  </SelectItem>
+                  <SelectSeparator />
+                </SelectGroup>
+              )}
+
               {sortByAgeEnabled && (
                 <SelectGroup>
                   <SelectLabel>Age</SelectLabel>
@@ -158,6 +217,7 @@ export default function FiltersBar({
                   <SelectSeparator />
                 </SelectGroup>
               )}
+
               {sortByDateEnabled && (
                 <SelectGroup>
                   <SelectLabel>Joined at</SelectLabel>
@@ -165,6 +225,7 @@ export default function FiltersBar({
                   <SelectItem value="joinedAt-desc">Newest first</SelectItem>
                 </SelectGroup>
               )}
+
               {sortByLastMaintenanceDateEnabled && (
                 <SelectGroup>
                   <SelectLabel>Last maintenance date</SelectLabel>
@@ -176,6 +237,7 @@ export default function FiltersBar({
                   </SelectItem>
                 </SelectGroup>
               )}
+
               {sortByPurchaseDateEnabled && (
                 <SelectGroup>
                   <SelectLabel>Purchase date</SelectLabel>
@@ -183,6 +245,14 @@ export default function FiltersBar({
                   <SelectItem value="purchaseDate-desc">
                     Newest first
                   </SelectItem>
+                </SelectGroup>
+              )}
+
+              {sortByBookingDateEnabled && (
+                <SelectGroup>
+                  <SelectLabel>Booking date</SelectLabel>
+                  <SelectItem value="bookingDate-asc">Oldest first</SelectItem>
+                  <SelectItem value="bookingDate-desc">Newest first</SelectItem>
                 </SelectGroup>
               )}
             </SelectContent>
