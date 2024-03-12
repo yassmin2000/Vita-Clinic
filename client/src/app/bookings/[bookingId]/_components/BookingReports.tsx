@@ -8,6 +8,7 @@ import { Plus, Trash } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import ReportItemSkeleton from './ReportItemSkeleton';
+import NewReportButton from './NewReportButton';
 
 const reportsData = [
   {
@@ -95,10 +96,7 @@ export default function BookingReports({ id }: BookingReportsProps) {
           Booking Reports
         </span>
 
-        <Button size="sm">
-          <Plus className="mr-1" />
-          New report
-        </Button>
+        <NewReportButton />
       </div>
       <div className="grid grid-cols-1 gap-6 divide-y divide-accent md:grid-cols-2 lg:grid-cols-3">
         {isLoading &&
@@ -113,7 +111,7 @@ export default function BookingReports({ id }: BookingReportsProps) {
               className="col-span-1 divide-y divide-accent rounded-lg transition-all hover:shadow-lg dark:shadow-white/10"
             >
               <Link
-                href={`/report/${report.id}`}
+                href={`/reports/${report.id}`}
                 className="flex flex-col gap-2"
               >
                 <div className="flex w-full items-center justify-between space-x-6 px-6 pt-6">

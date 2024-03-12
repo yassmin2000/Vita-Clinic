@@ -3,11 +3,13 @@ import { Inter } from 'next/font/google';
 import NextTopLoader from 'nextjs-toploader';
 
 import './globals.css';
+import 'simplebar-react/dist/simplebar.min.css';
 
 import Providers from '@/components/Providers';
 import Sidebar from '@/components/Sidebar';
 import Navbar from '@/components/Navbar';
 import { cn } from '@/lib/utils';
+import { Toaster } from '@/components/ui/toaster';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -25,7 +27,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={cn('bg-background', inter.className)}>
+      <body className={cn('min-h-screen bg-background', inter.className)}>
         <Providers>
           <NextTopLoader color="#2563eb" />
           {modal}
@@ -35,9 +37,10 @@ export default function RootLayout({
               <Sidebar />
             </div>
             <main className="h-full pt-16 md:pl-16">
-              <div className="h-full space-y-2 p-4">{children}</div>
+              <div className="h-full space-y-2 px-4">{children}</div>
             </main>
           </div>
+          <Toaster />
         </Providers>
       </body>
     </html>
