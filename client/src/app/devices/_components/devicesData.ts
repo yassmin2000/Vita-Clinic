@@ -1,5 +1,6 @@
 export const devices = [
   {
+    id: '1',
     name: 'X-ray Machine',
     manufacturer: 'Siemens',
     lastMaintenanceDate: '2023-02-15',
@@ -10,6 +11,7 @@ export const devices = [
     serialNumber: 'RXM123456',
   },
   {
+    id: '2',
     name: 'MRI Scanner',
     manufacturer: 'Philips',
     lastMaintenanceDate: '2023-01-20',
@@ -20,6 +22,7 @@ export const devices = [
     serialNumber: 'MRIS789012',
   },
   {
+    id: '3',
     name: 'CT Scanner',
     manufacturer: 'GE Healthcare',
     lastMaintenanceDate: '2023-03-05',
@@ -30,6 +33,7 @@ export const devices = [
     serialNumber: 'CTS345678',
   },
   {
+    id: '4',
     name: 'Ultrasound Machine',
     manufacturer: 'Toshiba Medical',
     lastMaintenanceDate: '2022-12-10',
@@ -40,6 +44,7 @@ export const devices = [
     serialNumber: 'USM456789',
   },
   {
+    id: '5',
     name: 'Mammography System',
     manufacturer: 'Hologic',
     lastMaintenanceDate: '2023-04-18',
@@ -50,6 +55,7 @@ export const devices = [
     serialNumber: 'MMS987654',
   },
   {
+    id: '6',
     name: 'Fluoroscopy Machine',
     manufacturer: 'Varian',
     lastMaintenanceDate: '2023-02-28',
@@ -60,6 +66,7 @@ export const devices = [
     serialNumber: 'FLM234567',
   },
   {
+    id: '7',
     name: 'PACS System',
     manufacturer: 'Agfa HealthCare',
     lastMaintenanceDate: '2023-01-15',
@@ -70,6 +77,7 @@ export const devices = [
     serialNumber: 'PACS123456',
   },
   {
+    id: '8',
     name: 'Nuclear Medicine Gamma Camera',
     manufacturer: 'Siemens',
     lastMaintenanceDate: '2023-05-10',
@@ -80,6 +88,7 @@ export const devices = [
     serialNumber: 'NMGC345678',
   },
   {
+    id: '9',
     name: 'C-arm Fluoroscopy',
     manufacturer: 'Ziehm Imaging',
     lastMaintenanceDate: '2023-03-20',
@@ -90,6 +99,7 @@ export const devices = [
     serialNumber: 'CARM789012',
   },
   {
+    id: '10',
     name: 'Digital Radiography System',
     manufacturer: 'Carestream Health',
     lastMaintenanceDate: '2023-04-05',
@@ -100,6 +110,7 @@ export const devices = [
     serialNumber: 'DRS234567',
   },
   {
+    id: '11',
     name: 'Positron Emission Tomography (PET) Scanner',
     manufacturer: 'Siemens',
     lastMaintenanceDate: '2023-02-15',
@@ -110,6 +121,7 @@ export const devices = [
     serialNumber: 'PET123456',
   },
   {
+    id: '12',
     name: 'Portable X-ray Machine',
     manufacturer: 'Philips',
     lastMaintenanceDate: '2023-01-28',
@@ -120,6 +132,7 @@ export const devices = [
     serialNumber: 'PXRM456789',
   },
   {
+    id: '13',
     name: 'Bone Densitometer',
     manufacturer: 'GE Healthcare',
     lastMaintenanceDate: '2023-03-10',
@@ -130,6 +143,7 @@ export const devices = [
     serialNumber: 'BDT987654',
   },
   {
+    id: '14',
     name: 'Interventional Radiology System',
     manufacturer: 'Siemens',
     lastMaintenanceDate: '2023-05-15',
@@ -140,6 +154,7 @@ export const devices = [
     serialNumber: 'IRS234567',
   },
   {
+    id: '15',
     name: 'Digital Mammography System',
     manufacturer: 'Hologic',
     lastMaintenanceDate: '2023-04-02',
@@ -150,6 +165,7 @@ export const devices = [
     serialNumber: 'DMS789012',
   },
   {
+    id: '16',
     name: 'Echocardiography Machine',
     manufacturer: 'Philips',
     lastMaintenanceDate: '2023-03-18',
@@ -160,6 +176,7 @@ export const devices = [
     serialNumber: 'ECM234567',
   },
   {
+    id: '17',
     name: 'Magnetic Resonance Angiography (MRA) Machine',
     manufacturer: 'Siemens',
     lastMaintenanceDate: '2023-02-10',
@@ -170,6 +187,7 @@ export const devices = [
     serialNumber: 'MRAM456789',
   },
   {
+    id: '18',
     name: 'X-ray Fluoroscopy',
     manufacturer: 'Varian',
     lastMaintenanceDate: '2023-01-25',
@@ -180,6 +198,7 @@ export const devices = [
     serialNumber: 'XRF789012',
   },
   {
+    id: '19',
     name: 'Gamma Knife Radiosurgery System',
     manufacturer: 'Elekta',
     lastMaintenanceDate: '2023-03-08',
@@ -190,6 +209,7 @@ export const devices = [
     serialNumber: 'GKRS234567',
   },
   {
+    id: '20',
     name: 'Digital Fluoroscopy',
     manufacturer: 'Ziehm Imaging',
     lastMaintenanceDate: '2023-04-15',
@@ -200,6 +220,7 @@ export const devices = [
     serialNumber: 'DFM456789',
   },
   {
+    id: '21',
     name: 'Cone Beam CT Scanner',
     manufacturer: 'Carestream Health',
     lastMaintenanceDate: '2023-02-28',
@@ -210,6 +231,7 @@ export const devices = [
     serialNumber: 'CBCT123456',
   },
   {
+    id: '22',
     name: 'Digital Tomosynthesis',
     manufacturer: 'Hologic',
     lastMaintenanceDate: '2023-01-15',
@@ -220,6 +242,7 @@ export const devices = [
     serialNumber: 'DTM456789',
   },
   {
+    id: '23',
     name: 'Portable Ultrasound',
     manufacturer: 'GE Healthcare',
     lastMaintenanceDate: '2023-03-10',
@@ -230,6 +253,7 @@ export const devices = [
     serialNumber: 'PUS789012',
   },
   {
+    id: '24',
     name: 'Dental X-ray Unit',
     manufacturer: 'Planmeca',
     lastMaintenanceDate: '2023-04-05',
@@ -240,6 +264,7 @@ export const devices = [
     serialNumber: 'DXU234567',
   },
   {
+    id: '25',
     name: 'Magnetic Resonance Imaging (MRI) System',
     manufacturer: 'Siemens',
     lastMaintenanceDate: '2023-02-15',
@@ -250,6 +275,7 @@ export const devices = [
     serialNumber: 'MRIS123456',
   },
   {
+    id: '26',
     name: 'Digital Radiography Panel',
     manufacturer: 'Canon Medical Systems',
     lastMaintenanceDate: '2023-01-28',
@@ -260,6 +286,7 @@ export const devices = [
     serialNumber: 'DRP456789',
   },
   {
+    id: '27',
     name: 'Intraoral Camera',
     manufacturer: 'Sirona Dental Systems',
     lastMaintenanceDate: '2023-03-20',
@@ -270,6 +297,7 @@ export const devices = [
     serialNumber: 'IOC789012',
   },
   {
+    id: '28',
     name: 'Nuclear Medicine SPECT Scanner',
     manufacturer: 'Philips',
     lastMaintenanceDate: '2023-04-18',
@@ -280,6 +308,7 @@ export const devices = [
     serialNumber: 'NMSS234567',
   },
   {
+    id: '29',
     name: 'Pulse Oximeter',
     manufacturer: 'Masimo',
     lastMaintenanceDate: '2023-03-05',
@@ -290,6 +319,7 @@ export const devices = [
     serialNumber: 'POX789012',
   },
   {
+    id: '30',
     name: 'Digital Fluoroscopy System',
     manufacturer: 'Shimadzu',
     lastMaintenanceDate: '2023-02-10',
@@ -300,6 +330,7 @@ export const devices = [
     serialNumber: 'DFS123456',
   },
   {
+    id: '31',
     name: 'Cath Lab System',
     manufacturer: 'Siemens',
     lastMaintenanceDate: '2023-01-20',
@@ -310,6 +341,7 @@ export const devices = [
     serialNumber: 'CLS456789',
   },
   {
+    id: '32',
     name: 'Gamma Counter',
     manufacturer: 'PerkinElmer',
     lastMaintenanceDate: '2023-05-10',
@@ -320,6 +352,7 @@ export const devices = [
     serialNumber: 'GC678901',
   },
   {
+    id: '33',
     name: 'C-arm X-ray Machine',
     manufacturer: 'Ziehm Imaging',
     lastMaintenanceDate: '2023-03-15',
@@ -330,6 +363,7 @@ export const devices = [
     serialNumber: 'CAXM123456',
   },
   {
+    id: '34',
     name: 'Digital Pathology Scanner',
     manufacturer: 'Leica Biosystems',
     lastMaintenanceDate: '2023-04-02',
@@ -340,6 +374,7 @@ export const devices = [
     serialNumber: 'DPS234567',
   },
   {
+    id: '35',
     name: 'Mobile X-ray Unit',
     manufacturer: 'Philips',
     lastMaintenanceDate: '2023-03-18',
@@ -350,6 +385,7 @@ export const devices = [
     serialNumber: 'MXU789012',
   },
   {
+    id: '36',
     name: 'Radiation Therapy Linear Accelerator',
     manufacturer: 'Varian',
     lastMaintenanceDate: '2023-02-10',
@@ -360,6 +396,7 @@ export const devices = [
     serialNumber: 'RTLA123456',
   },
   {
+    id: '37',
     name: 'Digital C-arm',
     manufacturer: 'Siemens',
     lastMaintenanceDate: '2023-01-25',
@@ -370,6 +407,7 @@ export const devices = [
     serialNumber: 'DCARM456789',
   },
   {
+    id: '38',
     name: 'Portable MRI',
     manufacturer: 'GE Healthcare',
     lastMaintenanceDate: '2023-03-08',
@@ -380,6 +418,7 @@ export const devices = [
     serialNumber: 'PMRI234567',
   },
   {
+    id: '39',
     name: 'Positron Emission Tomography-Computed Tomography (PET-CT)',
     manufacturer: 'Philips',
     lastMaintenanceDate: '2023-04-15',
@@ -390,6 +429,7 @@ export const devices = [
     serialNumber: 'PETCT678901',
   },
   {
+    id: '40',
     name: 'Digital Mammography Machine',
     manufacturer: 'Fujifilm',
     lastMaintenanceDate: '2023-05-02',

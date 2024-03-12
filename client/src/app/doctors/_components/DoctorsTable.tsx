@@ -70,7 +70,6 @@ export default function DoctorsTable() {
       <FiltersBar
         refetch={refetch}
         genderFilter
-        specialtyFilter
         searchFilter
         searchPlaceholder="Search by name or email address"
         sortingEnabled
@@ -78,7 +77,7 @@ export default function DoctorsTable() {
         sortByAgeEnabled
         sortByDateEnabled
         addNewButton
-        addNewRoute="/user/new?role=doctor"
+        addNewRoute="/users/new?role=doctor"
         addNewContent="New Doctor"
       />
       <DataTable columns={columns} data={doctors || []} isLoading={isLoading} />

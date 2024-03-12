@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import Image from 'next/image';
 import { ColumnDef } from '@tanstack/react-table';
 import {
@@ -159,10 +160,14 @@ export const columns: ColumnDef<Admin>[] = [
               <Trash className="mr-2 h-4 w-4" /> Delete
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <Eye className="mr-2 h-4 w-4" />
-              View profile
-            </DropdownMenuItem>
+            <Link href={`/users/${admin.id}`}>
+              <DropdownMenuItem asChild>
+                <div className="flex items-center gap-2">
+                  <Eye className="h-4 w-4" />
+                  View profile
+                </div>
+              </DropdownMenuItem>
+            </Link>
           </DropdownMenuContent>
         </DropdownMenu>
       );

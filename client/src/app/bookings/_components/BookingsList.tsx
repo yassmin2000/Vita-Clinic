@@ -5,13 +5,11 @@ import { useQuery } from '@tanstack/react-query';
 
 import { bookings as bookingsData } from './bookingData';
 
-import { Card } from '@/components/ui/card';
 import FiltersBar from '@/components/FiltersBar';
 import Pagination from '@/components/Pagination';
 import BookingItemSkeleton from './BookingItemSkeleton';
 
 import { useTableOptions } from '@/hooks/useTableOptions';
-import { cn } from '@/lib/utils';
 import BookingsListItem from './BookingsListItem';
 
 export default function BookingsList() {

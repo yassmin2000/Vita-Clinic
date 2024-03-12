@@ -1,7 +1,8 @@
 'use client';
 
+import Link from 'next/link';
 import { format, formatDistanceToNow, parseISO } from 'date-fns';
-import { Eye, MoreHorizontal, Pencil, Trash } from 'lucide-react';
+import { Eye, MoreVertical, Pencil, Trash } from 'lucide-react';
 
 import { Card, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -22,6 +23,7 @@ import {
 } from '@/components/ui/tooltip';
 
 interface DeviceCardProps {
+  id: string;
   deviceImage: string;
   deviceName: string;
   manufacturer: string;
@@ -32,6 +34,7 @@ interface DeviceCardProps {
 }
 
 export default function DeviceCard({
+  id,
   deviceImage,
   deviceName,
   manufacturer,
@@ -60,7 +63,7 @@ export default function DeviceCard({
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="h-8 w-8 p-0">
                   <span className="sr-only">Open menu</span>
-                  <MoreHorizontal className="h-4 w-4" />
+                  <MoreVertical className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
@@ -72,10 +75,14 @@ export default function DeviceCard({
                   <Trash className="mr-2 h-4 w-4" /> Delete
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                  <Eye className="mr-2 h-4 w-4" />
-                  View
-                </DropdownMenuItem>
+                <Link href={`/users/${id}`}>
+                  <DropdownMenuItem asChild>
+                    <div className="flex items-center gap-2">
+                      <Eye className="h-4 w-4" />
+                      View
+                    </div>
+                  </DropdownMenuItem>
+                </Link>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>

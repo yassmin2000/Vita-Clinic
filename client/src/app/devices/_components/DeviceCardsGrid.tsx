@@ -81,7 +81,7 @@ export default function DeviceCardsGrid() {
         sortByPurchaseDateEnabled
         sortByLastMaintenanceDateEnabled
         addNewButton
-        addNewRoute="/device/new"
+        addNewRoute="/devices/new"
         addNewContent="New Device"
       />
 
@@ -95,6 +95,8 @@ export default function DeviceCardsGrid() {
           devices.length > 0 &&
           devices.map((device) => (
             <DeviceCard
+              id={device.id}
+              key={device.id}
               deviceName={device.name}
               deviceImage={device.deviceImage}
               manufacturer={device.manufacturer}

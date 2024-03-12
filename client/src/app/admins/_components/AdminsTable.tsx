@@ -72,7 +72,6 @@ export default function AdminsTable() {
       <FiltersBar
         refetch={refetch}
         genderFilter
-        specialtyFilter
         searchFilter
         searchPlaceholder="Search by name or email address"
         sortingEnabled
@@ -80,7 +79,7 @@ export default function AdminsTable() {
         sortByAgeEnabled
         sortByDateEnabled
         addNewButton
-        addNewRoute="/user/new?role=admin"
+        addNewRoute="/users/new?role=admin"
         addNewContent="New Admin"
       />
       <DataTable columns={columns} data={admins || []} isLoading={isLoading} />

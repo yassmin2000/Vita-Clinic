@@ -61,7 +61,7 @@ export default function BookingsListItem({
           <p className="font-medium">
             Booking by{' '}
             <Link
-              href={`/user/${patientName}`}
+              href={`/users/${patientName}`}
               className="text-primary transition-all hover:text-primary/80"
             >
               {patientName}
@@ -74,7 +74,7 @@ export default function BookingsListItem({
             <p className="text-sm text-muted-foreground">
               Booking to Dr.{' '}
               <Link
-                href={`/user/${doctorName}`}
+                href={`/users/${doctorName}`}
                 className="text-primary transition-all hover:text-primary/80"
               >
                 {doctorName}
@@ -92,7 +92,7 @@ export default function BookingsListItem({
             <p className="text-sm text-muted-foreground">
               Booking to Dr.{' '}
               <Link
-                href={`/user/${doctorName}`}
+                href={`/users/${doctorName}`}
                 className="text-primary transition-all hover:text-primary/80"
               >
                 {doctorName}
@@ -102,7 +102,7 @@ export default function BookingsListItem({
           )}
         </div>
       </div>
-      <Link href={`/booking/${id}`}>
+      <Link href={`/bookings/${id}`}>
         <ArrowRight className="h-5 w-5" />
       </Link>
     </Card>

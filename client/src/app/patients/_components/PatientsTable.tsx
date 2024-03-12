@@ -77,7 +77,7 @@ export default function PatientsTable() {
         sortByAgeEnabled
         sortByDateEnabled
         addNewButton
-        addNewRoute="/user/new?role=patient"
+        addNewRoute="/users/new?role=patient"
         addNewContent="New Patient"
       />
       <DataTable
