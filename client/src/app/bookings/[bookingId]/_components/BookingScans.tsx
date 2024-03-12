@@ -1,12 +1,13 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { useQuery } from '@tanstack/react-query';
-import { format } from 'date-fns';
-import { Plus, Trash } from 'lucide-react';
 import Link from 'next/link';
-import ScanItemSkeleton from './ScanItemSkeleton copy';
+import { useQuery } from '@tanstack/react-query';
+import { Plus, Trash } from 'lucide-react';
+import { format } from 'date-fns';
+
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import ScanItemSkeleton from './ScanItemSkeleton';
 
 const scansData = [
   {

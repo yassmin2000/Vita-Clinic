@@ -1,5 +1,7 @@
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import Link from 'next/link';
+import { format, formatDistanceToNow, parseISO } from 'date-fns';
+import { Check, MoreVertical, Timer, X } from 'lucide-react';
+
 import {
   Card,
   CardContent,
@@ -14,10 +16,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { format, formatDistanceToNow, parseISO } from 'date-fns';
-
-import { Check, MoreVertical, Timer, X } from 'lucide-react';
-import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 
 type Booking = {
   id: number;

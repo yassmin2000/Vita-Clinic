@@ -1,9 +1,10 @@
-import { Separator } from '@/components/ui/separator';
 import { Suspense } from 'react';
+
 import BookingDetailsCard from './_components/BookingDetailsCard';
 import BookingReports from './_components/BookingReports';
 import BookingScans from './_components/BookingScans';
 import BookingDetailsCardSkeleton from './_components/BookingDetailsCardSkeleton';
+import { Separator } from '@/components/ui/separator';
 
 interface BookingPageProps {
   params: {
