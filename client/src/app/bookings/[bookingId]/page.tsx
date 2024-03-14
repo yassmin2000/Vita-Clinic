@@ -16,7 +16,7 @@ export default async function BookingPage({
   params: { bookingId },
 }: BookingPageProps) {
   return (
-    <section className="container mx-auto px-4 py-4">
+    <section className="container mx-auto px-4 py-8">
       <div className="flex flex-col gap-6">
         <Suspense fallback={<BookingDetailsCardSkeleton />}>
           <BookingDetailsCard />
