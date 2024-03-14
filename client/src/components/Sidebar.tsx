@@ -55,7 +55,7 @@ const routes = [
   },
   {
     icon: View,
-    href: '/viewier',
+    href: '/dicom-viewer',
     label: 'DICOM Viewer',
   },
   { icon: Trash2, href: '/trash', label: 'Trash', super: true },
