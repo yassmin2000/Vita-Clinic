@@ -5,17 +5,17 @@ import { ArrowRight, Check, Timer, X } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 
-interface BookingsListItemProps {
+interface AppointmentsListItemProps {
   id: number;
   patientName: string;
   doctorName: string;
   status: 'completed' | 'pending' | 'cancelled';
   bookedAt: string;
-  bookingDate: string;
+  appointmentDate: string;
   cancelledAt: string;
 }
 
-const bookingStatus = {
+const appointmentStatus = {
   cancelled: {
     icon: X,
     textColor: 'text-red-800',
@@ -33,16 +33,16 @@ const bookingStatus = {
   },
 };
 
-export default function BookingsListItem({
+export default function AppointmentsListItem({
   id,
   patientName,
   doctorName,
   status,
   bookedAt,
-  bookingDate,
+  appointmentDate,
   cancelledAt,
-}: BookingsListItemProps) {
-  const currentStatus = bookingStatus[status];
+}: AppointmentsListItemProps) {
+  const currentStatus = appointmentStatus[status];
 
   return (
     <Card
@@ -59,7 +59,7 @@ export default function BookingsListItem({
         </div>
         <div className="flex flex-col">
           <p className="font-medium">
-            Booking by{' '}
+            Appointment by{' '}
             <Link
               href={`/users/${patientName}`}
               className="text-primary transition-all hover:text-primary/80"
@@ -72,37 +72,37 @@ export default function BookingsListItem({
           </p>
           {status === 'pending' && (
             <p className="text-sm text-muted-foreground">
-              Booking to Dr.{' '}
+              Appointment to Dr.{' '}
               <Link
                 href={`/users/${doctorName}`}
                 className="text-primary transition-all hover:text-primary/80"
               >
                 {doctorName}
               </Link>{' '}
-              on {format(parseISO(bookingDate), 'MMM dd, yyyy')}
+              on {format(parseISO(appointmentDate), 'MMM dd, yyyy')}
             </p>
           )}
           {status === 'cancelled' && (
             <p className="text-sm text-muted-foreground">
               Cancelled on {format(parseISO(cancelledAt), 'MMM dd, yyyy')},
-              booked by {format(parseISO(bookingDate), 'MMM dd, yyyy')}
+              booked by {format(parseISO(appointmentDate), 'MMM dd, yyyy')}
             </p>
           )}
           {status === 'completed' && (
             <p className="text-sm text-muted-foreground">
-              Booking to Dr.{' '}
+              Appointment to Dr.{' '}
               <Link
                 href={`/users/${doctorName}`}
                 className="text-primary transition-all hover:text-primary/80"
               >
                 {doctorName}
               </Link>{' '}
-              on {format(parseISO(bookingDate), 'MMM dd, yyyy')}
+              on {format(parseISO(appointmentDate), 'MMM dd, yyyy')}
             </p>
           )}
         </div>
       </div>
-      <Link href={`/bookings/${id}`}>
+      <Link href={`/appointments/${id}`}>
         <ArrowRight className="h-5 w-5" />
       </Link>
     </Card>

@@ -60,11 +60,11 @@ const scansData = [
   },
 ];
 
-interface BookingScansProps {
+interface AppointmentScansProps {
   id: string;
 }
 
-export default function BookingScans({ id }: BookingScansProps) {
+export default function AppointmentScans({ id }: AppointmentScansProps) {
   const { data: scans, isLoading } = useQuery({
     queryKey: [`scans_${id}`],
     queryFn: async () => {
@@ -77,7 +77,7 @@ export default function BookingScans({ id }: BookingScansProps) {
     <div className="flex flex-col gap-4 px-6">
       <div className="flex items-center justify-between">
         <span className="text-xl font-semibold text-primary">
-          Booking Scans
+          Appointment Scans
         </span>
 
         <Button size="sm">

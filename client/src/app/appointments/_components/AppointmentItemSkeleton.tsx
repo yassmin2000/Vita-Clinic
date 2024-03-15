@@ -1,7 +1,7 @@
 import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 
-export default function BookingItemSkeleton() {
+export default function AppointmentItemSkeleton() {
   return (
     <Card className="flex items-center justify-between border-black/5 p-4 transition-all dark:border-gray-800">
       <div className="flex items-center gap-x-4">

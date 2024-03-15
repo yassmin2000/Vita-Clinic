@@ -76,11 +76,11 @@ const reportsData = [
   },
 ];
 
-interface BookingReportsProps {
+interface AppointmentReportsProps {
   id: string;
 }
 
-export default function BookingReports({ id }: BookingReportsProps) {
+export default function AppointmentReports({ id }: AppointmentReportsProps) {
   const { data: reports, isLoading } = useQuery({
     queryKey: [`reports_${id}`],
     queryFn: async () => {
@@ -93,7 +93,7 @@ export default function BookingReports({ id }: BookingReportsProps) {
     <div className="flex flex-col gap-4 px-6">
       <div className="flex items-center justify-between">
         <span className="text-xl font-semibold text-primary">
-          Booking Reports
+          Appointment Reports
         </span>
 
         <NewReportButton />

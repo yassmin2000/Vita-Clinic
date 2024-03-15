@@ -30,8 +30,8 @@ const routes = [
   },
   {
     icon: CalendarCheck,
-    href: '/bookings',
-    label: 'Bookings',
+    href: '/appointments',
+    label: 'Appointments',
   },
   {
     icon: ShieldPlus,

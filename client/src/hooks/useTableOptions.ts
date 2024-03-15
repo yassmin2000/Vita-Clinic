@@ -13,8 +13,8 @@ type UseTableOptions = {
   setCurrentGender: (gender: 'all' | 'male' | 'female') => void;
   currentStatus: string;
   setCurrentStatus: (status: 'all' | 'active' | 'inactive') => void;
-  currentBookingStatus: string;
-  setCurrentBookingStatus: (
+  currentAppointmentStatus: string;
+  setCurrentAppointmentStatus: (
     status: 'all' | 'completed' | 'pending' | 'cancelled'
   ) => void;
   reset: () => void;
@@ -33,8 +33,9 @@ export const useTableOptions = create<UseTableOptions>((set) => ({
   setCurrentGender: (gender) => set({ currentGender: gender }),
   currentStatus: 'all',
   setCurrentStatus: (status) => set({ currentStatus: status }),
-  currentBookingStatus: 'all',
-  setCurrentBookingStatus: (status) => set({ currentBookingStatus: status }),
+  currentAppointmentStatus: 'all',
+  setCurrentAppointmentStatus: (status) =>
+    set({ currentAppointmentStatus: status }),
   reset: () =>
     set({
       currentPage: 1,
@@ -43,6 +44,6 @@ export const useTableOptions = create<UseTableOptions>((set) => ({
       searchValue: '',
       currentGender: 'all',
       currentStatus: 'all',
-      currentBookingStatus: 'all',
+      currentAppointmentStatus: 'all',
     }),
 }));

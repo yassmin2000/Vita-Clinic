@@ -34,7 +34,7 @@ const specialties = [
 interface FiltersBarProps {
   genderFilter?: boolean;
   statusFilter?: boolean;
-  bookingStatusFilter?: boolean;
+  appointmentStatusFilter?: boolean;
   searchFilter?: boolean;
   sortingEnabled?: boolean;
   sortByNameEnabled?: boolean;
@@ -44,7 +44,7 @@ interface FiltersBarProps {
   sortByDateEnabled?: boolean;
   sortByLastMaintenanceDateEnabled?: boolean;
   sortByPurchaseDateEnabled?: boolean;
-  sortByBookingDateEnabled?: boolean;
+  sortByAppointmentDateEnabled?: boolean;
   searchPlaceholder?: string;
   addNewButton?: boolean;
   addNewRoute: string;
@@ -55,7 +55,7 @@ interface FiltersBarProps {
 export default function FiltersBar({
   genderFilter = false,
   statusFilter = false,
-  bookingStatusFilter = false,
+  appointmentStatusFilter = false,
   searchFilter = false,
   sortingEnabled = false,
   sortByNameEnabled = false,
@@ -65,7 +65,7 @@ export default function FiltersBar({
   sortByDateEnabled = false,
   sortByLastMaintenanceDateEnabled = false,
   sortByPurchaseDateEnabled = false,
-  sortByBookingDateEnabled = false,
+  sortByAppointmentDateEnabled = false,
   searchPlaceholder,
   addNewButton = true,
   addNewRoute,
@@ -82,8 +82,8 @@ export default function FiltersBar({
     setCurrentGender,
     currentStatus,
     setCurrentStatus,
-    currentBookingStatus,
-    setCurrentBookingStatus,
+    currentAppointmentStatus,
+    setCurrentAppointmentStatus,
   } = useTableOptions();
 
   const request = debounce(async () => {
@@ -139,9 +139,9 @@ export default function FiltersBar({
           </Tabs>
         )}
 
-        {bookingStatusFilter && (
+        {appointmentStatusFilter && (
           <Tabs
-            value={currentBookingStatus}
+            value={currentAppointmentStatus}
             onValueChange={(value) => {
               if (
                 value === 'all' ||
@@ -150,7 +150,7 @@ export default function FiltersBar({
                 value === 'cancelled'
               ) {
                 setCurrentPage(1);
-                setCurrentBookingStatus(value);
+                setCurrentAppointmentStatus(value);
               }
             }}
             className="w-[350px]"
@@ -248,11 +248,15 @@ export default function FiltersBar({
                 </SelectGroup>
               )}
 
-              {sortByBookingDateEnabled && (
+              {sortByAppointmentDateEnabled && (
                 <SelectGroup>
-                  <SelectLabel>Booking date</SelectLabel>
-                  <SelectItem value="bookingDate-asc">Oldest first</SelectItem>
-                  <SelectItem value="bookingDate-desc">Newest first</SelectItem>
+                  <SelectLabel>Appointment date</SelectLabel>
+                  <SelectItem value="appointmentDate-asc">
+                    Oldest first
+                  </SelectItem>
+                  <SelectItem value="appointmentDate-desc">
+                    Newest first
+                  </SelectItem>
                 </SelectGroup>
               )}
             </SelectContent>

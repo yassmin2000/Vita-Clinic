@@ -3,33 +3,33 @@
 import { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
-import { bookings as bookingsData } from './bookingData';
+import { appointments as appointmentsData } from './appointmentData';
 
 import FiltersBar from '@/components/FiltersBar';
 import Pagination from '@/components/Pagination';
-import BookingItemSkeleton from './BookingItemSkeleton';
+import AppointmentItemSkeleton from './AppointmentItemSkeleton';
 
 import { useTableOptions } from '@/hooks/useTableOptions';
-import BookingsListItem from './BookingsListItem';
+import AppointmentsListItem from './AppointmentsListItem';
 
-export default function BookingsList() {
+export default function AppointmentsList() {
   const {
     sortBy,
     setSortBy,
     searchValue,
     currentPage,
     countPerPage,
-    currentBookingStatus,
+    currentAppointmentStatus,
     reset,
   } = useTableOptions();
 
   const {
-    data: bookings,
+    data: appointments,
     refetch,
     isLoading,
   } = useQuery({
     queryKey: [
-      `bookings_page_${currentPage}_status_${currentBookingStatus}_count_${countPerPage}_sort_${sortBy}_search_${searchValue}`,
+      `appointments_page_${currentPage}_status_${currentAppointmentStatus}_count_${countPerPage}_sort_${sortBy}_search_${searchValue}`,
     ],
     queryFn: async () => {
       await new Promise((resolve) => setTimeout(resolve, 500));
@@ -37,19 +37,19 @@ export default function BookingsList() {
       if (
         sortWith !== 'patientName' &&
         sortWith !== 'doctorName' &&
-        sortWith !== 'bookingDate'
+        sortWith !== 'appointmentDate'
       )
         return null;
 
-      return bookingsData
+      return appointmentsData
         .filter(
-          (booking) =>
-            (currentBookingStatus === 'all' ||
-              booking.status.toLowerCase() === currentBookingStatus) &&
-            (booking.patientName
+          (appointment) =>
+            (currentAppointmentStatus === 'all' ||
+              appointment.status.toLowerCase() === currentAppointmentStatus) &&
+            (appointment.patientName
               .toLowerCase()
               .includes(searchValue.toLowerCase()) ||
-              booking.doctorName
+              appointment.doctorName
                 .toLowerCase()
                 .includes(searchValue.toLowerCase()))
         )
@@ -68,20 +68,20 @@ export default function BookingsList() {
 
   useEffect(() => {
     reset();
-    setSortBy('bookingDate-desc');
+    setSortBy('appointmentDate-desc');
   }, []);
 
   return (
     <>
       <FiltersBar
         refetch={refetch}
-        bookingStatusFilter
+        appointmentStatusFilter
         searchFilter
         searchPlaceholder="Search by patient name or doctor name"
         sortingEnabled
         sortByPatientNameEnabled
         sortByDoctorNameEnabled
-        sortByBookingDateEnabled
+        sortByAppointmentDateEnabled
         addNewButton={false}
         addNewRoute="/"
         addNewContent=""
@@ -90,29 +90,33 @@ export default function BookingsList() {
       <div className="flex flex-col gap-2">
         {isLoading &&
           Array.from({ length: 7 }).map((_, index) => (
-            <BookingItemSkeleton key={index} />
+            <AppointmentItemSkeleton key={index} />
           ))}
-        {bookings && bookings.length === 0 && <p>No bookings found</p>}
+        {appointments && appointments.length === 0 && (
+          <p>No appointments found</p>
+        )}
 
-        {bookings &&
-          bookings.length > 0 &&
-          bookings.map((booking) => (
-            <BookingsListItem
-              key={booking.id}
-              id={booking.id}
-              patientName={booking.patientName}
-              doctorName={booking.doctorName}
-              bookingDate={booking.bookingDate}
-              bookedAt={booking.bookedAt}
-              cancelledAt={booking.cancelledAt}
-              status={booking.status}
+        {appointments &&
+          appointments.length > 0 &&
+          appointments.map((appointment) => (
+            <AppointmentsListItem
+              key={appointment.id}
+              id={appointment.id}
+              patientName={appointment.patientName}
+              doctorName={appointment.doctorName}
+              appointmentDate={appointment.appointmentDate}
+              bookedAt={appointment.bookedAt}
+              cancelledAt={appointment.cancelledAt}
+              status={appointment.status}
             />
           ))}
       </div>
 
       <Pagination
         previousDisabled={currentPage === 1 || isLoading}
-        nextDisabled={(bookings && bookings.length < countPerPage) || isLoading}
+        nextDisabled={
+          (appointments && appointments.length < countPerPage) || isLoading
+        }
       />
     </>
   );

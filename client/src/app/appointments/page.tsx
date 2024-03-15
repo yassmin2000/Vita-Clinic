@@ -1,4 +1,4 @@
-import BookingsList from './_components/BookingsList';
+import AppointmentsList from './_components/AppointmentsList';
 
 export default function DevicesPage() {
   return (
@@ -6,13 +6,13 @@ export default function DevicesPage() {
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-1">
           <h2 className="text-sm font-semibold uppercase text-primary">
-            Bookings
+          Appointments
           </h2>
           <h3 className="text-base text-muted-foreground">
-            View all your bookings, past and upcoming.
+            View all your appointments, past and upcoming.
           </h3>
         </div>
-        <BookingsList />
+        <AppointmentsList />
       </div>
     </section>
   );
