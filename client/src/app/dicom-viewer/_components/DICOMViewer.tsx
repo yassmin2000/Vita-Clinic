@@ -7,8 +7,16 @@ import cornerstone from 'cornerstone-core';
 import cornerstoneTools from 'cornerstone-tools';
 
 import { initCornerstone } from '@/lib/cornerstone';
+import useViewerStore from '@/hooks/useViewerStore';
+import { cn } from '@/lib/utils';
 
-export default function DICOMViewer() {
+interface DICOMViewerProps {
+  index: number;
+}
+
+export default function DICOMViewer({ index }: DICOMViewerProps) {
+  const { currentViewerId, setCurrentViewerId } = useViewerStore();
+
   const [isCornerstoneInitialized, setIsCornerstoneInitialized] =
     useState(false);
 
@@ -45,7 +53,7 @@ export default function DICOMViewer() {
   useEffect(() => {
     if (!isCornerstoneInitialized) {
       initCornerstone();
-      const element = document.getElementById('viewer');
+      const element = document.getElementById('viewer_' + index);
       cornerstone.enable(element);
       setIsCornerstoneInitialized(true);
     }
@@ -66,7 +74,7 @@ export default function DICOMViewer() {
           currentImageIdIndex: 0,
           imageIds: imageIds1,
         };
-        const element = document.getElementById('viewer');
+        const element = document.getElementById('viewer_' + index);
         cornerstone.displayImage(element, images[0]);
         cornerstoneTools.addStackStateManager(element, ['stack']);
         cornerstoneTools.addToolState(element, 'stack', stack);
@@ -74,5 +82,16 @@ export default function DICOMViewer() {
     }
   }, [isCornerstoneInitialized, imageIds1]);
 
-  return <div id="viewer" className="h-full w-full" />;
+  return (
+    <div
+      onClick={() => {
+        setCurrentViewerId(index);
+      }}
+      id={`viewer_${index}`}
+      className={cn(
+        'h-full w-full border',
+        currentViewerId === index && 'border-primary'
+      )}
+    />
+  );
 }

@@ -17,6 +17,7 @@ import {
   Egg,
   Eraser,
   GalleryVerticalEnd,
+  Layout,
   Move,
   Plus,
   RectangleHorizontal,
@@ -42,6 +43,13 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
+import useViewerStore from '@/hooks/useViewerStore';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 const tools = [
   // Navigation Tools
@@ -99,6 +107,8 @@ const tools = [
 export default function ViewerToolbar() {
   const [activeTool, setActiveTool] = useState<string>('Pan');
   const [mouseWheelTool, setMouseWheelTool] = useState('StackScroll');
+  const { currentViewerId, setCurrentViewerId, setRows, setCols } =
+    useViewerStore();
 
   const inputRef = useRef<HTMLInputElement | null>(null);
 
@@ -113,7 +123,7 @@ export default function ViewerToolbar() {
         currentImageIdIndex: 0,
         imageIds,
       };
-      const element = document.getElementById('viewer');
+      const element = document.getElementById('viewer_' + currentViewerId);
       cornerstone.loadImage(imageIds[0]).then((image: any) => {
         cornerstone.displayImage(element, image);
         cornerstoneTools.addStackStateManager(element, ['stack']);
@@ -123,7 +133,7 @@ export default function ViewerToolbar() {
   };
 
   const handleSaveImage = () => {
-    const element = document.getElementById('viewer');
+    const element = document.getElementById('viewer_' + currentViewerId);
     const canvas = cornerstone.getEnabledElement(element).canvas;
     const dataUrl = canvas.toDataURL('image/png');
 
@@ -135,7 +145,7 @@ export default function ViewerToolbar() {
   };
 
   const handleRemoveAnnotation = () => {
-    const element = document.getElementById('viewer');
+    const element = document.getElementById('viewer_' + currentViewerId);
 
     // Get the names of all tools
     const toolNames = cornerstoneTools.store.state.tools.map(
@@ -152,12 +162,12 @@ export default function ViewerToolbar() {
   };
 
   const handleResetViewport = () => {
-    const element = document.getElementById('viewer');
+    const element = document.getElementById('viewer_' + currentViewerId);
     cornerstone.reset(element);
   };
 
   return (
-    <div className="left-1/2 top-0 w-screen">
+    <div className="absolute top-0 w-screen">
       <input
         ref={inputRef}
         id="fileInput"
@@ -302,6 +312,54 @@ export default function ViewerToolbar() {
               )}
             </div>
           ))}
+
+          <Separator orientation="vertical" className="mx-2 h-5" />
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <Layout className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem
+                onClick={() => {
+                  setCurrentViewerId(0);
+                  setRows(1);
+                  setCols(1);
+                }}
+              >
+                1x1
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  setCurrentViewerId(0);
+                  setRows(1);
+                  setCols(2);
+                }}
+              >
+                1x2
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  setCurrentViewerId(0);
+                  setRows(2);
+                  setCols(1);
+                }}
+              >
+                2x1
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  setCurrentViewerId(0);
+                  setRows(2);
+                  setCols(2);
+                }}
+              >
+                2x2
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </TooltipProvider>
       </div>
     </div>
