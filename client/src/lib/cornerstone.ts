@@ -56,6 +56,7 @@ export function initCornerstone() {
   const ZoomTool = cornerstoneTools.ZoomTool;
   const MagnifyTool = cornerstoneTools.MagnifyTool;
   const WwwcTool = cornerstoneTools.WwwcTool;
+  const RotateTool = cornerstoneTools.RotateTool;
 
   // Measurement Tools
   const LengthTool = cornerstoneTools.LengthTool;
@@ -72,9 +73,9 @@ export function initCornerstone() {
 
   // Segmentation Tools
   const RectangleScissorsTool = cornerstoneTools.RectangleScissorsTool;
-  const SphericalBrushTool = cornerstoneTools.SphericalBrushTool;
   const FreehandScissorsTool = cornerstoneTools.FreehandScissorsTool;
   const BrushTool = cornerstoneTools.BrushTool;
+  const CircleScissorsTool = cornerstoneTools.CircleScissorsTool;
 
   // Additional Tools
   const EraserTool = cornerstoneTools.EraserTool;
@@ -87,6 +88,7 @@ export function initCornerstone() {
   cornerstoneTools.addTool(ZoomTool);
   cornerstoneTools.addTool(MagnifyTool);
   cornerstoneTools.addTool(WwwcTool);
+  cornerstoneTools.addTool(RotateTool);
   cornerstoneTools.addTool(LengthTool);
   cornerstoneTools.addTool(RectangleRoiTool);
   cornerstoneTools.addTool(EllipticalRoiTool);
@@ -105,7 +107,7 @@ export function initCornerstone() {
   cornerstoneTools.addTool(RectangleScissorsTool);
   cornerstoneTools.addTool(FreehandScissorsTool);
   cornerstoneTools.addTool(BrushTool);
-  cornerstoneTools.addTool(SphericalBrushTool);
+  cornerstoneTools.addTool(CircleScissorsTool);
   cornerstoneTools.addTool(EraserTool);
   cornerstoneTools.addTool(DragProbeTool);
   cornerstoneTools.addTool(CircleRoiTool);

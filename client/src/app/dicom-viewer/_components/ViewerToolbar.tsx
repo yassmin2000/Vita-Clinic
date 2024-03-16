@@ -12,22 +12,31 @@ import {
   Brush,
   Circle,
   CircleDot,
+  Columns2,
   Contrast,
   DraftingCompass,
   Egg,
   Eraser,
   GalleryVerticalEnd,
+  Grid2X2,
   Layout,
+  LayoutGrid,
+  LayoutPanelLeft,
+  LayoutPanelTop,
   Move,
   Plus,
   RectangleHorizontal,
+  Rotate3D,
   RotateCcw,
+  RotateCw,
+  Rows2,
   Ruler,
   Save,
   ScissorsLineDashed,
   Search,
   SearchCode,
   Square,
+  SquareIcon,
   Trash2,
   Type,
   Upload,
@@ -58,6 +67,11 @@ const tools = [
     { name: 'Zoom', tool: 'Zoom', icon: ZoomIn },
     { name: 'Magnify', tool: 'Magnify', icon: Search },
     { name: 'Wwwc', tool: 'Wwwc', icon: Contrast },
+    {
+      name: 'Rotate',
+      tool: 'Rotate',
+      icon: RotateCw,
+    },
   ],
 
   // Measurement Tools
@@ -95,6 +109,7 @@ const tools = [
       tool: 'RectangleScissors',
       icon: Square,
     },
+    { name: 'Circle Scissors', tool: 'CircleScissors', icon: Circle },
     {
       name: 'Freehand Scissors',
       tool: 'FreehandScissors',
@@ -107,8 +122,13 @@ const tools = [
 export default function ViewerToolbar() {
   const [activeTool, setActiveTool] = useState<string>('Pan');
   const [mouseWheelTool, setMouseWheelTool] = useState('StackScroll');
-  const { currentViewerId, setCurrentViewerId, setRows, setCols } =
-    useViewerStore();
+  const {
+    currentViewerId,
+    setCurrentViewerId,
+    setFirstViewportsCount,
+    setSecondViewportsCount,
+    setSplitViewportsBy,
+  } = useViewerStore();
 
   const inputRef = useRef<HTMLInputElement | null>(null);
 
@@ -167,7 +187,7 @@ export default function ViewerToolbar() {
   };
 
   return (
-    <div className="absolute top-0 w-screen">
+    <div className="sticky left-0 top-0 w-full">
       <input
         ref={inputRef}
         id="fileInput"
@@ -316,47 +336,95 @@ export default function ViewerToolbar() {
           <Separator orientation="vertical" className="mx-2 h-5" />
 
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <Layout className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            <Tooltip>
+              <TooltipTrigger>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="h-8 w-8 p-0">
+                    <LayoutGrid className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">Layout</TooltipContent>
+            </Tooltip>
+            <DropdownMenuContent
+              className="grid grid-cols-4 grid-rows-2"
+              align="end"
+            >
               <DropdownMenuItem
                 onClick={() => {
                   setCurrentViewerId(0);
-                  setRows(1);
-                  setCols(1);
+                  setFirstViewportsCount(1);
+                  setSecondViewportsCount(0);
                 }}
               >
-                1x1
+                <SquareIcon className="h-5 w-5" />
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => {
                   setCurrentViewerId(0);
-                  setRows(1);
-                  setCols(2);
+                  setFirstViewportsCount(1);
+                  setSecondViewportsCount(1);
                 }}
               >
-                1x2
+                <Columns2 className="h-5 w-5" />
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => {
                   setCurrentViewerId(0);
-                  setRows(2);
-                  setCols(1);
+                  setFirstViewportsCount(2);
+                  setSecondViewportsCount(0);
                 }}
               >
-                2x1
+                <Rows2 className="h-5 w-5" />
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => {
                   setCurrentViewerId(0);
-                  setRows(2);
-                  setCols(2);
+                  setFirstViewportsCount(2);
+                  setSecondViewportsCount(2);
                 }}
               >
-                2x2
+                <Grid2X2 className="h-5 w-5" />
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  setCurrentViewerId(0);
+                  setFirstViewportsCount(1);
+                  setSecondViewportsCount(2);
+                  setSplitViewportsBy('cols');
+                }}
+              >
+                <LayoutPanelLeft className="h-5 w-5" />
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  setCurrentViewerId(0);
+                  setFirstViewportsCount(2);
+                  setSecondViewportsCount(1);
+                  setSplitViewportsBy('cols');
+                }}
+              >
+                <LayoutPanelLeft className="h-5 w-5 rotate-180" />
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  setCurrentViewerId(0);
+                  setFirstViewportsCount(1);
+                  setSecondViewportsCount(2);
+                  setSplitViewportsBy('rows');
+                }}
+              >
+                <LayoutPanelTop className="h-5 w-5" />
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  setCurrentViewerId(0);
+                  setFirstViewportsCount(2);
+                  setSecondViewportsCount(1);
+                  setSplitViewportsBy('rows');
+                }}
+              >
+                <LayoutPanelTop className="h-5 w-5 rotate-180" />
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
