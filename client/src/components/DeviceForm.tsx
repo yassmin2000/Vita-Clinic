@@ -56,7 +56,7 @@ const formSchema = z.object({
     .max(new Date(), {
       message: 'Purchase date cannot be in the future.',
     }),
-  image: z.instanceof(File).optional(),
+  image: z.any().optional(),
 });
 
 export default function DeviceForm() {
