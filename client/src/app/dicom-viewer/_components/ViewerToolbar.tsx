@@ -272,10 +272,9 @@ export default function ViewerToolbar() {
           {tools.map((toolGroup, i) => (
             <div key={i} className="flex items-center gap-0.5">
               {toolGroup.map((tool) => (
-                <Tooltip>
+                <Tooltip key={tool.name}>
                   <TooltipTrigger>
                     <Button
-                      key={tool.name}
                       className={cn(activeTool === tool.tool && 'bg-accent')}
                       size="xs"
                       variant="ghost"

@@ -1,4 +1,6 @@
 // @ts-nocheck
+'use clinet';
+
 import dicomParser from 'dicom-parser';
 import cornerstone from 'cornerstone-core';
 import cornerstoneWADOImageLoader from 'cornerstone-wado-image-loader';

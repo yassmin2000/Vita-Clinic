@@ -1,5 +1,10 @@
-import ViewerToolbar from './_components/ViewerToolbar';
-import Viewers from './_components/Viewers';
+'use client';
+import dynamic from 'next/dynamic';
+
+const ViewerToolbar = dynamic(() => import('./_components/ViewerToolbar'), {
+  ssr: false,
+});
+const Viewers = dynamic(() => import('./_components/Viewers'), { ssr: false });
 
 export default function DICOMViewerPage() {
   return (

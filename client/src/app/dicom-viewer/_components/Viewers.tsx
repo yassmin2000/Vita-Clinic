@@ -1,7 +1,11 @@
 'use client';
 
+import dynamic from 'next/dynamic';
+
+const DICOMViewer = dynamic(() => import('./DICOMViewer'), {
+  ssr: false,
+});
 import useViewerStore from '@/hooks/useViewerStore';
-import DICOMViewer from './DICOMViewer';
 import { cn } from '@/lib/utils';
 
 export default function Viewers() {
