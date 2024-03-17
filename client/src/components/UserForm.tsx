@@ -66,7 +66,7 @@ const formSchema = z.object({
       message: 'Birth date cannot be in the future.',
     }),
   speciality: z.string().optional(),
-  avatar: z.instanceof(File).optional(),
+  avatar: z.any(),
 });
 
 export default function UserForm() {
