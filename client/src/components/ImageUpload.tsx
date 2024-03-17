@@ -19,6 +19,10 @@ export default function ImageUpload({
   const [image, setImage] = useState(value || '/placeholder.svg');
 
   const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
     const file = event.target.files?.[0];
 
     if (!file) {
