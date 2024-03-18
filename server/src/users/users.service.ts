@@ -1,17 +1,16 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
-import { CreateUserDto, VerifyUserDto } from './dto/user.dto';
+import { CreateUserDto, VerifyUserDto } from './dto/users.dto';
 import { hash } from 'bcrypt';
 import * as randomstring from 'randomstring';
+import { Role } from '@prisma/client';
 
 @Injectable()
-export class UserService {
+export class UsersService {
   constructor(private prisma: PrismaService) {}
 
-  async create(dto: CreateUserDto) {
-    const user = await this.prisma.user.findUnique({
-      where: { email: dto.email },
-    });
+  async create(dto: CreateUserDto, role: Role = 'PATIENT') {
+    const user = await this.findByEmail(dto.email);
 
     if (user) {
       throw new ConflictException('Email already exists');
@@ -20,8 +19,9 @@ export class UserService {
     const newUser = await this.prisma.user.create({
       data: {
         ...dto,
+        role,
         password: await hash(dto.password, 10),
-        otp: randomstring.generate({ length: 8, numeric: true }),
+        otp: randomstring.generate({ length: 8, charset: 'numeric' }),
         isVerified: false,
       },
     });
@@ -32,9 +32,7 @@ export class UserService {
   }
 
   async verify(dto: VerifyUserDto) {
-    const user = await this.prisma.user.findUnique({
-      where: { email: dto.email },
-    });
+    const user = await this.findByEmail(dto.email);
 
     if (!user) {
       throw new ConflictException('Email does not exist');

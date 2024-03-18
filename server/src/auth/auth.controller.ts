@@ -1,6 +1,6 @@
-import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
-import { CreateUserDto, VerifyUserDto } from 'src/user/dto/user.dto';
-import { UserService } from 'src/user/user.service';
+import { Body, Controller, Post, Put, Req, UseGuards } from '@nestjs/common';
+import { CreateUserDto, VerifyUserDto } from 'src/users/dto/users.dto';
+import { UsersService } from 'src/users/users.service';
 import { LoginDto } from './dto/auth.dto';
 import { AuthService } from './auth.service';
 import { RefreshJwtGuard } from './guards/refresh.guard';
@@ -9,7 +9,7 @@ import { Request } from 'express';
 @Controller('auth')
 export class AuthController {
   constructor(
-    private userService: UserService,
+    private userService: UsersService,
     private authService: AuthService,
   ) {}
 
@@ -18,7 +18,7 @@ export class AuthController {
     return await this.userService.create(dto);
   }
 
-  @Post('verify')
+  @Put('verify')
   async verifyUser(@Body() dto: VerifyUserDto) {
     return await this.userService.verify(dto);
   }

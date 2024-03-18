@@ -7,11 +7,381 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  ADMIN   @map("admin")
+  DOCTOR  @map("doctor")
+  PATIENT @map("patient")
+}
+
+enum Sex {
+  MALE   @map("male")
+  FEMALE @map("female")
+}
+
+enum BloodType {
+  A_POSITIVE  @map("A+")
+  A_NEGATIVE  @map("A-")
+  B_POSITIVE  @map("B+")
+  B_NEGATIVE  @map("B-")
+  O_POSITIVE  @map("O+")
+  O_NEGATIVE  @map("O-")
+  AB_POSITIVE @map("AB+")
+  AB_NEGATIVE @map("AB-")
+}
+
+enum Frequency {
+  DAILY   @map("daily")
+  WEEKLY  @map("weekly")
+  MONTHLY @map("monthly")
+  YEARLY  @map("yearly")
+}
+
+enum AppointmentStatus {
+  PENDING   @map("pending")
+  COMPLETED @map("completed")
+  CANCELLED @map("cancelled")
+}
+
 model User {
+  id        String @id @default(uuid())
+  email     String @unique
+  role      Role   @default(PATIENT)
+  firstName String
+  lastName  String
+
+  avatarURL String?
+
+  password   String
+  otp        String?
+  isVerified Boolean @default(false)
+
+  birthDate   DateTime
+  sex         Sex
+  phoneNumber String
+  address     String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  emr      ElectronicMedicalRecord?
+  messages Message[]
+
+  appointmentsAsDoctor  Appointment[] @relation("appointmentsAsDoctor")
+  appointmentsAsPatient Appointment[] @relation("appointmentsAsPatient")
+}
+
+model ElectronicMedicalRecord {
+  id        String @id @default(uuid())
+  patient   User   @relation(fields: [patientId], references: [id])
+  patientId String @unique
+
+  height    Float
+  weight    Float
+  bloodType BloodType
+
+  patientDiganosis         PatientDiganosis[]
+  patientSurgeries         PatientSurgery[]
+  patientMedicalConditions PatientMedicalCondition[]
+  patientAllergies         PatientAllergy[]
+  patientMedications       PatientMedication[]
+  appointments             Appointment[]
+
+  insurance Insurance?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Diagnosis {
+  id               String             @id @default(uuid())
+  diagnosis        String
+  patientDiganosis PatientDiganosis[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PatientDiganosis {
+  id            String    @id @default(uuid())
+  diagnosis     Diagnosis @relation(fields: [diagnosisId], references: [id])
+  diagnosisId   String
+  description   String?
+  diganosisDate DateTime
+
+  emr   ElectronicMedicalRecord @relation(fields: [emrId], references: [id])
+  emrId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Surgery {
+  id             String           @id @default(uuid())
+  surgery        String
+  patientSurgery PatientSurgery[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PatientSurgery {
+  id          String   @id @default(uuid())
+  surgery     Surgery  @relation(fields: [surgeryId], references: [id])
+  surgeryId   String
+  description String?
+  surgeryDate DateTime
+
+  emr   ElectronicMedicalRecord @relation(fields: [emrId], references: [id])
+  emrId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model MedicalCondition {
+  id                      String                    @id @default(uuid())
+  medicalCondition        String
+  patientMedicalCondition PatientMedicalCondition[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PatientMedicalCondition {
+  id                 String           @id @default(uuid())
+  medicalCondition   MedicalCondition @relation(fields: [medicalConditionId], references: [id])
+  medicalConditionId String
+  description        String?
+  diganosisDate      DateTime
+
+  emr   ElectronicMedicalRecord @relation(fields: [emrId], references: [id])
+  emrId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Allergy {
+  id             String           @id @default(uuid())
+  allergy        String
+  patientAllergy PatientAllergy[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PatientAllergy {
+  id              String  @id @default(uuid())
+  allergy         Allergy @relation(fields: [allergyId], references: [id])
+  allergyId       String
+  description     String?
+  patientReaction String?
+
+  emr   ElectronicMedicalRecord @relation(fields: [emrId], references: [id])
+  emrId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Medication {
+  id                String              @id @default(uuid())
+  medication        String
+  patientMedication PatientMedication[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PatientMedication {
+  id             String     @id @default(uuid())
+  medication     Medication @relation(fields: [medicationId], references: [id])
+  medicationId   String
+  description    String?
+  dosage         Float
+  frequency      Frequency
+  required       Boolean
+  medicationDate DateTime
+
+  emr   ElectronicMedicalRecord @relation(fields: [emrId], references: [id])
+  emrId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Insurance {
+  id           String @id @default(uuid())
+  provider     String
+  policyNumber String
+
+  emr   ElectronicMedicalRecord @relation(fields: [emrId], references: [id])
+  emrId String                  @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Appointment {
+  id   String   @id @default(uuid())
+  date DateTime
+
+  doctor   User   @relation("appointmentsAsDoctor", fields: [doctorId], references: [id])
+  doctorId String
+
+  patient   User   @relation("appointmentsAsPatient", fields: [patientId], references: [id])
+  patientId String
+
+  ElectronicMedicalRecord   ElectronicMedicalRecord? @relation(fields: [electronicMedicalRecordId], references: [id])
+  electronicMedicalRecordId String?
+
+  status AppointmentStatus
+
+  reports               Report[]
+  scans                 Scan[]
+  laboratoryTestResults LaboratoryTestResult[]
+
+  billing Billing?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Report {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  date        DateTime
+  reportURL   String
+
+  appointment   Appointment @relation(fields: [appointmentId], references: [id])
+  appointmentId String
+
+  messages Message[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Message {
+  id      String   @id @default(uuid())
+  message String
+  date    DateTime
+  user    User     @relation(fields: [userId], references: [id])
+  userId  String
+
+  report   Report @relation(fields: [reportId], references: [id])
+  reportId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Modality {
   id          String @id @default(uuid())
-  email       String @unique
   name        String
-  password    String
-  otp         String?
-  isVerified  Boolean @default(false)
+  description String
+  price       Float
+  scan        Scan[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Scan {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  date        DateTime
+  modality    Modality @relation(fields: [modalityId], references: [id])
+  modalityId  String
+  scanURLs    String[]
+
+  appointment   Appointment @relation(fields: [appointmentId], references: [id])
+  appointmentId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Billing {
+  id     String   @id @default(uuid())
+  date   DateTime
+  amount Float
+
+  appointment   Appointment @relation(fields: [appointmentId], references: [id])
+  appointmentId String      @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model TestValue {
+  id          String  @id @default(uuid())
+  name        String
+  description String?
+
+  minimumValue Float
+  maximumValue Float
+  unit         String
+
+  laboratoryTest LaboratoryTest[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model LaboratoryTest {
+  id          String  @id @default(uuid())
+  name        String
+  description String?
+  price       Float
+
+  values               TestValue[]
+  laboratoryTestResult LaboratoryTestResult[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model LaboratoryTestResult {
+  id               String         @id @default(uuid())
+  result           String
+  date             DateTime
+  laboratoryTest   LaboratoryTest @relation(fields: [laboratoryTestId], references: [id])
+  laboratoryTestId String
+  results          Float[]
+
+  appointment   Appointment @relation(fields: [appointmentId], references: [id])
+  appointmentId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Device {
+  id           String @id @default(uuid())
+  name         String
+  description  String
+  manufacturer String
+  serialNumber String
+  price        Float
+
+  purchaseDate DateTime
+  maintenances Maintenance[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Maintenance {
+  id          String   @id @default(uuid())
+  description String
+  date        DateTime
+
+  device   Device @relation(fields: [deviceId], references: [id])
+  deviceId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
