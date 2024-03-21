@@ -5,10 +5,8 @@ import { getAuthSession } from '@/lib/auth';
 
 export default async function AuthLayout({
   children,
-  modal,
 }: Readonly<{
   children: React.ReactNode;
-  modal: React.ReactNode;
 }>) {
   const session = await getAuthSession();
 
