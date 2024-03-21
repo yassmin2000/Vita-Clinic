@@ -8,6 +8,7 @@ import { format } from 'date-fns';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import ScanItemSkeleton from './ScanItemSkeleton';
+import NewScanButton from './NewScanButton';
 
 const scansData = [
   {
@@ -80,10 +81,7 @@ export default function AppointmentScans({ id }: AppointmentScansProps) {
           Appointment Scans
         </span>
 
-        <Button size="sm">
-          <Plus className="mr-1" />
-          New Scan
-        </Button>
+        <NewScanButton />
       </div>
       <div className="grid grid-cols-1 gap-6 divide-y divide-accent md:grid-cols-2 lg:grid-cols-3">
         {isLoading &&
