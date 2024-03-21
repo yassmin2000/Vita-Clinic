@@ -1,5 +1,6 @@
-import { MessageType } from '@/app/reports/[reportId]/_components/Messages';
 import { create } from 'zustand';
+
+import { MessageType } from '@/app/(dsahboard)/reports/[reportId]/_components/Messages';
 
 type useChatProps = {
   addMessage: () => void;
