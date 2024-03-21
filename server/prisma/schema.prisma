@@ -316,7 +316,7 @@ model Billing {
   updatedAt DateTime @updatedAt
 }
 
-model TestValue {
+model Biomark {
   id          String  @id @default(uuid())
   name        String
   description String?
@@ -337,7 +337,7 @@ model LaboratoryTest {
   description String?
   price       Float
 
-  values               TestValue[]
+  biomarks             Biomark[]
   laboratoryTestResult LaboratoryTestResult[]
 
   createdAt DateTime @default(now())

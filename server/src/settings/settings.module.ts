@@ -13,6 +13,10 @@ import { DiagnosisService } from './diagnosis/diagnosis.service';
 import { DiagnosisController } from './diagnosis/diagnosis.controller';
 import { DiagnosisModule } from './diagnosis/diagnosis.module';
 import { MedicationModule } from './medication/medication.module';
+import { BiomarkModule } from './biomark/biomark.module';
+import { LaboratoryTestService } from './laboratory-test/laboratory-test.service';
+import { LaboratoryTestController } from './laboratory-test/laboratory-test.controller';
+import { LaboratoryTestModule } from './laboratory-test/laboratory-test.module';
 
 @Module({
   providers: [
@@ -20,12 +24,14 @@ import { MedicationModule } from './medication/medication.module';
     SurgeryService,
     MedicalConditionService,
     DiagnosisService,
+    LaboratoryTestService,
   ],
   controllers: [
     SettingsController,
     SurgeryController,
     MedicalConditionController,
     DiagnosisController,
+    LaboratoryTestController,
   ],
   imports: [
     SurgeryModule,
@@ -34,6 +40,8 @@ import { MedicationModule } from './medication/medication.module';
     AllergyModule,
     DiagnosisModule,
     MedicationModule,
+    BiomarkModule,
+    LaboratoryTestModule,
   ],
 })
 export class SettingsModule {}
