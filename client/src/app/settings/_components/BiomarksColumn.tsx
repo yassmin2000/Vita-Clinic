@@ -2,7 +2,7 @@
 
 import { ColumnDef } from '@tanstack/react-table';
 import { parseISO, format, formatDistanceToNow } from 'date-fns';
-import { ArrowUpDown, MoreHorizontal, Pencil, Trash } from 'lucide-react';
+import { ArrowUpDown, Copy, MoreHorizontal, Pencil, Trash } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -19,14 +19,17 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 
-export type Lookup = {
+export type Biomark = {
   id: string | number;
   name: string;
+  unit: string;
+  minimum: Number;
+  maximum: Number;
   description?: string;
   createdAt: string;
 };
 
-export const columns: ColumnDef<Lookup>[] = [
+export const columns: ColumnDef<Biomark>[] = [
   {
     id: 'name',
     accessorKey: 'name',
@@ -65,6 +68,11 @@ export const columns: ColumnDef<Lookup>[] = [
     },
   },
   {
+    id: 'unit',
+    accessorKey: 'unit',
+    header: 'Unit',
+  },
+  {
     accessorKey: 'description',
     header: 'Description',
     cell: ({ row }) => {
@@ -86,6 +94,21 @@ export const columns: ColumnDef<Lookup>[] = [
             )}
           </Tooltip>
         </TooltipProvider>
+      );
+    },
+  },
+  {
+    id: 'range',
+    header: 'Range',
+    cell: ({ row }) => {
+      const minimum: Number = row.original.minimum;
+      const maximum: Number = row.original.maximum;
+      const unit: string = row.original.unit;
+
+      return (
+        <div className="flex flex-col whitespace-nowrap">
+          <span>{`${minimum}${unit} - ${maximum}${unit}`}</span>
+        </div>
       );
     },
   },

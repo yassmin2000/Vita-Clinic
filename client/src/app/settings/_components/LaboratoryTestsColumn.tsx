@@ -2,7 +2,7 @@
 
 import { ColumnDef } from '@tanstack/react-table';
 import { parseISO, format, formatDistanceToNow } from 'date-fns';
-import { ArrowUpDown, MoreHorizontal, Pencil, Trash } from 'lucide-react';
+import { ArrowUpDown, Copy, MoreHorizontal, Pencil, Trash } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -19,14 +19,19 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 
-export type Lookup = {
+export type LaboratoryTest = {
   id: string | number;
   name: string;
   description?: string;
+  price: Number;
+  biomarks: {
+    id: string | number;
+    name: string;
+  }[];
   createdAt: string;
 };
 
-export const columns: ColumnDef<Lookup>[] = [
+export const columns: ColumnDef<LaboratoryTest>[] = [
   {
     id: 'name',
     accessorKey: 'name',
@@ -65,6 +70,24 @@ export const columns: ColumnDef<Lookup>[] = [
     },
   },
   {
+    id: 'price',
+    accessorKey: 'price',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          className="p-0"
+          onClick={() => {
+            column.toggleSorting(column.getIsSorted() === 'asc');
+          }}
+        >
+          Price
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+  },
+  {
     accessorKey: 'description',
     header: 'Description',
     cell: ({ row }) => {
@@ -82,6 +105,44 @@ export const columns: ColumnDef<Lookup>[] = [
             {description && (
               <TooltipContent side="bottom" className="max-w-xl text-wrap">
                 {description}
+              </TooltipContent>
+            )}
+          </Tooltip>
+        </TooltipProvider>
+      );
+    },
+  },
+  {
+    accessorKey: 'biomarks',
+    header: 'Biomarks',
+    cell: ({ row }) => {
+      const biomarks: {
+        id: string | number;
+        name: string;
+      }[] = row.getValue('biomarks');
+      const biomarksNames = biomarks
+        .map((biomark) => {
+          const match = biomark.name.match(/\(([^)]+)\)$/);
+          return match ? match[1] : biomark.name;
+        })
+        .join(', ');
+
+      const biomarksFullNames: string = biomarks
+        .map((biomark) => biomark.name)
+        .join(', ');
+
+      return (
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger>
+              <p className="max-w-2xl truncate text-sm text-muted-foreground">
+                {biomarksNames || 'No description'}
+              </p>
+            </TooltipTrigger>
+
+            {biomarksFullNames && (
+              <TooltipContent side="bottom" className="max-w-xl text-wrap">
+                {biomarksFullNames}
               </TooltipContent>
             )}
           </Tooltip>

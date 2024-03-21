@@ -5,6 +5,8 @@ import AllergiesTable from './_components/AllergiesTable';
 import MedicationsTable from './_components/MedicationsTable';
 import SurgeriesTable from './_components/SurgeriesTable';
 import ModalitiesTable from './_components/ModalitiesTable';
+import BiomarksTable from './_components/BiomarksTable';
+import LaboratoryTestsTable from './_components/LaboratoryTestsTable';
 
 export default function SettingsPage() {
   return (
@@ -28,6 +30,8 @@ export default function SettingsPage() {
             <TabsTrigger value="medications">Medications</TabsTrigger>
             <TabsTrigger value="surgeries">Surgeries</TabsTrigger>
             <TabsTrigger value="modalities">Modalities</TabsTrigger>
+            <TabsTrigger value="biomarks">Biomarks</TabsTrigger>
+            <TabsTrigger value="laboratory-tests">Laboratory Tests</TabsTrigger>
           </TabsList>
           <TabsContent value="diagnosis">
             <DiagnosisTable />
@@ -46,6 +50,12 @@ export default function SettingsPage() {
           </TabsContent>
           <TabsContent value="modalities">
             <ModalitiesTable />
+          </TabsContent>
+          <TabsContent value="biomarks">
+            <BiomarksTable />
+          </TabsContent>
+          <TabsContent value="laboratory-tests">
+            <LaboratoryTestsTable />
           </TabsContent>
         </Tabs>
       </div>
