@@ -68,7 +68,7 @@ export default function UserButton({ user }: UserButtonProps) {
         </DropdownMenuItem>
         <DropdownMenuSeparator />
 
-        <DropdownMenuItem className="cursor-pointer" onClick={signOut}>
+        <DropdownMenuItem className="cursor-pointer" onClick={() => signOut()}>
           Sign Out
         </DropdownMenuItem>
       </DropdownMenuContent>

@@ -7,6 +7,7 @@ import { Poppins } from 'next/font/google';
 import UserButton from './UserButton';
 import ModeToggle from './ModeToggle';
 import { cn } from '@/lib/utils';
+import { useSession } from 'next-auth/react';
 
 const poppins = Poppins({
   weight: '600',
@@ -15,6 +16,7 @@ const poppins = Poppins({
 
 export default function Navbar() {
   const router = useRouter();
+  const { data: session } = useSession();
 
   return (
     <div className="fixed z-50 flex h-16 w-full items-center justify-between border-b border-primary/10 bg-secondary px-4 py-2">
@@ -33,13 +35,15 @@ export default function Navbar() {
       </div>
       <div className="flex items-center gap-x-3">
         <ModeToggle />
-        <UserButton
-          user={{
-            name: 'Abdallah Magy',
-            email: 'abdallah@gmail.com',
-            image: 'https://avatars.githubusercontent.com/u/17731926?v=4',
-          }}
-        />
+        {session?.user && (
+          <UserButton
+            user={{
+              name: `${session.user.firstName} ${session.user.lastName}`,
+              email: session.user.email,
+              image: session.user.avatarURL,
+            }}
+          />
+        )}
       </div>
     </div>
   );
