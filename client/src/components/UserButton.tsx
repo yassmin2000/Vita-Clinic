@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
+import { signOut } from 'next-auth/react';
 import { User } from 'lucide-react';
 
 import {
@@ -67,7 +68,9 @@ export default function UserButton({ user }: UserButtonProps) {
         </DropdownMenuItem>
         <DropdownMenuSeparator />
 
-        <DropdownMenuItem className="cursor-pointer">Sign out</DropdownMenuItem>
+        <DropdownMenuItem className="cursor-pointer" onClick={signOut}>
+          Sign Out
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

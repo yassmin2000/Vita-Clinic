@@ -6,8 +6,6 @@ import './globals.css';
 import 'simplebar-react/dist/simplebar.min.css';
 
 import Providers from '@/components/Providers';
-import Sidebar from '@/components/Sidebar';
-import Navbar from '@/components/Navbar';
 import { cn } from '@/lib/utils';
 import { Toaster } from '@/components/ui/toaster';
 
@@ -20,26 +18,15 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-  modal,
 }: Readonly<{
   children: React.ReactNode;
-  modal: React.ReactNode;
 }>) {
   return (
     <html lang="en">
       <body className={cn('min-h-screen bg-background', inter.className)}>
         <Providers>
           <NextTopLoader color="#2563eb" />
-          {modal}
-          <div className="h-full">
-            <Navbar />
-            <div className="fixed inset-y-0 z-50 mt-16 hidden w-16 flex-col md:flex">
-              <Sidebar />
-            </div>
-            <main className="h-full pt-16 md:pl-16">
-              <div className="h-full space-y-2 px-4">{children}</div>
-            </main>
-          </div>
+          {children}
           <Toaster />
         </Providers>
       </body>

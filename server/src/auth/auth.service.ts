@@ -24,6 +24,8 @@ export class AuthService {
       avatar: user.avatarURL,
     };
 
+    const EXPIRE_TIME = 5 * 60 * 60 * 1000;
+
     return {
       user,
       backendTokens: {
@@ -31,10 +33,11 @@ export class AuthService {
           expiresIn: '5h',
           secret: process.env.jwtSecretKey,
         }),
-        refeshToken: await this.jwtService.signAsync(payload, {
+        refreshToken: await this.jwtService.signAsync(payload, {
           expiresIn: '7d',
           secret: process.env.jwtRefreshTokenKey,
         }),
+        expiresIn: new Date().setTime(new Date().getTime() + EXPIRE_TIME),
       },
     };
   }
@@ -65,15 +68,18 @@ export class AuthService {
       sub: user.sub,
     };
 
+    const EXPIRE_TIME = 5 * 60 * 60 * 1000;
+
     return {
       accessToken: await this.jwtService.signAsync(payload, {
         expiresIn: '5h',
         secret: process.env.jwtSecretKey,
       }),
-      refeshToken: await this.jwtService.signAsync(payload, {
+      refreshToken: await this.jwtService.signAsync(payload, {
         expiresIn: '7d',
         secret: process.env.jwtRefreshTokenKey,
       }),
+      expiresIn: new Date().setTime(new Date().getTime() + EXPIRE_TIME),
     };
   }
 }
