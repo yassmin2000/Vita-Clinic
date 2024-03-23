@@ -56,7 +56,10 @@ export const columns: ColumnDef<Patient>[] = [
               </div>
             ) : (
               <AvatarFallback>
-                <span>{name}</span>
+                <span>
+                  {name.split(' ')[0][0].toUpperCase() +
+                    name.split(' ')[1][0].toUpperCase()}
+                </span>
               </AvatarFallback>
             )}
           </Avatar>

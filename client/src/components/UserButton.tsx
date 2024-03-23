@@ -38,8 +38,10 @@ export default function UserButton({ user }: UserButtonProps) {
             </div>
           ) : (
             <AvatarFallback>
-              <span className="sr-only">{user.name}</span>
-              <User className="h-4 w-4" />
+              <span>
+                {user.name.split(' ')[0][0].toUpperCase() +
+                  user.name.split(' ')[1][0].toUpperCase()}
+              </span>
             </AvatarFallback>
           )}
         </Avatar>
