@@ -68,7 +68,6 @@ export const authOptions: NextAuthOptions = {
         return token;
       }
 
-      console.log('EXPIRED, REFRESHING');
       return await refreshToken(token);
     },
 
@@ -81,3 +80,19 @@ export const authOptions: NextAuthOptions = {
 };
 
 export const getAuthSession = () => getServerSession(authOptions);
+
+export const getAccessToken = async () => {
+  const session = await getAuthSession();
+  if (session && session.backendTokens.accessToken) {
+    return session.backendTokens.accessToken;
+  }
+  return null;
+};
+
+export const getUserRole = async () => {
+  const session = await getAuthSession();
+  if (session && session.user.role) {
+    return session.user.role;
+  }
+  return null;
+};
