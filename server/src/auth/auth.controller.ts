@@ -15,7 +15,7 @@ export class AuthController {
 
   @Post('register')
   async registerUser(@Body() dto: CreateUserDto) {
-    return await this.userService.create(dto);
+    return await this.userService.create(dto, 'patient');
   }
 
   @Put('verify')

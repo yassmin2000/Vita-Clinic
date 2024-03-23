@@ -8,47 +8,46 @@ datasource db {
 }
 
 enum Role {
-  ADMIN   @map("admin")
-  DOCTOR  @map("doctor")
-  PATIENT @map("patient")
+  admin
+  doctor
+  patient
 }
 
 enum Sex {
-  MALE   @map("male")
-  FEMALE @map("female")
+  male
+  female
 }
 
 enum BloodType {
-  A_POSITIVE  @map("A+")
-  A_NEGATIVE  @map("A-")
-  B_POSITIVE  @map("B+")
-  B_NEGATIVE  @map("B-")
-  O_POSITIVE  @map("O+")
-  O_NEGATIVE  @map("O-")
-  AB_POSITIVE @map("AB+")
-  AB_NEGATIVE @map("AB-")
+  a_positive
+  a_negative
+  b_positive
+  b_negative
+  ab_positive
+  ab_negative
+  o_positive
+  o_negative
 }
 
 enum Frequency {
-  DAILY   @map("daily")
-  WEEKLY  @map("weekly")
-  MONTHLY @map("monthly")
-  YEARLY  @map("yearly")
+  daily
+  weekly
+  monthly
+  yearly
 }
 
 enum AppointmentStatus {
-  PENDING   @map("pending")
-  COMPLETED @map("completed")
-  CANCELLED @map("cancelled")
+  pending
+  cancelled
+  completed
 }
 
 model User {
-  id        String @id @default(uuid())
-  email     String @unique
-  role      Role   @default(PATIENT)
+  id        String  @id @default(uuid())
+  email     String  @unique
+  role      Role    @default(patient)
   firstName String
   lastName  String
-
   avatarURL String?
 
   password   String
@@ -78,23 +77,24 @@ model ElectronicMedicalRecord {
   height    Float
   weight    Float
   bloodType BloodType
-
-  patientDiganosis         PatientDiganosis[]
-  patientSurgeries         PatientSurgery[]
-  patientMedicalConditions PatientMedicalCondition[]
-  patientAllergies         PatientAllergy[]
-  patientMedications       PatientMedication[]
-  appointments             Appointment[]
-
   insurance Insurance?
+
+  diagnoses         PatientDiganosis[]
+  surgeries         PatientSurgery[]
+  medicalConditions PatientMedicalCondition[]
+  allergies         PatientAllergy[]
+  medications       PatientMedication[]
+  appointments      Appointment[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Diagnosis {
-  id               String             @id @default(uuid())
-  diagnosis        String
+  id          String  @id @default(uuid())
+  diagnosis   String
+  description String?
+
   patientDiganosis PatientDiganosis[]
 
   createdAt DateTime @default(now())
@@ -102,10 +102,11 @@ model Diagnosis {
 }
 
 model PatientDiganosis {
-  id            String    @id @default(uuid())
-  diagnosis     Diagnosis @relation(fields: [diagnosisId], references: [id])
-  diagnosisId   String
-  description   String?
+  id          String    @id @default(uuid())
+  diagnosis   Diagnosis @relation(fields: [diagnosisId], references: [id])
+  diagnosisId String
+
+  notes         String?
   diganosisDate DateTime
 
   emr   ElectronicMedicalRecord @relation(fields: [emrId], references: [id])
@@ -116,8 +117,10 @@ model PatientDiganosis {
 }
 
 model Surgery {
-  id             String           @id @default(uuid())
-  surgery        String
+  id          String  @id @default(uuid())
+  surgery     String
+  description String?
+
   patientSurgery PatientSurgery[]
 
   createdAt DateTime @default(now())
@@ -125,10 +128,11 @@ model Surgery {
 }
 
 model PatientSurgery {
-  id          String   @id @default(uuid())
-  surgery     Surgery  @relation(fields: [surgeryId], references: [id])
-  surgeryId   String
-  description String?
+  id        String  @id @default(uuid())
+  surgery   Surgery @relation(fields: [surgeryId], references: [id])
+  surgeryId String
+
+  notes       String?
   surgeryDate DateTime
 
   emr   ElectronicMedicalRecord @relation(fields: [emrId], references: [id])
@@ -139,8 +143,10 @@ model PatientSurgery {
 }
 
 model MedicalCondition {
-  id                      String                    @id @default(uuid())
-  medicalCondition        String
+  id               String  @id @default(uuid())
+  medicalCondition String
+  description      String?
+
   patientMedicalCondition PatientMedicalCondition[]
 
   createdAt DateTime @default(now())
@@ -151,8 +157,9 @@ model PatientMedicalCondition {
   id                 String           @id @default(uuid())
   medicalCondition   MedicalCondition @relation(fields: [medicalConditionId], references: [id])
   medicalConditionId String
-  description        String?
-  diganosisDate      DateTime
+
+  notes         String?
+  diganosisDate DateTime
 
   emr   ElectronicMedicalRecord @relation(fields: [emrId], references: [id])
   emrId String
@@ -162,8 +169,10 @@ model PatientMedicalCondition {
 }
 
 model Allergy {
-  id             String           @id @default(uuid())
-  allergy        String
+  id          String  @id @default(uuid())
+  allergy     String
+  description String?
+
   patientAllergy PatientAllergy[]
 
   createdAt DateTime @default(now())
@@ -171,10 +180,11 @@ model Allergy {
 }
 
 model PatientAllergy {
-  id              String  @id @default(uuid())
-  allergy         Allergy @relation(fields: [allergyId], references: [id])
-  allergyId       String
-  description     String?
+  id        String  @id @default(uuid())
+  allergy   Allergy @relation(fields: [allergyId], references: [id])
+  allergyId String
+
+  notes           String?
   patientReaction String?
 
   emr   ElectronicMedicalRecord @relation(fields: [emrId], references: [id])
@@ -185,8 +195,10 @@ model PatientAllergy {
 }
 
 model Medication {
-  id                String              @id @default(uuid())
-  medication        String
+  id          String  @id @default(uuid())
+  medication  String
+  description String?
+
   patientMedication PatientMedication[]
 
   createdAt DateTime @default(now())
@@ -194,10 +206,11 @@ model Medication {
 }
 
 model PatientMedication {
-  id             String     @id @default(uuid())
-  medication     Medication @relation(fields: [medicationId], references: [id])
-  medicationId   String
-  description    String?
+  id           String     @id @default(uuid())
+  medication   Medication @relation(fields: [medicationId], references: [id])
+  medicationId String
+
+  notes          String?
   dosage         Float
   frequency      Frequency
   required       Boolean
@@ -235,13 +248,12 @@ model Appointment {
   ElectronicMedicalRecord   ElectronicMedicalRecord? @relation(fields: [electronicMedicalRecordId], references: [id])
   electronicMedicalRecordId String?
 
-  status AppointmentStatus
+  status  AppointmentStatus
+  billing Billing?
 
   reports               Report[]
   scans                 Scan[]
   laboratoryTestResults LaboratoryTestResult[]
-
-  billing Billing?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -267,8 +279,9 @@ model Message {
   id      String   @id @default(uuid())
   message String
   date    DateTime
-  user    User     @relation(fields: [userId], references: [id])
-  userId  String
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
 
   report   Report @relation(fields: [reportId], references: [id])
   reportId String
@@ -282,7 +295,8 @@ model Modality {
   name        String
   description String
   price       Float
-  scan        Scan[]
+
+  scan Scan[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -293,9 +307,11 @@ model Scan {
   title       String
   description String
   date        DateTime
-  modality    Modality @relation(fields: [modalityId], references: [id])
-  modalityId  String
-  scanURLs    String[]
+
+  modality   Modality @relation(fields: [modalityId], references: [id])
+  modalityId String
+
+  scanURLs String[]
 
   appointment   Appointment @relation(fields: [appointmentId], references: [id])
   appointmentId String
@@ -316,7 +332,7 @@ model Billing {
   updatedAt DateTime @updatedAt
 }
 
-model Biomark {
+model Biomarker {
   id          String  @id @default(uuid())
   name        String
   description String?
@@ -337,7 +353,7 @@ model LaboratoryTest {
   description String?
   price       Float
 
-  biomarks             Biomark[]
+  biomarkers           Biomarker[]
   laboratoryTestResult LaboratoryTestResult[]
 
   createdAt DateTime @default(now())
@@ -345,12 +361,14 @@ model LaboratoryTest {
 }
 
 model LaboratoryTestResult {
-  id               String         @id @default(uuid())
-  result           String
-  date             DateTime
+  id     String   @id @default(uuid())
+  result String
+  date   DateTime
+
   laboratoryTest   LaboratoryTest @relation(fields: [laboratoryTestId], references: [id])
   laboratoryTestId String
-  results          Float[]
+
+  results Float[]
 
   appointment   Appointment @relation(fields: [appointmentId], references: [id])
   appointmentId String
@@ -360,9 +378,10 @@ model LaboratoryTestResult {
 }
 
 model Device {
-  id           String @id @default(uuid())
-  name         String
-  description  String
+  id          String @id @default(uuid())
+  name        String
+  description String
+
   manufacturer String
   serialNumber String
   price        Float

@@ -22,11 +22,11 @@ export class CreateUserDto {
   @IsString()
   address: string;
 
-  @IsEnum(['MALE', 'FEMALE'])
-  sex: 'MALE' | 'FEMALE';
+  @IsEnum(['male', 'female'])
+  sex: 'male' | 'female';
 
-  @IsEnum(['PATIENT', 'DOCTOR', 'ADMIN'])
-  role: 'PATIENT' | 'DOCTOR' | 'ADMIN';
+  @IsEnum(['patient', 'doctor', 'admin'])
+  role?: 'patient' | 'doctor' | 'admin';
 }
 
 export class VerifyUserDto {

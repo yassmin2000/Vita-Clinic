@@ -7,19 +7,19 @@ import { PrismaService } from './prisma.service';
 import { UsersService } from './users/users.service';
 import { DevicesModule } from './devices/devices.module';
 import { DevicesService } from './devices/devices.service';
-import { SettingsModule } from './settings/settings.module';
 import { UsersModule } from './users/users.module';
 import { UsersController } from './users/users.controller';
 import { JwtModule } from '@nestjs/jwt';
+import { SettingsModule } from './settings/settings.module';
 
 @Module({
   imports: [
     JwtModule.register({}),
     ConfigModule.forRoot(),
     AuthModule,
-    SettingsModule,
     DevicesModule,
     UsersModule,
+    SettingsModule,
   ],
   controllers: [AppController, UsersController],
   providers: [AppService, PrismaService, UsersService, DevicesService],

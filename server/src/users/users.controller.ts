@@ -24,7 +24,7 @@ export class UsersController {
   async getUserProfile(@Param('id') id: string, @Req() request: Request) {
     const user: Payload = request['user'];
 
-    if (user.id !== id && user.role !== 'ADMIN') {
+    if (user.id !== id && user.role !== 'admin') {
       throw new UnauthorizedException();
     }
 
@@ -42,14 +42,14 @@ export class UsersController {
   async createNewUser(@Body() dto: CreateUserDto, @Req() request: Request) {
     const user: Payload = request['user'];
 
-    if (user.role !== 'ADMIN') {
+    if (user.role !== 'admin') {
       throw new UnauthorizedException();
     }
 
-    if (dto.role === 'ADMIN') {
+    if (dto.role === 'admin') {
       throw new UnauthorizedException();
     }
 
-    return await this.userService.create(dto, dto.role);
+    return await this.userService.create(dto, dto.role, true);
   }
 }

@@ -9,7 +9,11 @@ import { Role } from '@prisma/client';
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
-  async create(dto: CreateUserDto, role: Role = 'PATIENT') {
+  async create(
+    dto: CreateUserDto,
+    role: Role = 'patient',
+    verified: boolean = false,
+  ) {
     const user = await this.findByEmail(dto.email);
 
     if (user) {
@@ -21,8 +25,10 @@ export class UsersService {
         ...dto,
         role,
         password: await hash(dto.password, 10),
-        otp: randomstring.generate({ length: 8, charset: 'numeric' }),
-        isVerified: false,
+        otp: verified
+          ? null
+          : randomstring.generate({ length: 8, charset: 'numeric' }),
+        isVerified: verified,
       },
     });
 
