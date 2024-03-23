@@ -19,7 +19,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 
-export type Biomark = {
+export type Biomarker = {
   id: string | number;
   name: string;
   unit: string;
@@ -29,7 +29,7 @@ export type Biomark = {
   createdAt: string;
 };
 
-export const columns: ColumnDef<Biomark>[] = [
+export const columns: ColumnDef<Biomarker>[] = [
   {
     id: 'name',
     accessorKey: 'name',

@@ -2,14 +2,14 @@
 
 import { useQuery } from '@tanstack/react-query';
 
-import { data } from './biomarksData';
+import { data } from './biomarkersData';
 
 import { DataTable } from '@/components/DataTable';
-import { columns } from './BiomarksColumn';
+import { columns } from './BiomarkersColumn';
 
-export default function BiomarksTable() {
-  const { data: biomarks, isLoading } = useQuery({
-    queryKey: ['biomarks'],
+export default function BiomarkersTable() {
+  const { data: biomarkers, isLoading } = useQuery({
+    queryKey: ['biomarkers'],
     queryFn: async () => {
       await new Promise((resolve) => setTimeout(resolve, 500));
       return data;
@@ -19,11 +19,11 @@ export default function BiomarksTable() {
   return (
     <DataTable
       columns={columns}
-      data={biomarks || []}
+      data={biomarkers || []}
       isLoading={isLoading}
       pagination
       filtering
-      title="Biomark"
+      title="Biomarker"
     />
   );
 }

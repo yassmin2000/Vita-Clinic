@@ -24,7 +24,7 @@ export type LaboratoryTest = {
   name: string;
   description?: string;
   price: Number;
-  biomarks: {
+  biomarkers: {
     id: string | number;
     name: string;
   }[];
@@ -113,22 +113,22 @@ export const columns: ColumnDef<LaboratoryTest>[] = [
     },
   },
   {
-    accessorKey: 'biomarks',
-    header: 'Biomarks',
+    accessorKey: 'biomarkers',
+    header: 'Biomarkers',
     cell: ({ row }) => {
-      const biomarks: {
+      const biomarkers: {
         id: string | number;
         name: string;
-      }[] = row.getValue('biomarks');
-      const biomarksNames = biomarks
-        .map((biomark) => {
-          const match = biomark.name.match(/\(([^)]+)\)$/);
-          return match ? match[1] : biomark.name;
+      }[] = row.getValue('biomarkers');
+      const biomarkersNames = biomarkers
+        .map((biomarker) => {
+          const match = biomarker.name.match(/\(([^)]+)\)$/);
+          return match ? match[1] : biomarker.name;
         })
         .join(', ');
 
-      const biomarksFullNames: string = biomarks
-        .map((biomark) => biomark.name)
+      const biomarkersFullNames: string = biomarkers
+        .map((biomarker) => biomarker.name)
         .join(', ');
 
       return (
@@ -136,13 +136,13 @@ export const columns: ColumnDef<LaboratoryTest>[] = [
           <Tooltip>
             <TooltipTrigger>
               <p className="max-w-2xl truncate text-sm text-muted-foreground">
-                {biomarksNames || 'No description'}
+                {biomarkersNames || 'No description'}
               </p>
             </TooltipTrigger>
 
-            {biomarksFullNames && (
+            {biomarkersFullNames && (
               <TooltipContent side="bottom" className="max-w-xl text-wrap">
-                {biomarksFullNames}
+                {biomarkersFullNames}
               </TooltipContent>
             )}
           </Tooltip>
