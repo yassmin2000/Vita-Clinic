@@ -343,10 +343,15 @@ export default function Messages({ fileId }: MessagesProps) {
     ),
   };
 
-  const combinedMessages = [
-    // ...(isLoadingAIMessage ? [loadingMessage] : []),
+  const totalMessages = [
+    ...(isLoadingAIMessage ? [loadingMessage] : []),
     ...messages,
   ];
+
+  const combinedMessages = totalMessages.filter(
+    (message, index, self) =>
+      index === self.findIndex((m) => m.id === message.id)
+  );
 
   return (
     <div className="scrollbar-thumb-blue scrollbar-thumb-rounded scrollbar-track-blue-light scrollbar-w-2 scrolling-touch flex max-h-[calc(100vh-3.5rem-7rem)] flex-1 flex-col-reverse gap-4 overflow-y-auto border-zinc-200 p-3">

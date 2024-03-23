@@ -59,6 +59,7 @@ export default function ChatInput({
     onMutate: async ({ message }) => {
       backupMessage.current = message;
       setMessage('');
+      setIsLoading(true);
 
       await queryClient.cancelQueries({
         queryKey: [`file_messages_${fileId}`],
@@ -100,6 +101,7 @@ export default function ChatInput({
 
       let accResponse = '';
       let isAIResponseCreated = false;
+      const randomId = crypto.randomUUID();
 
       while (!done) {
         const { value, done: doneReading } = await reader.read();
@@ -108,11 +110,11 @@ export default function ChatInput({
         accResponse += chunkValue;
 
         if (isAIResponseCreated) {
-          updateMessage('ai-response', accResponse);
+          updateMessage(randomId, accResponse);
         } else {
           isAIResponseCreated = true;
           addNewMessage({
-            id: 'ai-response',
+            id: randomId,
             text: accResponse,
             createdAt: new Date().toISOString(),
             isUserMessage: false,
