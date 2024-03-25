@@ -33,7 +33,7 @@ export class UsersController {
       throw new NotFoundException();
     }
 
-    const { password, otp, isVerified, ...result } = profile;
+    const { password, isEmailVerified, isPhoneVerified, ...result } = profile;
     return result;
   }
 

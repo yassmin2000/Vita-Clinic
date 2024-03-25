@@ -11,6 +11,8 @@ import { UsersModule } from './users/users.module';
 import { UsersController } from './users/users.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { SettingsModule } from './settings/settings.module';
+import { OtpModule } from './otp/otp.module';
+import { OtpService } from './otp/otp.service';
 
 @Module({
   imports: [
@@ -20,8 +22,15 @@ import { SettingsModule } from './settings/settings.module';
     DevicesModule,
     UsersModule,
     SettingsModule,
+    OtpModule,
   ],
   controllers: [AppController, UsersController],
-  providers: [AppService, PrismaService, UsersService, DevicesService],
+  providers: [
+    AppService,
+    PrismaService,
+    UsersService,
+    DevicesService,
+    OtpService,
+  ],
 })
 export class AppModule {}

@@ -17,10 +17,10 @@ export class CreateUserDto {
   birthDate: Date;
 
   @IsString()
-  phoneNumber: string;
+  phoneNumber?: string;
 
   @IsString()
-  address: string;
+  address?: string;
 
   @IsEnum(['male', 'female'])
   sex: 'male' | 'female';
@@ -29,10 +29,28 @@ export class CreateUserDto {
   role?: 'patient' | 'doctor' | 'admin';
 }
 
-export class VerifyUserDto {
+export class VerifyUserEmailDto {
   @IsString()
   email: string;
 
   @IsString()
   otp: string;
+}
+
+export class ResendEmailVerificationDto {
+  @IsString()
+  email: string;
+}
+
+export class VerifyUserPhoneDto {
+  @IsString()
+  phoneNumber: string;
+
+  @IsString()
+  otp: string;
+}
+
+export class ResendPhoneVerificationDto {
+  @IsString()
+  phoneNumber: string;
 }

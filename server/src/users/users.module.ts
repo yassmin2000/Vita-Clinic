@@ -7,10 +7,18 @@ import { AdminsController } from './admins/admins.controller';
 import { AdminsModule } from './admins/admins.module';
 import { DoctorsModule } from './doctors/doctors.module';
 import { PrismaService } from 'src/prisma.service';
-import { JwtService } from '@nestjs/jwt';
+import { JwtModule, JwtService } from '@nestjs/jwt';
+import { OtpService } from 'src/otp/otp.service';
+import { OtpModule } from 'src/otp/otp.module';
 
 @Module({
-  providers: [UsersService, AdminsService, PrismaService, JwtService],
+  providers: [
+    UsersService,
+    AdminsService,
+    PrismaService,
+    OtpService,
+    JwtService,
+  ],
   controllers: [UsersController, AdminsController],
   imports: [PatientsModule, AdminsModule, DoctorsModule],
 })

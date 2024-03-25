@@ -54,11 +54,11 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    if (!user.isVerified) {
+    if (!user.isEmailVerified) {
       throw new UnauthorizedException('Email is not verified');
     }
 
-    const { password, otp, isVerified, ...result } = user;
+    const { password, isEmailVerified, isPhoneVerified, ...result } = user;
     return result;
   }
 

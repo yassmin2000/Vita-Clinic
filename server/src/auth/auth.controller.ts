@@ -1,5 +1,11 @@
 import { Body, Controller, Post, Put, Req, UseGuards } from '@nestjs/common';
-import { CreateUserDto, VerifyUserDto } from 'src/users/dto/users.dto';
+import {
+  CreateUserDto,
+  ResendEmailVerificationDto,
+  ResendPhoneVerificationDto,
+  VerifyUserEmailDto,
+  VerifyUserPhoneDto,
+} from 'src/users/dto/users.dto';
 import { UsersService } from 'src/users/users.service';
 import { LoginDto } from './dto/auth.dto';
 import { AuthService } from './auth.service';
@@ -18,9 +24,24 @@ export class AuthController {
     return await this.userService.create(dto, 'patient');
   }
 
-  @Put('verify')
-  async verifyUser(@Body() dto: VerifyUserDto) {
-    return await this.userService.verify(dto);
+  @Put('verify/email')
+  async verifyUserEmail(@Body() dto: VerifyUserEmailDto) {
+    return await this.userService.verifyEmail(dto);
+  }
+
+  @Post('/resend/email')
+  async resendEmailVerification(@Body() dto: ResendEmailVerificationDto) {
+    return await this.userService.resendEmailVerification(dto);
+  }
+
+  @Put('verify/phone')
+  async verifyUserPhone(@Body() dto: VerifyUserPhoneDto) {
+    return await this.userService.verifyPhone(dto);
+  }
+
+  @Post('/resend/phone')
+  async resendPhoneVerification(@Body() dto: ResendPhoneVerificationDto) {
+    return await this.userService.resendPhoneVerification(dto);
   }
 
   @Post('login')

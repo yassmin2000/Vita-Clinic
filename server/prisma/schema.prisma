@@ -38,8 +38,35 @@ enum Frequency {
 
 enum AppointmentStatus {
   pending
+  rejected
+  approved
   cancelled
   completed
+}
+
+enum BillingStatus {
+  initial
+  paid
+}
+
+enum OtpType {
+  email
+  phone
+  reset
+}
+
+model Otp {
+  id  String @id @default(uuid())
+  otp String @unique
+
+  type       OtpType
+  expiryDate DateTime
+
+  User   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model User {
@@ -49,15 +76,16 @@ model User {
   firstName String
   lastName  String
   avatarURL String?
+  password  String
 
-  password   String
-  otp        String?
-  isVerified Boolean @default(false)
+  isEmailVerified Boolean @default(false)
+  isPhoneVerified Boolean @default(false)
+  otp             Otp[]
 
   birthDate   DateTime
   sex         Sex
-  phoneNumber String
-  address     String
+  phoneNumber String?  @unique
+  address     String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -321,9 +349,10 @@ model Scan {
 }
 
 model Billing {
-  id     String   @id @default(uuid())
+  id     String        @id @default(uuid())
   date   DateTime
   amount Float
+  status BillingStatus @default(initial)
 
   appointment   Appointment @relation(fields: [appointmentId], references: [id])
   appointmentId String      @unique
@@ -382,12 +411,25 @@ model Device {
   name        String
   description String
 
-  manufacturer String
   serialNumber String
   price        Float
 
+  manufacturer   Manufacturer @relation(fields: [manufacturerId], references: [id])
+  manufacturerId String
+
   purchaseDate DateTime
   maintenances Maintenance[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Manufacturer {
+  id          String @id @default(uuid())
+  name        String
+  description String
+
+  devices Device[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
