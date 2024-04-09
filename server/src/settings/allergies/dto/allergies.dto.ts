@@ -1,4 +1,6 @@
-import { IsString, IsOptional } from 'class-validator';
+import { PartialType } from '@nestjs/mapped-types';
+
+import { IsString } from 'class-validator';
 
 export class CreateAllergyDto {
   @IsString()
@@ -8,12 +10,4 @@ export class CreateAllergyDto {
   description?: string;
 }
 
-export class UpdateAllergyDto {
-  @IsOptional()
-  @IsString()
-  name?: string;
-
-  @IsOptional()
-  @IsString()
-  description?: string;
-}
+export class UpdateAllergyDto extends PartialType(CreateAllergyDto) {}

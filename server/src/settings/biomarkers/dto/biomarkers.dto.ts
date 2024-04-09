@@ -1,41 +1,21 @@
 import { IsString, IsOptional, IsNumber } from 'class-validator';
-
+import { PartialType } from '@nestjs/mapped-types';
 export class CreateBiomarkerDto {
-    @IsString()
-    name: string;
+  @IsString()
+  name: string;
 
-    @IsOptional()
-    @IsString()
-    description?: string;
+  @IsOptional()
+  @IsString()
+  description?: string;
 
-    @IsNumber()
-    minimumValue: number;
+  @IsNumber()
+  minimumValue: number;
 
-    @IsNumber()
-    maximumValue: number;
+  @IsNumber()
+  maximumValue: number;
 
-    @IsString()
-    unit: string;
+  @IsString()
+  unit: string;
 }
 
-export class UpdateBiomarkerDto {
-    @IsOptional()
-    @IsString()
-    name?: string;
-
-    @IsOptional()
-    @IsString()
-    description?: string;
-
-    @IsOptional()
-    @IsNumber()
-    minimumValue?: number;
-
-    @IsOptional()
-    @IsNumber()
-    maximumValue?: number;
-
-    @IsOptional()
-    @IsString()
-    unit?: string;
-}
+export class UpdateBiomarkerDto extends PartialType(CreateBiomarkerDto) {}

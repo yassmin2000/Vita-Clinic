@@ -40,7 +40,7 @@ export class AllergiesController {
       throw new UnauthorizedException();
     }
 
-    return await this.allergiesService.findAll();
+    return await this.allergiesService.getAllAllergies();
   }
 
   @UseGuards(JwtGuard)
@@ -68,7 +68,7 @@ export class AllergiesController {
       throw new UnauthorizedException();
     }
 
-    await this.allergiesService.deleteAllergy(id);
+    return this.allergiesService.deleteAllergy(id);
   }
 
   @UseGuards(JwtGuard)
@@ -80,7 +80,7 @@ export class AllergiesController {
       throw new UnauthorizedException();
     }
 
-    const allergy = await this.allergiesService.findById(id);
+    const allergy = await this.allergiesService.getAllergyById(id);
     if (!allergy) {
       throw new NotFoundException('Allergy not found');
     }
