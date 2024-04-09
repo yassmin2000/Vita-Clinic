@@ -1,21 +1,19 @@
-
-import { IsString, IsOptional} from 'class-validator';
-
+import { IsString, IsOptional } from 'class-validator';
 
 export class CreateAllergyDto {
-    @IsString()
-    allergy: string;
+  @IsString()
+  name: string;
 
-    @IsString()
-    description?: string;
+  @IsString()
+  description?: string;
 }
 
 export class UpdateAllergyDto {
-    @IsOptional()
-    @IsString()
-    allergy?: string;
+  @IsOptional()
+  @IsString()
+  name?: string;
 
-    @IsOptional()
-    @IsString()
-    description?: string;
+  @IsOptional()
+  @IsString()
+  description?: string;
 }

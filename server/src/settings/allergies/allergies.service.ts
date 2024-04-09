@@ -7,12 +7,9 @@ export class AllergiesService {
   constructor(private readonly prisma: PrismaService) {}
 
   async createAllergy(createAllergyDto: CreateAllergyDto) {
-    const { allergy, description } = createAllergyDto;
+    const { name, description } = createAllergyDto;
     return this.prisma.allergy.create({
-      data: {
-        allergy,
-        description,
-      },
+      data: createAllergyDto,
     });
   }
 
@@ -27,7 +24,7 @@ export class AllergiesService {
   }
 
   async updateAllergy(id: string, updateAllergyDto: UpdateAllergyDto) {
-    const { allergy, description } = updateAllergyDto;
+    const { name, description } = updateAllergyDto;
     const existingAllergy = await this.prisma.allergy.findUnique({
       where: { id },
     });
@@ -38,10 +35,7 @@ export class AllergiesService {
 
     return this.prisma.allergy.update({
       where: { id },
-      data: {
-        allergy: allergy ?? existingAllergy.allergy,
-        description: description ?? existingAllergy.description,
-      },
+      data: updateAllergyDto,
     });
   }
 

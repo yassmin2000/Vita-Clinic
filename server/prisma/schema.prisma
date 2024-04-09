@@ -120,7 +120,7 @@ model ElectronicMedicalRecord {
 
 model Diagnosis {
   id          String  @id @default(uuid())
-  diagnosis   String
+  name        String
   description String?
 
   patientDiganosis PatientDiganosis[]
@@ -146,7 +146,7 @@ model PatientDiganosis {
 
 model Surgery {
   id          String  @id @default(uuid())
-  surgery     String
+  name        String
   description String?
 
   patientSurgery PatientSurgery[]
@@ -171,9 +171,9 @@ model PatientSurgery {
 }
 
 model MedicalCondition {
-  id               String  @id @default(uuid())
-  medicalCondition String
-  description      String?
+  id          String  @id @default(uuid())
+  name        String
+  description String?
 
   patientMedicalCondition PatientMedicalCondition[]
 
@@ -198,7 +198,7 @@ model PatientMedicalCondition {
 
 model Allergy {
   id          String  @id @default(uuid())
-  allergy     String
+  name        String
   description String?
 
   patientAllergy PatientAllergy[]
@@ -224,7 +224,7 @@ model PatientAllergy {
 
 model Medication {
   id          String  @id @default(uuid())
-  medication  String
+  name        String
   description String?
 
   patientMedication PatientMedication[]
