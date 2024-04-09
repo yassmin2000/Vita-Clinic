@@ -19,12 +19,10 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 
-export type Lookup = {
-  id: string | number;
-  name: string;
-  description?: string;
-  createdAt: string;
-};
+import useUserRole from '@/hooks/useUserRole';
+import useSettingsStore from '@/hooks/useSettingsStore';
+
+import type { Lookup } from '@/types/settings.type';
 
 export const columns: ColumnDef<Lookup>[] = [
   {
@@ -125,6 +123,9 @@ export const columns: ColumnDef<Lookup>[] = [
   {
     id: 'actions',
     cell: ({ row }) => {
+      const role = useUserRole();
+      const { openForm, setCurrentLookup } = useSettingsStore();
+
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -135,12 +136,19 @@ export const columns: ColumnDef<Lookup>[] = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => {
+                setCurrentLookup(row.original);
+                openForm();
+              }}
+            >
               <Pencil className="mr-2 h-4 w-4" /> Edit
             </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Trash className="mr-2 h-4 w-4" /> Delete
-            </DropdownMenuItem>
+            {role === 'admin' && (
+              <DropdownMenuItem>
+                <Trash className="mr-2 h-4 w-4" /> Delete
+              </DropdownMenuItem>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       );

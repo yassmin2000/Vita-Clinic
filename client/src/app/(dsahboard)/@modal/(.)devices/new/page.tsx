@@ -3,7 +3,7 @@ import DeviceForm from '@/components/DeviceForm';
 
 export default function CrateDeviceModal() {
   return (
-    <Modal>
+    <Modal isOpen={true}>
       <DeviceForm />
     </Modal>
   );

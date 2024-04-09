@@ -3,7 +3,7 @@ import UserForm from '@/components/UserForm';
 
 export default function CrateUserModal() {
   return (
-    <Modal>
+    <Modal isOpen={true}>
       <UserForm />
     </Modal>
   );

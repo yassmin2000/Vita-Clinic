@@ -22,7 +22,7 @@ import {
 } from './ui/table';
 import { Skeleton } from './ui/skeleton';
 import { Button } from './ui/button';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Input } from './ui/input';
 import { Plus } from 'lucide-react';
 
@@ -34,6 +34,7 @@ interface DataTableProps<TData, TValue> {
   pagination?: boolean;
   filtering?: boolean;
   title?: string;
+  button?: React.ReactNode;
 }
 
 export function DataTable<TData, TValue>({
@@ -44,6 +45,7 @@ export function DataTable<TData, TValue>({
   pagination = false,
   filtering = false,
   title,
+  button,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -76,9 +78,10 @@ export function DataTable<TData, TValue>({
             }}
             className="max-w-sm"
           />
-          <Button>
-            <Plus className="mr-1 h-4 w-4" /> New {title || ''}
-          </Button>
+          {button && button}
+          {/* <Button> */}
+          {/* <Plus className="mr-1 h-4 w-4" /> New {title || ''} */}
+          {/* </Button> */}
         </div>
       )}
       <div className="rounded-md border">

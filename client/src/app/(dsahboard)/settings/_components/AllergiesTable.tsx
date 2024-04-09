@@ -1,30 +1,68 @@
 'use client';
 
-import { useEffect } from 'react';
+import axios from 'axios';
 import { useQuery } from '@tanstack/react-query';
-
-import { data } from './allergiesData';
 
 import { DataTable } from '@/components/DataTable';
 import { columns } from './LookupsColumn';
+import NewEntityButton from './NewEntityButton';
+import Modal from '@/components/Modal';
+import LookupForm from './LookupForm';
+
+import useAccessToken from '@/hooks/useAccessToken';
+import useSettingsStore from '@/hooks/useSettingsStore';
+
+import type { Lookup } from '@/types/settings.type';
 
 export default function AllergiesTable() {
+  const accessToken = useAccessToken();
+
   const { data: allergies, isLoading } = useQuery({
     queryKey: ['allergies'],
     queryFn: async () => {
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      return data;
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/settings/allergies`,
+        {
+          headers: {
+            authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      return response.data as Lookup[];
     },
   });
 
+  const { isFormOpen, closeForm, currentLookup } = useSettingsStore();
+
   return (
-    <DataTable
-      columns={columns}
-      data={allergies || []}
-      isLoading={isLoading}
-      pagination
-      filtering
-      title="Allergy"
-    />
+    <>
+      <DataTable
+        columns={columns}
+        data={allergies || []}
+        isLoading={isLoading}
+        pagination
+        filtering
+        title="Allergy"
+        button={<NewEntityButton title="Allergy" />}
+      />
+      <Modal isOpen={isFormOpen} onClose={closeForm} className="h-fit max-w-lg">
+        <LookupForm
+          title="Allergy"
+          endpoint="settings/allergies"
+          queryKey="allergies"
+          placeholder="Milk Allergy"
+          currentId={currentLookup ? currentLookup.id : undefined}
+          defaultValues={
+            currentLookup
+              ? {
+                  name: currentLookup.name,
+                  description: currentLookup.description,
+                }
+              : undefined
+          }
+        />
+      </Modal>
+    </>
   );
 }
