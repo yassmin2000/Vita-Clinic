@@ -35,7 +35,7 @@ interface LookupFormProps {
   endpoint: string;
   queryKey: string;
   placeholder: string;
-  currentId?: string | number;
+  currentId?: string;
   defaultValues?: z.infer<typeof formSchema>;
 }
 
@@ -127,25 +127,23 @@ export default function LookupForm({
         className="space-y-6 px-4 text-foreground"
       >
         <div className="w-full space-y-2">
-          <div>
-            {currentId ? (
-              <>
-                <h3 className="text-lg font-medium">
-                  Edit {defaultValues?.name.toLowerCase()}
-                </h3>
-                <p className="text-sm text-muted-foreground">
-                  Update the {defaultValues?.name.toLowerCase()} information.
-                </p>
-              </>
-            ) : (
-              <>
-                <h3 className="text-lg font-medium">New {title}</h3>
-                <p className="text-sm text-muted-foreground">
-                  Add a new {title.toLowerCase()} to the list.
-                </p>
-              </>
-            )}
-          </div>
+          {currentId ? (
+            <div>
+              <h3 className="text-lg font-medium">
+                Edit {defaultValues?.name.toLowerCase()}
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                Update the {defaultValues?.name.toLowerCase()} details.
+              </p>
+            </div>
+          ) : (
+            <div>
+              <h3 className="text-lg font-medium">New {title}</h3>
+              <p className="text-sm text-muted-foreground">
+                Add a new {title.toLowerCase()} to the list.
+              </p>
+            </div>
+          )}
           <Separator className="bg-primary/10" />
         </div>
         <div className="flex flex-col gap-4">
