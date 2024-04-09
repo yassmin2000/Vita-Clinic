@@ -1,13 +1,22 @@
 'use client';
 
+import axios from 'axios';
 import { useQuery } from '@tanstack/react-query';
-
-import { data } from './medicalConditionsData';
 
 import { DataTable } from '@/components/DataTable';
 import { columns } from './LookupsColumn';
+import NewEntityButton from './NewEntityButton';
+import Modal from '@/components/Modal';
+import LookupForm from './LookupForm';
+
+import useAccessToken from '@/hooks/useAccessToken';
+import useSettingsStore from '@/hooks/useSettingsStore';
+
+import type { Lookup } from '@/types/settings.type';
 
 export default function MedicalConditionsTable() {
+  const accessToken = useAccessToken();
+
   const {
     data: medicalConditions,
     refetch,
@@ -15,19 +24,49 @@ export default function MedicalConditionsTable() {
   } = useQuery({
     queryKey: ['medical-conditions'],
     queryFn: async () => {
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      return data;
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/settings/medical-conditions`,
+        {
+          headers: {
+            authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      return response.data as Lookup[];
     },
   });
 
+  const { isFormOpen, closeForm, currentLookup } = useSettingsStore();
+
   return (
-    <DataTable
-      columns={columns}
-      data={medicalConditions || []}
-      isLoading={isLoading}
-      pagination
-      filtering
-      title="Medical Condition"
-    />
+    <>
+      <DataTable
+        columns={columns}
+        data={medicalConditions || []}
+        isLoading={isLoading}
+        pagination
+        filtering
+        title="Medical Condition"
+        button={<NewEntityButton title="Medical Condition" />}
+      />
+      <Modal isOpen={isFormOpen} onClose={closeForm} className="h-fit max-w-lg">
+        <LookupForm
+          title="Medical Condition"
+          endpoint="settings/medical-conditions"
+          queryKey="medical-conditions"
+          placeholder="Asthma"
+          currentId={currentLookup ? currentLookup.id : undefined}
+          defaultValues={
+            currentLookup
+              ? {
+                  name: currentLookup.name,
+                  description: currentLookup.description,
+                }
+              : undefined
+          }
+        />
+      </Modal>
+    </>
   );
 }
