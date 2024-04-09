@@ -1,6 +1,6 @@
 'use client';
 
-import { ColumnDef } from '@tanstack/react-table';
+import type { ColumnDef, Row } from '@tanstack/react-table';
 import { parseISO, format, formatDistanceToNow } from 'date-fns';
 import { ArrowUpDown, Copy, MoreHorizontal, Pencil, Trash } from 'lucide-react';
 
@@ -19,14 +19,43 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 
-export type Biomarker = {
-  id: string | number;
-  name: string;
-  unit: string;
-  minimum: Number;
-  maximum: Number;
-  description?: string;
-  createdAt: string;
+import useUserRole from '@/hooks/useUserRole';
+import useSettingsStore from '@/hooks/useSettingsStore';
+
+import type { Biomarker } from '@/types/settings.type';
+
+const ActionsCell = ({ row }: { row: Row<Biomarker> }) => {
+  const role = useUserRole();
+  const { openForm, setCurrentBiomarker } = useSettingsStore();
+
+  if (role !== 'admin') {
+    return null;
+  }
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" className="h-8 w-8 p-0">
+          <span className="sr-only">Open menu</span>
+          <MoreHorizontal className="h-4 w-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+        <DropdownMenuItem
+          onClick={() => {
+            setCurrentBiomarker(row.original);
+            openForm();
+          }}
+        >
+          <Pencil className="mr-2 h-4 w-4" /> Edit
+        </DropdownMenuItem>
+        <DropdownMenuItem>
+          <Trash className="mr-2 h-4 w-4" /> Delete
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
 };
 
 export const columns: ColumnDef<Biomarker>[] = [
@@ -101,8 +130,8 @@ export const columns: ColumnDef<Biomarker>[] = [
     id: 'range',
     header: 'Range',
     cell: ({ row }) => {
-      const minimum: Number = row.original.minimum;
-      const maximum: Number = row.original.maximum;
+      const minimum: Number = row.original.minimumValue;
+      const maximum: Number = row.original.maximumValue;
       const unit: string = row.original.unit;
 
       return (
@@ -147,26 +176,6 @@ export const columns: ColumnDef<Biomarker>[] = [
   },
   {
     id: 'actions',
-    cell: ({ row }) => {
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem>
-              <Pencil className="mr-2 h-4 w-4" /> Edit
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Trash className="mr-2 h-4 w-4" /> Delete
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
-    },
+    cell: ({ row }) => <ActionsCell row={row} />,
   },
 ];

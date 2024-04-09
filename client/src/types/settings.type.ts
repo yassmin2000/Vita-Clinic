@@ -9,8 +9,8 @@ export type Biomarker = {
   id: string;
   name: string;
   unit: string;
-  minimum: number;
-  maximum: number;
+  minimumValue: number;
+  maximumValue: number;
   description?: string;
   createdAt: string;
 };
