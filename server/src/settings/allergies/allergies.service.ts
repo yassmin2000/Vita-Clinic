@@ -12,11 +12,11 @@ export class AllergiesService {
     });
   }
 
-  async getAllAllergies() {
+  async findAll() {
     return await this.prisma.allergy.findMany();
   }
 
-  async getAllergyById(id: string) {
+  async findById(id: string) {
     return this.prisma.allergy.findUnique({
       where: { id },
     });

@@ -19,7 +19,7 @@ import { Payload } from 'src/types/payload.type';
 @Controller('settings/allergies')
 export class AllergiesController {
   constructor(private readonly allergiesService: AllergiesService) {}
-  
+
   @UseGuards(JwtGuard)
   @Post()
   async createAllergy(@Body() dto: CreateAllergyDto, @Req() request: Request) {
@@ -40,7 +40,24 @@ export class AllergiesController {
       throw new UnauthorizedException();
     }
 
-    return await this.allergiesService.getAllAllergies();
+    return await this.allergiesService.findAll();
+  }
+
+  @UseGuards(JwtGuard)
+  @Get(':id')
+  async getAllergy(@Param('id') id: string, @Req() request: Request) {
+    const user: Payload = request['user'];
+
+    if (user.role === 'patient') {
+      throw new UnauthorizedException();
+    }
+
+    const allergy = await this.allergiesService.findById(id);
+    if (!allergy) {
+      throw new NotFoundException('Allergy not found');
+    }
+
+    return allergy;
   }
 
   @UseGuards(JwtGuard)
@@ -69,22 +86,5 @@ export class AllergiesController {
     }
 
     return this.allergiesService.deleteAllergy(id);
-  }
-
-  @UseGuards(JwtGuard)
-  @Get(':id')
-  async getAllergy(@Param('id') id: string, @Req() request: Request) {
-    const user: Payload = request['user'];
-
-    if (user.role === 'patient') {
-      throw new UnauthorizedException();
-    }
-
-    const allergy = await this.allergiesService.getAllergyById(id);
-    if (!allergy) {
-      throw new NotFoundException('Allergy not found');
-    }
-
-    return allergy;
   }
 }

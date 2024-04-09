@@ -2,8 +2,6 @@ import { Module } from '@nestjs/common';
 import { SettingsController } from './settings.controller';
 import { SettingsService } from './settings.service';
 import { DiagnosesModule } from './diagnoses/diagnoses.module';
-import { MedicalConditionsService } from './medical-conditions/medical-conditions.service';
-import { MedicalConditionsController } from './medical-conditions/medical-conditions.controller';
 import { MedicalConditionsModule } from './medical-conditions/medical-conditions.module';
 import { AllergiesModule } from './allergies/allergies.module';
 import { MedicationsService } from './medications/medications.service';
@@ -21,14 +19,12 @@ import { LaboratoryTestsModule } from './laboratory-tests/laboratory-tests.modul
 @Module({
   controllers: [
     SettingsController,
-    MedicalConditionsController,
     MedicationsController,
     ModalitiesController,
     LaboratoryTestsController,
   ],
   providers: [
     SettingsService,
-    MedicalConditionsService,
     MedicationsService,
     ModalitiesService,
     LaboratoryTestsService,
