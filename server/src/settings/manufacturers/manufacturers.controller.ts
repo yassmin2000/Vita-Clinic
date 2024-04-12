@@ -19,15 +19,15 @@ import { ManufacturersService } from './manufacturers.service';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
 import { Payload } from 'src/types/payload.type';
 
-@Controller('settings/medical-conditions')
+@Controller('settings/manufacturers')
 export class ManufacturersController {
   constructor(
-    private readonly medicalConditionsService: ManufacturersService,
+    private readonly manufacturersService: ManufacturersService,
   ) {}
 
   @UseGuards(JwtGuard)
   @Post()
-  async createMedicalCondition(
+  async createManufacturer(
     @Body() dto: CreateManufacturerDto,
     @Req() request: Request,
   ) {
@@ -36,7 +36,8 @@ export class ManufacturersController {
     if (user.role !== 'admin') {
       throw new UnauthorizedException();
     }
-    return this.medicalConditionsService.createManufacturer(dto);
+    return this.manufacturersService.createManufacturer(dto);
+  
   }
 
   @UseGuards(JwtGuard)
@@ -48,31 +49,31 @@ export class ManufacturersController {
       throw new UnauthorizedException();
     }
 
-    return await this.medicalConditionsService.findAll();
+    return await this.manufacturersService.findAll();
   }
 
   @UseGuards(JwtGuard)
   @Get(':id')
-  async getMedicalCondition(@Param('id') id: string, @Req() request: Request) {
+  async getManufacturers(@Param('id') id: string, @Req() request: Request) {
     const user: Payload = request['user'];
 
     if (user.role !== 'admin') {
       throw new UnauthorizedException();
     }
 
-    const medicalCondition = await this.medicalConditionsService.findById(id);
-    if (!medicalCondition) {
-      throw new NotFoundException('Medical Condition not found');
+    const manufacturer = await this.manufacturersService.findById(id);
+    if (!manufacturer) {
+      throw new NotFoundException('Manufacturer not found');
     }
 
-    return medicalCondition;
+    return manufacturer;
   }
 
   @UseGuards(JwtGuard)
   @Patch(':id')
-  async updateMedicalCondition(
+  async updateManufacturer(
     @Param('id') id: string,
-    @Body() UpdateMedicalConditionDto: UpdateManufacturerDto,
+    @Body() dto: UpdateManufacturerDto,
     @Req() request: Request,
   ) {
     const user: Payload = request['user'];
@@ -81,15 +82,15 @@ export class ManufacturersController {
       throw new UnauthorizedException();
     }
 
-    return await this.medicalConditionsService.updateManufacturer(
+    return await this.manufacturersService.updateManufacturer(
       id,
-      UpdateMedicalConditionDto,
+      UpdateManufacturerDto,
     );
   }
 
   @UseGuards(JwtGuard)
   @Delete(':id')
-  async deleteMedicalCondition(
+  async deleteManufacturer(
     @Param('id') id: string,
     @Req() request: Request,
   ) {
@@ -99,6 +100,6 @@ export class ManufacturersController {
       throw new UnauthorizedException();
     }
 
-    return this.medicalConditionsService.deleteMedicalCondition(id);
+    return this.manufacturersService.deleteManufacturer(id);
   }
 }

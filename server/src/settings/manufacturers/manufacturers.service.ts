@@ -36,12 +36,12 @@ export class ManufacturersService {
     id: string,
     updateManufacturerDto: UpdateManufacturerDto,
   ) {
-    const existingMedicalCondition =
+    const existingManufacturer =
       await this.prisma.manufacturer.findUnique({
         where: { id },
       });
 
-    if (!existingMedicalCondition) {
+    if (!existingManufacturer) {
       throw new NotFoundException('Manufacturer not found');
     }
 
@@ -51,7 +51,7 @@ export class ManufacturersService {
     });
   }
 
-  async deleteMedicalCondition(id: string) {
+  async deleteManufacturer(id: string) {
     const existingManufacturers = await this.prisma.manufacturer.findUnique({
       where: { id },
     });

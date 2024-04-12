@@ -36,6 +36,7 @@ export class BiomarkersService {
         return this.prisma.biomarker.update({
             where: { id },
             data: updateBiomarkerDto,
+            
         });
     }
 
