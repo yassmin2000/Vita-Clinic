@@ -11,8 +11,29 @@ import FiltersBar from '@/components/FiltersBar';
 import Pagination from '@/components/Pagination';
 
 import { useTableOptions } from '@/hooks/useTableOptions';
+import axios from 'axios';
+import useAccessToken from '@/hooks/useAccessToken';
+
+type Device = {
+  id: string;
+  name: string;
+  description?: string;
+  status: 'active' | 'inactive';
+  imageURL?: string;
+  serialNumber: string;
+  price: number;
+  purchaseDate: string;
+  createdAt: string;
+  updatedAt: string;
+  manufacturer: {
+    id: string;
+    name: string;
+  };
+};
 
 export default function DeviceCardsGrid() {
+  const accessToken = useAccessToken();
+
   const {
     sortBy,
     setSortBy,
@@ -29,38 +50,19 @@ export default function DeviceCardsGrid() {
     isLoading,
   } = useQuery({
     queryKey: [
-      `devices_page_${currentPage}_status_${currentStatus}_count_${countPerPage}_sort_${sortBy}_search_${searchValue}_count_${countPerPage}`,
+      `admins_page_${currentPage}_count_${countPerPage}_status_${currentStatus}_sort_${sortBy}_search_${searchValue}`,
     ],
     queryFn: async () => {
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      const [sortWith, sortHow] = sortBy.split('-');
-      if (
-        sortWith !== 'name' &&
-        sortWith !== 'purchaseDate' &&
-        sortWith !== 'lastMaintenanceDate'
-      )
-        return null;
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/devices?page=${currentPage}&limit=${countPerPage}&status=${currentStatus}&value=${searchValue}&sort=${sortBy}`,
+        {
+          headers: {
+            authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
 
-      return devicesData
-        .filter(
-          (device) =>
-            (currentStatus === 'all' ||
-              device.status.toLowerCase() === currentStatus) &&
-            (device.name.toLowerCase().includes(searchValue.toLowerCase()) ||
-              device.manufacturer
-                .toLowerCase()
-                .includes(searchValue.toLowerCase()))
-        )
-        .sort((a, b) => {
-          if (a[sortWith] < b[sortWith]) {
-            return sortHow === 'desc' ? 1 : -1;
-          }
-          if (a[sortWith] > b[sortWith]) {
-            return sortHow === 'desc' ? -1 : 1;
-          }
-          return 0;
-        })
-        .slice((currentPage - 1) * countPerPage, currentPage * countPerPage);
+      return response.data as Device[];
     },
   });
 
@@ -98,9 +100,12 @@ export default function DeviceCardsGrid() {
               id={device.id}
               key={device.id}
               deviceName={device.name}
-              deviceImage={device.deviceImage}
-              manufacturer={device.manufacturer}
-              lastMaintenanceDate={device.lastMaintenanceDate}
+              deviceImage={
+                device.imageURL ||
+                'https://www.dicardiology.com/sites/default/files/field/image/CT%20scan%20with%20patient%20and%20tech_from%20RSNA%202012%20PR%20Toshiba_Aquilion%20ONE%20ViSION%204.jpg'
+              }
+              manufacturer={device.manufacturer.name}
+              lastMaintenanceDate={'2023-02-15'}
               purchaseDate={device.purchaseDate}
               status={device.status}
               serialNumber={device.serialNumber}

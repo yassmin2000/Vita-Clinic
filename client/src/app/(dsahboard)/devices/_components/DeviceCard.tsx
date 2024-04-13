@@ -29,7 +29,7 @@ interface DeviceCardProps {
   manufacturer: string;
   lastMaintenanceDate: string;
   purchaseDate: string;
-  status: string;
+  status: 'active' | 'inactive';
   serialNumber: string;
 }
 
