@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+
 import { PrismaService } from 'src/prisma.service';
 import { CreateDiagnosisDto, UpdateDiagnosisDto } from './dto/diagnoses.dto';
 
@@ -6,23 +7,29 @@ import { CreateDiagnosisDto, UpdateDiagnosisDto } from './dto/diagnoses.dto';
 export class DiagnosesService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async createDiagnosis(createDiagnosisDto: CreateDiagnosisDto) {
+  async findAll() {
+    return this.prisma.diagnosis.findMany();
+  }
+
+  async findById(id: string) {
+    const diagnosis = await this.prisma.diagnosis.findUnique({
+      where: { id },
+    });
+
+    if (!diagnosis) {
+      throw new NotFoundException('Diagnosis not found');
+    }
+
+    return diagnosis;
+  }
+
+  async create(createDiagnosisDto: CreateDiagnosisDto) {
     return this.prisma.diagnosis.create({
       data: createDiagnosisDto,
     });
   }
 
-  async getAllDiagnoses() {
-    return this.prisma.diagnosis.findMany();
-  }
-
-  async getDiagnosisById(id: string) {
-    return this.prisma.diagnosis.findUnique({
-      where: { id },
-    });
-  }
-
-  async updateDiagnosis(id: string, updateDiagnosisDto: UpdateDiagnosisDto) {
+  async update(id: string, updateDiagnosisDto: UpdateDiagnosisDto) {
     const existingDiagnosis = await this.prisma.diagnosis.findUnique({
       where: { id },
     });
@@ -37,7 +44,7 @@ export class DiagnosesService {
     });
   }
 
-  async deleteDiagnosis(id: string) {
+  async delete(id: string) {
     const existingDiagnosis = await this.prisma.diagnosis.findUnique({
       where: { id },
     });

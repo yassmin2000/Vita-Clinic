@@ -3,7 +3,7 @@ import { LoginDto } from './dto/auth.dto';
 import { UsersService } from 'src/users/users.service';
 import { compare } from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { Payload } from 'src/types/payload.type';
+import type { Payload } from 'src/types/payload.type';
 
 @Injectable()
 export class AuthService {
@@ -18,6 +18,7 @@ export class AuthService {
     const payload: Payload = {
       id: user.id,
       email: user.email,
+      phoneNumber: user.phoneNumber,
       firstName: user.firstName,
       lastName: user.lastName,
       role: user.role,
@@ -42,7 +43,7 @@ export class AuthService {
     };
   }
 
-  async validateUser(dto: LoginDto) {
+  private async validateUser(dto: LoginDto) {
     const user = await this.userService.findByEmail(dto.email);
 
     if (!user) {
@@ -62,10 +63,15 @@ export class AuthService {
     return result;
   }
 
-  async refreshToken(user: any) {
-    const payload = {
-      username: user.username,
-      sub: user.sub,
+  async refreshToken(user: Payload) {
+    const payload: Payload = {
+      id: user.id,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      phoneNumber: user.phoneNumber,
+      role: user.role,
+      avatar: user.avatar,
     };
 
     const EXPIRE_TIME = 5 * 60 * 60 * 1000;

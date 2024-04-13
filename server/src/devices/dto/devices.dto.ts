@@ -9,6 +9,7 @@ import {
   IsInt,
 } from 'class-validator';
 import { Transform } from 'class-transformer';
+import type { DeviceStatus } from '@prisma/client';
 
 export class CreateDeviceDto {
   @IsNotEmpty()
@@ -60,13 +61,13 @@ export class GetAllDevicesQuery {
   @IsOptional()
   @IsIn(['all', 'active', 'inactive'])
   @Transform(({ value }) => value.toLowerCase(), { toClassOnly: true })
-  status?: 'all' | 'active' | 'inactive';
+  status?: 'all' | DeviceStatus;
 
   @IsOptional()
   @IsString()
   value?: string;
 
   @IsOptional()
-  @IsString()
-  sort?: string;
+  @IsIn(['name-desc', 'name-asc', 'purchaseDate-desc', 'purchaseDate-asc'])
+  sort?: 'name-desc' | 'name-asc' | 'purchaseDate-desc' | 'purchaseDate-asc';
 }

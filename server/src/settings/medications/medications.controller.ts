@@ -1,3 +1,4 @@
+import { Request } from 'express';
 import {
   Controller,
   Post,
@@ -17,7 +18,7 @@ import {
   CreateMedicationDto,
 } from './dto/medications.dto';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
-import { Payload } from 'src/types/payload.type';
+import type { Payload } from 'src/types/payload.type';
 
 @Controller('settings/medications')
 export class MedicationsController {
@@ -46,7 +47,7 @@ export class MedicationsController {
       throw new UnauthorizedException();
     }
 
-    return await this.medicationsService.findAll();
+    return this.medicationsService.findAll();
   }
 
   @UseGuards(JwtGuard)
@@ -79,10 +80,7 @@ export class MedicationsController {
       throw new UnauthorizedException();
     }
 
-    return await this.medicationsService.updateMedication(
-      id,
-      updateMedicationDto,
-    );
+    return this.medicationsService.updateMedication(id, updateMedicationDto);
   }
 
   @UseGuards(JwtGuard)

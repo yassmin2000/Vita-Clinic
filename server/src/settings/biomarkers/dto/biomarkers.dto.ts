@@ -1,6 +1,8 @@
-import { IsString, IsOptional, IsNumber } from 'class-validator';
 import { PartialType } from '@nestjs/mapped-types';
+import { IsString, IsOptional, IsNumber, IsNotEmpty } from 'class-validator';
+
 export class CreateBiomarkerDto {
+  @IsNotEmpty()
   @IsString()
   name: string;
 
@@ -8,12 +10,15 @@ export class CreateBiomarkerDto {
   @IsString()
   description?: string;
 
+  @IsNotEmpty()
   @IsNumber()
   minimumValue: number;
 
+  @IsNotEmpty()
   @IsNumber()
   maximumValue: number;
 
+  @IsNotEmpty()
   @IsString()
   unit: string;
 }

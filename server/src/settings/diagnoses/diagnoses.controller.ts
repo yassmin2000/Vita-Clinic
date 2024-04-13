@@ -1,3 +1,4 @@
+import { Request } from 'express';
 import {
   Controller,
   Post,
@@ -9,21 +10,47 @@ import {
   Req,
   UnauthorizedException,
   UseGuards,
-  NotFoundException,
+  ValidationPipe,
 } from '@nestjs/common';
-import { JwtGuard } from 'src/auth/guards/jwt.guard';
+
 import { DiagnosesService } from './diagnoses.service';
-import { Payload } from 'src/types/payload.type';
+import { JwtGuard } from 'src/auth/guards/jwt.guard';
+
 import { CreateDiagnosisDto, UpdateDiagnosisDto } from './dto/diagnoses.dto';
+import type { Payload } from 'src/types/payload.type';
 
 @Controller('settings/diagnoses')
 export class DiagnosesController {
   constructor(private readonly diagnosesService: DiagnosesService) {}
 
   @UseGuards(JwtGuard)
+  @Get()
+  async getAllDiagnoses(@Req() request: Request) {
+    const user: Payload = request['user'];
+
+    if (user.role === 'patient') {
+      throw new UnauthorizedException();
+    }
+
+    return this.diagnosesService.findAll();
+  }
+
+  @UseGuards(JwtGuard)
+  @Get(':id')
+  async getDiagnosisById(@Param('id') id: string, @Req() request: Request) {
+    const user: Payload = request['user'];
+
+    if (user.role === 'patient') {
+      throw new UnauthorizedException();
+    }
+
+    return this.diagnosesService.findById(id);
+  }
+
+  @UseGuards(JwtGuard)
   @Post()
   async createDiagnosis(
-    @Body() createDiagnosisDto: CreateDiagnosisDto,
+    @Body(ValidationPipe) createDiagnosisDto: CreateDiagnosisDto,
     @Req() request: Request,
   ) {
     const user: Payload = request['user'];
@@ -32,44 +59,14 @@ export class DiagnosesController {
       throw new UnauthorizedException();
     }
 
-    return this.diagnosesService.createDiagnosis(createDiagnosisDto);
-  }
-
-  @UseGuards(JwtGuard)
-  @Get()
-  async getDiagnoses(@Req() request: Request) {
-    const user: Payload = request['user'];
-
-    if (user.role === 'patient') {
-      throw new UnauthorizedException();
-    }
-    return await this.diagnosesService.getAllDiagnoses();
-  }
-
-  @UseGuards(JwtGuard)
-  @Get(':id')
-  async getDiagnosisById(
-    @Param('id') id: string, 
-    @Req() request: Request
-    ) {
-    const user: Payload = request['user'];
-
-    if (user.role === 'patient') {
-      throw new UnauthorizedException();
-    }
-
-    const diagnosis = await this.diagnosesService.getDiagnosisById(id);
-    if (!diagnosis) {
-      throw new NotFoundException('diagnosis not found');
-    }
-    return diagnosis;
+    return this.diagnosesService.create(createDiagnosisDto);
   }
 
   @UseGuards(JwtGuard)
   @Patch(':id')
   async updateDiagnosis(
     @Param('id') id: string,
-    @Body() updateDiagnosisDto: UpdateDiagnosisDto,
+    @Body(ValidationPipe) updateDiagnosisDto: UpdateDiagnosisDto,
     @Req() request: Request,
   ) {
     const user: Payload = request['user'];
@@ -78,7 +75,7 @@ export class DiagnosesController {
       throw new UnauthorizedException();
     }
 
-    return await this.diagnosesService.updateDiagnosis(id, updateDiagnosisDto);
+    return this.diagnosesService.update(id, updateDiagnosisDto);
   }
 
   @UseGuards(JwtGuard)
@@ -90,6 +87,6 @@ export class DiagnosesController {
       throw new UnauthorizedException();
     }
 
-    return this.diagnosesService.deleteDiagnosis(id);
+    return this.diagnosesService.delete(id);
   }
 }

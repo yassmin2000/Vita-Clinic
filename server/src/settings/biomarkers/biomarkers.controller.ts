@@ -1,3 +1,4 @@
+import { Request } from 'express';
 import {
   Controller,
   Post,
@@ -9,31 +10,18 @@ import {
   Patch,
   Param,
   Delete,
-  NotFoundException,
+  ValidationPipe,
 } from '@nestjs/common';
-import { CreateBiomarkerDto, UpdateBiomarkerDto } from './dto/biomarkers.dto';
+
 import { BiomarkersService } from './biomarkers.service';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
-import { Payload } from 'src/types/payload.type';
+
+import { CreateBiomarkerDto, UpdateBiomarkerDto } from './dto/biomarkers.dto';
+import type { Payload } from 'src/types/payload.type';
 
 @Controller('/settings/biomarkers')
 export class BiomarkersController {
   constructor(private readonly biomarkersService: BiomarkersService) {}
-
-  @UseGuards(JwtGuard)
-  @Post()
-  async createBiomarker(
-    @Body() createBiomarkerDto: CreateBiomarkerDto,
-    @Req() request: Request,
-  ) {
-    const user: Payload = request['user'];
-
-    if (user.role === 'patient') {
-      throw new UnauthorizedException();
-    }
-
-    return await this.biomarkersService.createBiomarker(createBiomarkerDto);
-  }
 
   @UseGuards(JwtGuard)
   @Get()
@@ -44,7 +32,7 @@ export class BiomarkersController {
       throw new UnauthorizedException();
     }
 
-    return await this.biomarkersService.getAllBiomarkers();
+    return this.biomarkersService.findAll();
   }
 
   @UseGuards(JwtGuard)
@@ -56,14 +44,13 @@ export class BiomarkersController {
       throw new UnauthorizedException();
     }
 
-    return this.biomarkersService.getBiomarkerById(id);
+    return this.biomarkersService.findById(id);
   }
 
   @UseGuards(JwtGuard)
-  @Patch(':id')
-  async updateBiomarker(
-    @Param('id') id: string,
-    @Body() updateBiomarkerDto: UpdateBiomarkerDto,
+  @Post()
+  async createBiomarker(
+    @Body(ValidationPipe) createBiomarkerDto: CreateBiomarkerDto,
     @Req() request: Request,
   ) {
     const user: Payload = request['user'];
@@ -72,16 +59,23 @@ export class BiomarkersController {
       throw new UnauthorizedException();
     }
 
-    const updatedBiomarker = await this.biomarkersService.updateBiomarker(
-      id,
-      updateBiomarkerDto,
-    );
+    return this.biomarkersService.create(createBiomarkerDto);
+  }
 
-    if (!updatedBiomarker) {
-      throw new NotFoundException('Biomarker not found');
+  @UseGuards(JwtGuard)
+  @Patch(':id')
+  async updateBiomarker(
+    @Param('id') id: string,
+    @Body(ValidationPipe) updateBiomarkerDto: UpdateBiomarkerDto,
+    @Req() request: Request,
+  ) {
+    const user: Payload = request['user'];
+
+    if (user.role === 'patient') {
+      throw new UnauthorizedException();
     }
 
-    return updatedBiomarker;
+    return this.biomarkersService.update(id, updateBiomarkerDto);
   }
 
   @UseGuards(JwtGuard)
@@ -93,9 +87,6 @@ export class BiomarkersController {
       throw new UnauthorizedException();
     }
 
-    const deleted = await this.biomarkersService.deleteBiomarker(id);
-    if (!deleted) {
-      throw new NotFoundException('Biomarker not found');
-    }
+    return this.biomarkersService.delete(id);
   }
 }

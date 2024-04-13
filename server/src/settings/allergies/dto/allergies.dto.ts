@@ -1,11 +1,12 @@
 import { PartialType } from '@nestjs/mapped-types';
-
-import { IsString } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreateAllergyDto {
+  @IsNotEmpty()
   @IsString()
   name: string;
 
+  @IsOptional()
   @IsString()
   description?: string;
 }

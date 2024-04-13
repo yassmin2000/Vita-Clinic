@@ -1,4 +1,39 @@
-import { Controller } from '@nestjs/common';
+import { Request } from 'express';
+import {
+  Controller,
+  Get,
+  Query,
+  Req,
+  UnauthorizedException,
+  UseGuards,
+  ValidationPipe,
+} from '@nestjs/common';
 
-@Controller('doctors')
-export class DoctorsController {}
+import { UsersService } from '../users.service';
+import { JwtGuard } from 'src/auth/guards/jwt.guard';
+
+import { GetAllUsersQuery } from '../dto/users.dto';
+import type { Payload } from 'src/types/payload.type';
+
+@Controller('/users/doctors')
+export class DoctorsController {
+  constructor(private readonly usersService: UsersService) {}
+
+  @UseGuards(JwtGuard)
+  @Get()
+  async getAllDoctors(
+    @Req() request: Request,
+    @Query(new ValidationPipe({ transform: true }))
+    query: GetAllUsersQuery,
+  ) {
+    const user: Payload = request['user'];
+
+    if (user.role === 'patient') {
+      throw new UnauthorizedException();
+    }
+
+    return this.usersService.findAll('doctor', {
+      ...query,
+    });
+  }
+}

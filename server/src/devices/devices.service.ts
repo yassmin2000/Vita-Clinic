@@ -22,21 +22,9 @@ export class DevicesService {
     value = '',
     sort = 'purchaseDate-desc',
   }: GetAllDevicesQuery) {
-    const offset = (page - 1) * limit;
-    const queryOptions: any = {
-      skip: offset,
-      take: limit,
-      orderBy: this.constructOrderBy(sort),
-    };
-    if (status !== 'all') {
-      queryOptions.where = { status };
-    }
+    const [sortField, sortOrder] = sort.split('-') as [string, 'desc' | 'asc'];
 
-    if (value) {
-      queryOptions.where = { ...queryOptions.where, name: { contains: value } };
-    }
-
-    return await this.prisma.device.findMany({
+    return this.prisma.device.findMany({
       where: {
         name: {
           contains: value,
@@ -52,8 +40,12 @@ export class DevicesService {
           },
         },
       },
-      skip: (page - 1) * offset,
+      skip: (page - 1) * limit,
       take: limit,
+      orderBy: {
+        name: sortField === 'name' ? sortOrder : undefined,
+        purchaseDate: sortField === 'purchaseDate' ? sortOrder : undefined,
+      },
     });
   }
 
@@ -155,19 +147,5 @@ export class DevicesService {
     });
 
     return true;
-  }
-
-  private constructOrderBy(sort: string) {
-    const [field, order] = sort.split('-');
-    switch (field) {
-      case 'name':
-        return { name: order };
-      case 'lastMaintenanceDate':
-        return { lastMaintenanceDate: order };
-      case 'purchaseDate':
-        return { purchaseDate: order };
-      default:
-        return { purchaseDate: 'desc' }; // Default sort by purchaseDate-desc
-    }
   }
 }

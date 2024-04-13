@@ -1,27 +1,26 @@
 import { Module } from '@nestjs/common';
-import { SettingsController } from './settings.controller';
-import { SettingsService } from './settings.service';
-import { DiagnosesModule } from './diagnoses/diagnoses.module';
-import { MedicalConditionsModule } from './medical-conditions/medical-conditions.module';
+
 import { AllergiesModule } from './allergies/allergies.module';
-import { MedicationsModule } from './medications/medications.module';
-import { SurgeriesModule } from './surgeries/surgeries.module';
-import { ModalitiesModule } from './modalities/modalities.module';
 import { BiomarkersModule } from './biomarkers/biomarkers.module';
+import { DiagnosesModule } from './diagnoses/diagnoses.module';
 import { LaboratoryTestsModule } from './laboratory-tests/laboratory-tests.module';
+import { ManufacturersModule } from './manufacturers/manufacturers.module';
+import { MedicalConditionsModule } from './medical-conditions/medical-conditions.module';
+import { MedicationsModule } from './medications/medications.module';
+import { ModalitiesModule } from './modalities/modalities.module';
+import { SurgeriesModule } from './surgeries/surgeries.module';
 
 @Module({
-  controllers: [SettingsController],
-  providers: [SettingsService],
   imports: [
-    DiagnosesModule,
-    MedicalConditionsModule,
     AllergiesModule,
-    MedicationsModule,
-    SurgeriesModule,
-    ModalitiesModule,
     BiomarkersModule,
+    DiagnosesModule,
     LaboratoryTestsModule,
+    ManufacturersModule,
+    MedicationsModule,
+    MedicalConditionsModule,
+    ModalitiesModule,
+    SurgeriesModule,
   ],
 })
 export class SettingsModule {}

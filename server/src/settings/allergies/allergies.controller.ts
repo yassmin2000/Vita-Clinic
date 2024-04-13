@@ -1,3 +1,4 @@
+import { Request } from 'express';
 import {
   Controller,
   Post,
@@ -9,43 +10,34 @@ import {
   Patch,
   Param,
   Delete,
-  NotFoundException,
+  ValidationPipe,
 } from '@nestjs/common';
-import { CreateAllergyDto, UpdateAllergyDto } from './dto/allergies.dto';
+
 import { AllergiesService } from './allergies.service';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
-import { Payload } from 'src/types/payload.type';
+
+import { CreateAllergyDto, UpdateAllergyDto } from './dto/allergies.dto';
+import type { Payload } from 'src/types/payload.type';
 
 @Controller('settings/allergies')
 export class AllergiesController {
   constructor(private readonly allergiesService: AllergiesService) {}
 
   @UseGuards(JwtGuard)
-  @Post()
-  async createAllergy(@Body() dto: CreateAllergyDto, @Req() request: Request) {
-    const user: Payload = request['user'];
-
-    if (user.role === 'patient') {
-      throw new UnauthorizedException();
-    }
-    return this.allergiesService.createAllergy(dto);
-  }
-
-  @UseGuards(JwtGuard)
   @Get()
-  async getAllergies(@Req() request: Request) {
+  async getAllAllergies(@Req() request: Request) {
     const user: Payload = request['user'];
 
     if (user.role === 'patient') {
       throw new UnauthorizedException();
     }
 
-    return await this.allergiesService.findAll();
+    return this.allergiesService.findAll();
   }
 
   @UseGuards(JwtGuard)
   @Get(':id')
-  async getAllergy(@Param('id') id: string, @Req() request: Request) {
+  async getAllergyById(@Param('id') id: string, @Req() request: Request) {
     const user: Payload = request['user'];
 
     if (user.role === 'patient') {
@@ -53,18 +45,29 @@ export class AllergiesController {
     }
 
     const allergy = await this.allergiesService.findById(id);
-    if (!allergy) {
-      throw new NotFoundException('Allergy not found');
-    }
 
     return allergy;
+  }
+
+  @UseGuards(JwtGuard)
+  @Post()
+  async createAllergy(
+    @Body(ValidationPipe) dto: CreateAllergyDto,
+    @Req() request: Request,
+  ) {
+    const user: Payload = request['user'];
+
+    if (user.role === 'patient') {
+      throw new UnauthorizedException();
+    }
+    return this.allergiesService.create(dto);
   }
 
   @UseGuards(JwtGuard)
   @Patch(':id')
   async updateAllergy(
     @Param('id') id: string,
-    @Body() updateAllergyDto: UpdateAllergyDto,
+    @Body(ValidationPipe) updateAllergyDto: UpdateAllergyDto,
     @Req() request: Request,
   ) {
     const user: Payload = request['user'];
@@ -73,7 +76,7 @@ export class AllergiesController {
       throw new UnauthorizedException();
     }
 
-    return await this.allergiesService.updateAllergy(id, updateAllergyDto);
+    return this.allergiesService.update(id, updateAllergyDto);
   }
 
   @UseGuards(JwtGuard)
@@ -85,6 +88,6 @@ export class AllergiesController {
       throw new UnauthorizedException();
     }
 
-    return this.allergiesService.deleteAllergy(id);
+    return this.allergiesService.delete(id);
   }
 }

@@ -1,45 +1,41 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+
 import { PrismaService } from 'src/prisma.service';
 import {
   CreateManufacturerDto,
   UpdateManufacturerDto,
 } from './dto/manufacturers.dto';
 
-
 @Injectable()
 export class ManufacturersService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async createManufacturer(createManufacturerDto: CreateManufacturerDto) {
-    const { name, description } = createManufacturerDto;
-    return this.prisma.manufacturer.create({
-      data: {
-        name,
-        description,
-      },
-    });
-  }
-  
-
   async findAll() {
-    
-    return await this.prisma.manufacturer.findMany();
+    return this.prisma.manufacturer.findMany();
   }
 
   async findById(id: string) {
-    return this.prisma.manufacturer.findUnique({
+    const manufacturer = await this.prisma.manufacturer.findUnique({
       where: { id },
+    });
+
+    if (!manufacturer) {
+      throw new NotFoundException('Manufacturer not found');
+    }
+
+    return manufacturer;
+  }
+
+  async create(createManufacturerDto: CreateManufacturerDto) {
+    return this.prisma.manufacturer.create({
+      data: createManufacturerDto,
     });
   }
 
-  async updateManufacturer(
-    id: string,
-    updateManufacturerDto: UpdateManufacturerDto,
-  ) {
-    const existingManufacturer =
-      await this.prisma.manufacturer.findUnique({
-        where: { id },
-      });
+  async update(id: string, updateManufacturerDto: UpdateManufacturerDto) {
+    const existingManufacturer = await this.prisma.manufacturer.findUnique({
+      where: { id },
+    });
 
     if (!existingManufacturer) {
       throw new NotFoundException('Manufacturer not found');
@@ -51,7 +47,7 @@ export class ManufacturersService {
     });
   }
 
-  async deleteManufacturer(id: string) {
+  async delete(id: string) {
     const existingManufacturers = await this.prisma.manufacturer.findUnique({
       where: { id },
     });
@@ -64,5 +60,4 @@ export class ManufacturersService {
       where: { id },
     });
   }
-
 }

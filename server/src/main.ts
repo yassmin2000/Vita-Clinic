@@ -1,5 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -7,6 +8,8 @@ async function bootstrap() {
   app.enableCors({
     origin: '*',
   });
+  app.setGlobalPrefix('api');
+
   const config = new DocumentBuilder()
     .setTitle('Nexus Scan API')
     .setDescription('Nexus Scan API Documentation')
@@ -14,6 +17,7 @@ async function bootstrap() {
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
+
   await app.listen(8000);
 }
 bootstrap();

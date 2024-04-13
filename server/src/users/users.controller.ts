@@ -1,45 +1,30 @@
+import { Request } from 'express';
 import {
   Controller,
-  Get,
-  Param,
   UseGuards,
   Req,
   UnauthorizedException,
-  NotFoundException,
   Post,
   Body,
+  ValidationPipe,
 } from '@nestjs/common';
-import { Request } from 'express';
+
 import { UsersService } from './users.service';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
-import { Payload } from 'src/types/payload.type';
+
 import { CreateUserDto } from './dto/users.dto';
+import type { Payload } from 'src/types/payload.type';
 
 @Controller('users')
 export class UsersController {
   constructor(private userService: UsersService) {}
 
   @UseGuards(JwtGuard)
-  @Get(':id')
-  async getUserProfile(@Param('id') id: string, @Req() request: Request) {
-    const user: Payload = request['user'];
-
-    if (user.id !== id && user.role !== 'admin') {
-      throw new UnauthorizedException();
-    }
-
-    const profile = await this.userService.findById(id);
-    if (!profile) {
-      throw new NotFoundException();
-    }
-
-    const { password, isEmailVerified, isPhoneVerified, ...result } = profile;
-    return result;
-  }
-
-  @UseGuards(JwtGuard)
   @Post()
-  async createNewUser(@Body() dto: CreateUserDto, @Req() request: Request) {
+  async createUser(
+    @Body(ValidationPipe) dto: CreateUserDto,
+    @Req() request: Request,
+  ) {
     const user: Payload = request['user'];
 
     if (user.role !== 'admin') {
@@ -50,6 +35,6 @@ export class UsersController {
       throw new UnauthorizedException();
     }
 
-    return await this.userService.create(dto, dto.role, true);
+    return this.userService.create(dto, dto.role, true);
   }
 }

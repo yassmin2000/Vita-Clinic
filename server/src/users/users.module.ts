@@ -1,25 +1,18 @@
 import { Module } from '@nestjs/common';
-import { UsersService } from './users.service';
+import { JwtService } from '@nestjs/jwt';
+
 import { UsersController } from './users.controller';
-import { PatientsModule } from './patients/patients.module';
-import { AdminsService } from './admins/admins.service';
-import { AdminsController } from './admins/admins.controller';
+import { UsersService } from './users.service';
+import { PrismaService } from 'src/prisma.service';
+import { OtpService } from 'src/otp/otp.service';
+
 import { AdminsModule } from './admins/admins.module';
 import { DoctorsModule } from './doctors/doctors.module';
-import { PrismaService } from 'src/prisma.service';
-import { JwtModule, JwtService } from '@nestjs/jwt';
-import { OtpService } from 'src/otp/otp.service';
-import { OtpModule } from 'src/otp/otp.module';
+import { PatientsModule } from './patients/patients.module';
 
 @Module({
-  providers: [
-    UsersService,
-    AdminsService,
-    PrismaService,
-    OtpService,
-    JwtService,
-  ],
-  controllers: [UsersController, AdminsController],
-  imports: [PatientsModule, AdminsModule, DoctorsModule],
+  imports: [AdminsModule, DoctorsModule, PatientsModule],
+  controllers: [UsersController],
+  providers: [UsersService, JwtService, PrismaService, OtpService],
 })
 export class UsersModule {}

@@ -1,36 +1,39 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
+
 import { AuthModule } from './auth/auth.module';
+import { DevicesModule } from './devices/devices.module';
+import { OtpModule } from './otp/otp.module';
+import { SettingsModule } from './settings/settings.module';
+import { UsersModule } from './users/users.module';
+
+import { AppController } from './app.controller';
+import { UsersController } from './users/users.controller';
+
+import { AppService } from './app.service';
+import { DevicesService } from './devices/devices.service';
+import { OtpService } from './otp/otp.service';
 import { PrismaService } from './prisma.service';
 import { UsersService } from './users/users.service';
-import { DevicesModule } from './devices/devices.module';
-import { DevicesService } from './devices/devices.service';
-import { UsersModule } from './users/users.module';
-import { UsersController } from './users/users.controller';
-import { JwtModule } from '@nestjs/jwt';
-import { SettingsModule } from './settings/settings.module';
-import { OtpModule } from './otp/otp.module';
-import { OtpService } from './otp/otp.service';
 
 @Module({
   imports: [
-    JwtModule.register({}),
     ConfigModule.forRoot(),
+    JwtModule.register({}),
     AuthModule,
     DevicesModule,
-    UsersModule,
-    SettingsModule,
     OtpModule,
+    SettingsModule,
+    UsersModule,
   ],
   controllers: [AppController, UsersController],
   providers: [
     AppService,
-    PrismaService,
-    UsersService,
     DevicesService,
     OtpService,
+    PrismaService,
+    UsersService,
   ],
 })
 export class AppModule {}

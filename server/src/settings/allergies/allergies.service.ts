@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+
 import { PrismaService } from 'src/prisma.service';
 import { CreateAllergyDto, UpdateAllergyDto } from './dto/allergies.dto';
 
@@ -6,23 +7,29 @@ import { CreateAllergyDto, UpdateAllergyDto } from './dto/allergies.dto';
 export class AllergiesService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async createAllergy(createAllergyDto: CreateAllergyDto) {
+  async findAll() {
+    return this.prisma.allergy.findMany();
+  }
+
+  async findById(id: string) {
+    const allergy = await this.prisma.allergy.findUnique({
+      where: { id },
+    });
+
+    if (!allergy) {
+      throw new NotFoundException('Allergy not found');
+    }
+
+    return allergy;
+  }
+
+  async create(createAllergyDto: CreateAllergyDto) {
     return this.prisma.allergy.create({
       data: createAllergyDto,
     });
   }
 
-  async findAll() {
-    return await this.prisma.allergy.findMany();
-  }
-
-  async findById(id: string) {
-    return this.prisma.allergy.findUnique({
-      where: { id },
-    });
-  }
-
-  async updateAllergy(id: string, updateAllergyDto: UpdateAllergyDto) {
+  async update(id: string, updateAllergyDto: UpdateAllergyDto) {
     const existingAllergy = await this.prisma.allergy.findUnique({
       where: { id },
     });
@@ -37,7 +44,7 @@ export class AllergiesService {
     });
   }
 
-  async deleteAllergy(id: string) {
+  async delete(id: string) {
     const existingAllergy = await this.prisma.allergy.findUnique({
       where: { id },
     });

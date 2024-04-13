@@ -1,3 +1,4 @@
+import { Request } from 'express';
 import {
   Controller,
   Post,
@@ -21,7 +22,7 @@ import {
   GetAllDevicesQuery,
   UpdateDeviceDto,
 } from './dto/devices.dto';
-import { Payload } from 'src/types/payload.type';
+import type { Payload } from 'src/types/payload.type';
 
 @Controller('devices')
 export class DevicesController {
@@ -54,7 +55,7 @@ export class DevicesController {
       throw new UnauthorizedException();
     }
 
-    return await this.devicesService.findAll({ ...query });
+    return this.devicesService.findAll({ ...query });
   }
 
   @UseGuards(JwtGuard)
@@ -66,7 +67,7 @@ export class DevicesController {
       throw new UnauthorizedException();
     }
 
-    return await this.devicesService.findById(id);
+    return this.devicesService.findById(id);
   }
 
   @UseGuards(JwtGuard)

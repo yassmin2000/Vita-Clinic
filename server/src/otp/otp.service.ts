@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/prisma.service';
 import * as randomstring from 'randomstring';
+
+import { PrismaService } from 'src/prisma.service';
 
 @Injectable()
 export class OtpService {
@@ -32,7 +33,7 @@ export class OtpService {
       }
     }
 
-    return await this.prisma.otp.create({
+    return this.prisma.otp.create({
       data: {
         otp: otpString,
         type,

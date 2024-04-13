@@ -1,16 +1,22 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { hash } from 'bcrypt';
+import type { Role } from '@prisma/client';
+
 import { PrismaService } from 'src/prisma.service';
+import { OtpService } from 'src/otp/otp.service';
+
 import {
   CreateUserDto,
+  GetAllUsersQuery,
   ResendEmailVerificationDto,
   ResendPhoneVerificationDto,
   VerifyUserEmailDto,
   VerifyUserPhoneDto,
 } from './dto/users.dto';
-import { hash } from 'bcrypt';
-import * as randomstring from 'randomstring';
-import { Role } from '@prisma/client';
-import { OtpService } from 'src/otp/otp.service';
 
 @Injectable()
 export class UsersService {
@@ -18,6 +24,130 @@ export class UsersService {
     private prisma: PrismaService,
     private otp: OtpService,
   ) {}
+
+  async findAll(
+    role: Role,
+    {
+      page = 1,
+      limit = 10,
+      sex = 'all',
+      value = '',
+      sort = 'createdAt-desc',
+    }: GetAllUsersQuery,
+  ) {
+    const names = value.split(' ');
+    const mode = 'insensitive' as 'insensitive';
+    const [sortField, sortOrder] = sort.split('-') as [string, 'desc' | 'asc'];
+
+    const nameConditions = names.flatMap((name) => [
+      {
+        firstName: {
+          contains: name,
+          mode,
+        },
+      },
+      {
+        lastName: {
+          contains: name,
+          mode,
+        },
+      },
+    ]);
+
+    return this.prisma.user.findMany({
+      where: {
+        role,
+        sex: sex === 'all' ? undefined : sex,
+        OR: [
+          ...nameConditions,
+          {
+            email: {
+              contains: value,
+              mode,
+            },
+          },
+        ],
+      },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+        phoneNumber: true,
+        avatarURL: true,
+        birthDate: true,
+        sex: true,
+        address: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+      skip: (page - 1) * limit,
+      take: limit,
+      orderBy: [
+        {
+          firstName: sortField === 'name' ? sortOrder : undefined,
+        },
+        {
+          lastName: sortField === 'name' ? sortOrder : undefined,
+        },
+        {
+          birthDate: sortField === 'birthDate' ? sortOrder : undefined,
+        },
+        {
+          createdAt: sortField === 'createdAt' ? sortOrder : undefined,
+        },
+      ],
+    });
+  }
+
+  async findById(id: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+        phoneNumber: true,
+        avatarURL: true,
+        birthDate: true,
+        sex: true,
+        address: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return user;
+  }
+
+  async findByEmail(email: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return user;
+  }
+
+  async findByPhone(phone: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { phoneNumber: phone },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return user;
+  }
 
   async create(
     dto: CreateUserDto,
@@ -55,12 +185,15 @@ export class UsersService {
     return result;
   }
 
+  async changeRole(id: string, role: Role) {
+    return this.prisma.user.update({
+      where: { id },
+      data: { role },
+    });
+  }
+
   async verifyEmail(dto: VerifyUserEmailDto) {
     const user = await this.findByEmail(dto.email);
-
-    if (!user) {
-      throw new ConflictException('Email does not exist');
-    }
 
     if (user.isEmailVerified) {
       throw new ConflictException('Email is already verified');
@@ -101,10 +234,6 @@ export class UsersService {
   async resendEmailVerification(dto: ResendEmailVerificationDto) {
     const user = await this.findByEmail(dto.email);
 
-    if (!user) {
-      throw new ConflictException('Email does not exist');
-    }
-
     if (user.isEmailVerified) {
       throw new ConflictException('Email is already verified');
     }
@@ -116,10 +245,6 @@ export class UsersService {
 
   async verifyPhone(dto: VerifyUserPhoneDto) {
     const user = await this.findByPhone(dto.phoneNumber);
-
-    if (!user) {
-      throw new ConflictException('Phone number does not exist');
-    }
 
     if (user.isPhoneVerified) {
       throw new ConflictException('Phone number is already verified');
@@ -160,10 +285,6 @@ export class UsersService {
   async resendPhoneVerification(dto: ResendPhoneVerificationDto) {
     const user = await this.findByPhone(dto.phoneNumber);
 
-    if (!user) {
-      throw new ConflictException('Phone number does not exist');
-    }
-
     if (user.isPhoneVerified) {
       throw new ConflictException('Phone number is already verified');
     }
@@ -171,23 +292,5 @@ export class UsersService {
     await this.otp.create(user.id, 'phone');
 
     return { message: 'OTP sent successfully' };
-  }
-
-  async findByEmail(email: string) {
-    return await this.prisma.user.findUnique({
-      where: { email },
-    });
-  }
-
-  async findByPhone(phone: string) {
-    return await this.prisma.user.findUnique({
-      where: { phoneNumber: phone },
-    });
-  }
-
-  async findById(id: string) {
-    return await this.prisma.user.findUnique({
-      where: { id },
-    });
   }
 }

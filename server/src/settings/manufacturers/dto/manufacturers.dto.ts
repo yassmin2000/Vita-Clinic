@@ -1,7 +1,8 @@
-import { IsString,IsOptional,  } from 'class-validator';
 import { PartialType } from '@nestjs/mapped-types';
+import { IsString, IsOptional, IsNotEmpty } from 'class-validator';
 
 export class CreateManufacturerDto {
+  @IsNotEmpty()
   @IsString()
   name: string;
 
@@ -11,11 +12,3 @@ export class CreateManufacturerDto {
 }
 
 export class UpdateManufacturerDto extends PartialType(CreateManufacturerDto) {}
-
-
-
-
-
-
-
-

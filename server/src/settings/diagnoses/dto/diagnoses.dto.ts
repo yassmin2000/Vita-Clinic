@@ -1,6 +1,8 @@
-import { IsString, IsOptional } from 'class-validator';
 import { PartialType } from '@nestjs/mapped-types';
+import { IsString, IsOptional, IsNotEmpty } from 'class-validator';
+
 export class CreateDiagnosisDto {
+  @IsNotEmpty()
   @IsString()
   name: string;
 

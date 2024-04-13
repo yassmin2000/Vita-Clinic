@@ -1,3 +1,4 @@
+import { Request } from 'express';
 import {
   Controller,
   Post,
@@ -9,15 +10,17 @@ import {
   Patch,
   Param,
   Delete,
-  NotFoundException,
+  ValidationPipe,
 } from '@nestjs/common';
+
+import { MedicalConditionsService } from './medical-conditions.service';
+import { JwtGuard } from 'src/auth/guards/jwt.guard';
+
 import {
   CreateMedicalConditionDto,
   UpdateMedicalConditionDto,
 } from './dto/medical-conditions.dto';
-import { MedicalConditionsService } from './medical-conditions.service';
-import { JwtGuard } from 'src/auth/guards/jwt.guard';
-import { Payload } from 'src/types/payload.type';
+import type { Payload } from 'src/types/payload.type';
 
 @Controller('settings/medical-conditions')
 export class MedicalConditionsController {
@@ -26,9 +29,21 @@ export class MedicalConditionsController {
   ) {}
 
   @UseGuards(JwtGuard)
-  @Post()
-  async createMedicalCondition(
-    @Body() dto: CreateMedicalConditionDto,
+  @Get()
+  async getAllMedicalConditions(@Req() request: Request) {
+    const user: Payload = request['user'];
+
+    if (user.role === 'patient') {
+      throw new UnauthorizedException();
+    }
+
+    return this.medicalConditionsService.findAll();
+  }
+
+  @UseGuards(JwtGuard)
+  @Get(':id')
+  async getMedicalConditionById(
+    @Param('id') id: string,
     @Req() request: Request,
   ) {
     const user: Payload = request['user'];
@@ -36,43 +51,30 @@ export class MedicalConditionsController {
     if (user.role === 'patient') {
       throw new UnauthorizedException();
     }
-    return this.medicalConditionsService.createMedicalCondition(dto);
+
+    return this.medicalConditionsService.findById(id);
   }
 
   @UseGuards(JwtGuard)
-  @Get()
-  async findAll(@Req() request: Request) {
+  @Post()
+  async createMedicalCondition(
+    @Body(ValidationPipe) dto: CreateMedicalConditionDto,
+    @Req() request: Request,
+  ) {
     const user: Payload = request['user'];
 
     if (user.role === 'patient') {
       throw new UnauthorizedException();
     }
 
-    return await this.medicalConditionsService.findAll();
-  }
-
-  @UseGuards(JwtGuard)
-  @Get(':id')
-  async getMedicalCondition(@Param('id') id: string, @Req() request: Request) {
-    const user: Payload = request['user'];
-
-    if (user.role === 'patient') {
-      throw new UnauthorizedException();
-    }
-
-    const medicalCondition = await this.medicalConditionsService.findById(id);
-    if (!medicalCondition) {
-      throw new NotFoundException('Medical Condition not found');
-    }
-
-    return medicalCondition;
+    return this.medicalConditionsService.create(dto);
   }
 
   @UseGuards(JwtGuard)
   @Patch(':id')
   async updateMedicalCondition(
     @Param('id') id: string,
-    @Body() UpdateMedicalConditionDto: UpdateMedicalConditionDto,
+    @Body(ValidationPipe) UpdateMedicalConditionDto: UpdateMedicalConditionDto,
     @Req() request: Request,
   ) {
     const user: Payload = request['user'];
@@ -81,10 +83,7 @@ export class MedicalConditionsController {
       throw new UnauthorizedException();
     }
 
-    return await this.medicalConditionsService.updateMedicalCondition(
-      id,
-      UpdateMedicalConditionDto,
-    );
+    return this.medicalConditionsService.update(id, UpdateMedicalConditionDto);
   }
 
   @UseGuards(JwtGuard)
@@ -99,6 +98,6 @@ export class MedicalConditionsController {
       throw new UnauthorizedException();
     }
 
-    return this.medicalConditionsService.deleteMedicalCondition(id);
+    return this.medicalConditionsService.delete(id);
   }
 }
