@@ -1,18 +1,19 @@
 'use client';
-
 import { useEffect } from 'react';
+import axios from 'axios';
 import { useQuery } from '@tanstack/react-query';
-
-import { admins as adminsData } from './adminsData';
 
 import { DataTable } from '@/components/DataTable';
 import { columns } from './AdminColumn';
 import FiltersBar from '@/components/FiltersBar';
 import Pagination from '@/components/Pagination';
 
+import useAccessToken from '@/hooks/useAccessToken';
 import { useTableOptions } from '@/hooks/useTableOptions';
 
 export default function AdminsTable() {
+  const accessToken = useAccessToken();
+
   const {
     sortBy,
     searchValue,
@@ -25,41 +26,22 @@ export default function AdminsTable() {
   const {
     data: admins,
     refetch,
-    isFetched,
-    isFetching,
     isLoading,
   } = useQuery({
     queryKey: [
-      `admin_page_${currentPage}_count_${countPerPage}_gender_${currentGender}_sort_${sortBy}_search_${searchValue}_count_${countPerPage}`,
+      `admins_page_${currentPage}_count_${countPerPage}_sex_${currentGender}_sort_${sortBy}_search_${searchValue}`,
     ],
     queryFn: async () => {
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      const [sortWith, sortHow] = sortBy.split('-');
-      if (
-        sortWith !== 'name' &&
-        sortWith !== 'joinedAt' &&
-        sortWith !== 'birthDate'
-      )
-        return null;
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/users/admins?page=${currentPage}&limit=${countPerPage}&sex=${currentGender}&value=${searchValue}&sort=${sortBy}`,
+        {
+          headers: {
+            authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
 
-      return adminsData
-        .filter(
-          (admin) =>
-            (currentGender === 'all' ||
-              admin.gender.toLowerCase() === currentGender) &&
-            (admin.name.toLowerCase().includes(searchValue.toLowerCase()) ||
-              admin.email.toLowerCase().includes(searchValue.toLowerCase()))
-        )
-        .sort((a, b) => {
-          if (a[sortWith] < b[sortWith]) {
-            return sortHow === 'desc' ? 1 : -1;
-          }
-          if (a[sortWith] > b[sortWith]) {
-            return sortHow === 'desc' ? -1 : 1;
-          }
-          return 0;
-        })
-        .slice((currentPage - 1) * countPerPage, currentPage * countPerPage);
+      return response.data;
     },
   });
 

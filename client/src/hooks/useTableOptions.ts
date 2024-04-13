@@ -25,7 +25,7 @@ export const useTableOptions = create<UseTableOptions>((set) => ({
   setCurrentPage: (page) => set({ currentPage: page }),
   countPerPage: 10,
   setCountPerPage: (count) => set({ countPerPage: count }),
-  sortBy: 'joinedAt-desc',
+  sortBy: 'createdAt-desc',
   setSortBy: (sortBy) => set({ sortBy }),
   searchValue: '',
   setSearchValue: (searchValue) => set({ searchValue }),
@@ -40,7 +40,7 @@ export const useTableOptions = create<UseTableOptions>((set) => ({
     set({
       currentPage: 1,
       countPerPage: 10,
-      sortBy: 'joinedAt-desc',
+      sortBy: 'createdAt-desc',
       searchValue: '',
       currentGender: 'all',
       currentStatus: 'all',

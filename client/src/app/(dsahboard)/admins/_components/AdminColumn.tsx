@@ -30,14 +30,15 @@ import {
 } from '@/components/ui/tooltip';
 
 export type Admin = {
-  id: string | number;
-  name: string;
+  id: string;
+  firstName: string;
+  lastName: string;
   email: string;
   birthDate: string;
-  gender: 'Male' | 'Female';
+  sex: 'male' | 'female';
   isSuperAdmin: boolean;
-  joinedAt: string;
-  avatar: string;
+  createdAt: string;
+  avatarURL: string;
 };
 
 export const columns: ColumnDef<Admin>[] = [
@@ -45,8 +46,9 @@ export const columns: ColumnDef<Admin>[] = [
     id: 'name',
     header: 'Name',
     cell: ({ row }) => {
-      const name = row.original.name;
-      const avatar = row.original.avatar;
+      const firstName = row.original.firstName;
+      const lastName = row.original.lastName;
+      const avatar = row.original.avatarURL;
       const isSuperAdmin = row.original.isSuperAdmin;
 
       return (
@@ -56,7 +58,7 @@ export const columns: ColumnDef<Admin>[] = [
               <div className="relative aspect-square h-full w-full">
                 <Image
                   src={avatar}
-                  alt={`${name} profile picture`}
+                  alt={`${firstName} ${lastName} profile picture`}
                   referrerPolicy="no-referrer"
                   fill
                 />
@@ -64,14 +66,15 @@ export const columns: ColumnDef<Admin>[] = [
             ) : (
               <AvatarFallback>
                 <span>
-                  {name.split(' ')[0][0].toUpperCase() +
-                    name.split(' ')[1][0].toUpperCase()}
+                  {firstName[0].toUpperCase() + lastName[0].toUpperCase()}
                 </span>
               </AvatarFallback>
             )}
           </Avatar>
           <p className="flex items-center gap-1.5 font-medium text-foreground">
-            <span>{name}</span>
+            <span>
+              {firstName} {lastName}
+            </span>
             {isSuperAdmin && (
               <TooltipProvider>
                 <Tooltip>
@@ -90,14 +93,12 @@ export const columns: ColumnDef<Admin>[] = [
     },
   },
   {
-    accessorKey: 'gender',
+    accessorKey: 'sex',
     header: 'Gender',
     cell: ({ row }) => {
-      const gender: string = row.original.gender;
+      const sex: string = row.original.sex;
       return (
-        <Badge variant={gender === 'Male' ? 'default' : 'female'}>
-          {gender}
-        </Badge>
+        <Badge variant={sex === 'male' ? 'default' : 'female'}>{sex}</Badge>
       );
     },
   },
@@ -124,16 +125,16 @@ export const columns: ColumnDef<Admin>[] = [
     },
   },
   {
-    accessorKey: 'joinedAt',
+    accessorKey: 'createdAt',
     header: 'Joined at',
     cell: ({ row }) => {
-      const joinedAt: string = row.getValue('joinedAt');
+      const createdAt: string = row.getValue('createdAt');
 
       return (
         <div className="flex flex-col whitespace-nowrap">
-          <span>{format(parseISO(joinedAt), 'MMM dd, yyyy')}</span>
+          <span>{format(parseISO(createdAt), 'MMM dd, yyyy')}</span>
           <span className="text-sm text-muted-foreground">
-            {formatDistanceToNow(parseISO(joinedAt), {
+            {formatDistanceToNow(parseISO(createdAt), {
               addSuffix: true,
             })}
           </span>

@@ -24,14 +24,15 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 export type Patient = {
-  id: string | number;
-  name: string;
+  id: string;
+  firstName: string;
+  lastName: string;
   email: string;
   birthDate: string;
-  gender: 'Male' | 'Female';
+  sex: 'male' | 'female';
   bloodType: string;
-  joinedAt: string;
-  avatar: string;
+  createdAt: string;
+  avatarURL: string;
 };
 
 export const columns: ColumnDef<Patient>[] = [
@@ -39,8 +40,9 @@ export const columns: ColumnDef<Patient>[] = [
     id: 'name',
     header: 'Name',
     cell: ({ row }) => {
-      const name = row.original.name;
-      const avatar = row.original.avatar;
+      const firstName = row.original.firstName;
+      const lastName = row.original.lastName;
+      const avatar = row.original.avatarURL;
 
       return (
         <div className="flex items-center gap-3">
@@ -49,7 +51,7 @@ export const columns: ColumnDef<Patient>[] = [
               <div className="relative aspect-square h-full w-full">
                 <Image
                   src={avatar}
-                  alt={`${name} profile picture`}
+                  alt={`${firstName} ${lastName} profile picture`}
                   referrerPolicy="no-referrer"
                   fill
                 />
@@ -57,13 +59,14 @@ export const columns: ColumnDef<Patient>[] = [
             ) : (
               <AvatarFallback>
                 <span>
-                  {name.split(' ')[0][0].toUpperCase() +
-                    name.split(' ')[1][0].toUpperCase()}
+                  {firstName[0].toUpperCase() + lastName[0].toUpperCase()}
                 </span>
               </AvatarFallback>
             )}
           </Avatar>
-          <p className="font-medium text-foreground">{name}</p>
+          <p className="font-medium text-foreground">
+            {firstName} {lastName}
+          </p>
         </div>
       );
     },
@@ -72,9 +75,9 @@ export const columns: ColumnDef<Patient>[] = [
     accessorKey: 'gender',
     header: 'Gender',
     cell: ({ row }) => {
-      const gender: string = row.original.gender;
+      const gender: string = row.original.sex;
       return (
-        <Badge variant={gender === 'Male' ? 'default' : 'female'}>
+        <Badge variant={gender === 'male' ? 'default' : 'female'}>
           {gender}
         </Badge>
       );
@@ -111,16 +114,16 @@ export const columns: ColumnDef<Patient>[] = [
     },
   },
   {
-    accessorKey: 'joinedAt',
+    accessorKey: 'createdAt',
     header: 'Joined at',
     cell: ({ row }) => {
-      const joinedAt: string = row.getValue('joinedAt');
+      const createdAt: string = row.getValue('createdAt');
 
       return (
         <div className="flex flex-col whitespace-nowrap">
-          <span>{format(parseISO(joinedAt), 'MMM dd, yyyy')}</span>
+          <span>{format(parseISO(createdAt), 'MMM dd, yyyy')}</span>
           <span className="text-sm text-muted-foreground">
-            {formatDistanceToNow(parseISO(joinedAt), {
+            {formatDistanceToNow(parseISO(createdAt), {
               addSuffix: true,
             })}
           </span>

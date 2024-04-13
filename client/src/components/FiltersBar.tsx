@@ -221,8 +221,8 @@ export default function FiltersBar({
               {sortByDateEnabled && (
                 <SelectGroup>
                   <SelectLabel>Joined at</SelectLabel>
-                  <SelectItem value="joinedAt-asc">Oldest first</SelectItem>
-                  <SelectItem value="joinedAt-desc">Newest first</SelectItem>
+                  <SelectItem value="createdAt-asc">Oldest first</SelectItem>
+                  <SelectItem value="createdAt-desc">Newest first</SelectItem>
                 </SelectGroup>
               )}
 
