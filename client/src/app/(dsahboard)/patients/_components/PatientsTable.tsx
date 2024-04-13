@@ -5,7 +5,7 @@ import axios from 'axios';
 import { useQuery } from '@tanstack/react-query';
 
 import { DataTable } from '@/components/DataTable';
-import { columns } from './PatientsColumn';
+import { columns, type Patient } from './PatientsColumn';
 import FiltersBar from '@/components/FiltersBar';
 import Pagination from '@/components/Pagination';
 
@@ -42,7 +42,7 @@ export default function PatientsTable() {
         }
       );
 
-      return response.data;
+      return response.data as Patient[];
     },
   });
 

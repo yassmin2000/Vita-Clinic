@@ -4,7 +4,7 @@ import axios from 'axios';
 import { useQuery } from '@tanstack/react-query';
 
 import { DataTable } from '@/components/DataTable';
-import { columns } from './AdminColumn';
+import { type Admin, columns } from './AdminColumn';
 import FiltersBar from '@/components/FiltersBar';
 import Pagination from '@/components/Pagination';
 
@@ -41,7 +41,7 @@ export default function AdminsTable() {
         }
       );
 
-      return response.data;
+      return response.data as Admin[];
     },
   });
 
