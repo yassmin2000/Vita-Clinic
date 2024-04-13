@@ -1,18 +1,16 @@
 'use client';
 
 import { useEffect } from 'react';
+import axios from 'axios';
 import { useQuery } from '@tanstack/react-query';
-
-import { devices as devicesData } from './devicesData';
 
 import DeviceCard from './DeviceCard';
 import DeviceCardSkeleton from './DeviceCardSkeleton';
 import FiltersBar from '@/components/FiltersBar';
 import Pagination from '@/components/Pagination';
 
-import { useTableOptions } from '@/hooks/useTableOptions';
-import axios from 'axios';
 import useAccessToken from '@/hooks/useAccessToken';
+import { useTableOptions } from '@/hooks/useTableOptions';
 
 type Device = {
   id: string;
@@ -50,7 +48,7 @@ export default function DeviceCardsGrid() {
     isLoading,
   } = useQuery({
     queryKey: [
-      `admins_page_${currentPage}_count_${countPerPage}_status_${currentStatus}_sort_${sortBy}_search_${searchValue}`,
+      `devices_page_${currentPage}_count_${countPerPage}_status_${currentStatus}_sort_${sortBy}_search_${searchValue}`,
     ],
     queryFn: async () => {
       const response = await axios.get(
