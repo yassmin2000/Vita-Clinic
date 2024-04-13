@@ -1,5 +1,14 @@
-import { IsNotEmpty, IsString, IsNumber, IsDateString } from 'class-validator';
 import { PartialType } from '@nestjs/mapped-types';
+import {
+  IsNotEmpty,
+  IsString,
+  IsNumber,
+  IsDateString,
+  IsOptional,
+  IsIn,
+  IsInt,
+} from 'class-validator';
+import { Transform } from 'class-transformer';
 
 export class CreateDeviceDto {
   @IsNotEmpty()
@@ -18,11 +27,46 @@ export class CreateDeviceDto {
   @IsNumber()
   price: number;
 
+  @IsIn(['active', 'inactive'])
+  @Transform(({ value }) => value.toLowerCase(), { toClassOnly: true })
+  status: 'active' | 'inactive';
+
+  @IsOptional()
+  @IsString()
+  imageURL?: string;
+
+  @IsOptional()
   @IsString()
   description?: string;
 
+  @IsNotEmpty()
   @IsDateString()
-  purchaseDate?: string;
+  purchaseDate: string;
 }
 
 export class UpdateDeviceDto extends PartialType(CreateDeviceDto) {}
+
+export class GetAllDevicesQuery {
+  @IsOptional()
+  @IsInt()
+  @Transform(({ value }) => parseInt(value), { toClassOnly: true })
+  page?: number;
+
+  @IsOptional()
+  @IsInt()
+  @Transform(({ value }) => parseInt(value), { toClassOnly: true })
+  limit?: number;
+
+  @IsOptional()
+  @IsIn(['all', 'active', 'inactive'])
+  @Transform(({ value }) => value.toLowerCase(), { toClassOnly: true })
+  status?: 'all' | 'active' | 'inactive';
+
+  @IsOptional()
+  @IsString()
+  value?: string;
+
+  @IsOptional()
+  @IsString()
+  sort?: string;
+}

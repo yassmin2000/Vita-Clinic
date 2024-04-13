@@ -1,27 +1,27 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+
 import { PrismaService } from 'src/prisma.service';
-import { CreateDeviceDto, UpdateDeviceDto } from './dto/devices.dto';
+import {
+  CreateDeviceDto,
+  GetAllDevicesQuery,
+  UpdateDeviceDto,
+} from './dto/devices.dto';
 
 @Injectable()
 export class DevicesService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async createDevice(createDeviceDto: CreateDeviceDto) {
-    const { name, description, serialNumber, manufacturerId, price, purchaseDate } = createDeviceDto;
-  
-    return this.prisma.device.create({
-      data: {
-        name,
-        description,
-        serialNumber,
-        manufacturerId,
-        price,
-        purchaseDate,
-      },
-    });
-  }
-
-  async findAll(page: number, limit: number, status: string, value: string, sort: string) {
+  async findAll({
+    page = 1,
+    limit = 10,
+    status = 'all',
+    value = '',
+    sort = 'purchaseDate-desc',
+  }: GetAllDevicesQuery) {
     const offset = (page - 1) * limit;
     const queryOptions: any = {
       skip: offset,
@@ -31,25 +31,108 @@ export class DevicesService {
     if (status !== 'all') {
       queryOptions.where = { status };
     }
+
     if (value) {
       queryOptions.where = { ...queryOptions.where, name: { contains: value } };
     }
-    return await this.prisma.device.findMany(queryOptions);
-  }
 
-  async findById(id: string) {
-    return this.prisma.device.findUnique({
-      where: { id },
+    return await this.prisma.device.findMany({
+      where: {
+        name: {
+          contains: value,
+          mode: 'insensitive',
+        },
+        status: status === 'all' ? undefined : status,
+      },
+      include: {
+        manufacturer: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+      skip: (page - 1) * offset,
+      take: limit,
     });
   }
 
-  async updateDevice(id: string, updateDeviceDto: UpdateDeviceDto) {
+  async findById(id: string) {
+    const device = await this.prisma.device.findUnique({
+      where: { id },
+      include: {
+        manufacturer: {
+          select: {
+            id: true,
+            name: true,
+            description: true,
+          },
+        },
+      },
+    });
+
+    if (!device) {
+      throw new NotFoundException('Device not found');
+    }
+
+    return device;
+  }
+
+  async create(createDeviceDto: CreateDeviceDto) {
+    const existingSerialNumber = await this.prisma.device.findUnique({
+      where: {
+        serialNumber: createDeviceDto.serialNumber,
+      },
+    });
+
+    if (existingSerialNumber) {
+      throw new ConflictException('Serial number already exists');
+    }
+
+    const manufacturer = await this.prisma.manufacturer.findUnique({
+      where: { id: createDeviceDto.manufacturerId },
+    });
+
+    if (!manufacturer) {
+      throw new NotFoundException('Manufacturer not found');
+    }
+
+    return this.prisma.device.create({
+      data: createDeviceDto,
+    });
+  }
+
+  async update(id: string, updateDeviceDto: UpdateDeviceDto) {
     const existingDevice = await this.prisma.device.findUnique({
       where: { id },
     });
 
     if (!existingDevice) {
-      return null;
+      throw new NotFoundException('Device not found');
+    }
+
+    if (updateDeviceDto.serialNumber) {
+      const existingSerialNumber = await this.prisma.device.findUnique({
+        where: {
+          serialNumber: updateDeviceDto.serialNumber,
+        },
+      });
+
+      if (existingSerialNumber && existingSerialNumber.id !== id) {
+        throw new ConflictException('Serial number already exists');
+      }
+    }
+
+    if (updateDeviceDto.manufacturerId) {
+      const manufacturer = await this.prisma.manufacturer.findUnique({
+        where: {
+          id: updateDeviceDto.manufacturerId,
+        },
+      });
+
+      if (!manufacturer) {
+        throw new NotFoundException('Manufacturer not found');
+      }
     }
 
     return this.prisma.device.update({
@@ -58,13 +141,13 @@ export class DevicesService {
     });
   }
 
-  async deleteDevice(id: string) {
+  async delete(id: string) {
     const existingDevice = await this.prisma.device.findUnique({
       where: { id },
     });
 
     if (!existingDevice) {
-      return null;
+      throw new NotFoundException('Device not found');
     }
 
     await this.prisma.device.delete({

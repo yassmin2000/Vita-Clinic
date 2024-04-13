@@ -36,6 +36,11 @@ enum Frequency {
   yearly
 }
 
+enum DeviceStatus {
+  active
+  inactive
+}
+
 enum AppointmentStatus {
   pending
   rejected
@@ -407,11 +412,13 @@ model LaboratoryTestResult {
 }
 
 model Device {
-  id          String @id @default(uuid())
+  id          String  @id @default(uuid())
   name        String
-  description String
+  description String?
 
-  serialNumber String
+  status       DeviceStatus @default(active)
+  imageURL     String?
+  serialNumber String       @unique
   price        Float
 
   manufacturer   Manufacturer @relation(fields: [manufacturerId], references: [id])
@@ -425,9 +432,9 @@ model Device {
 }
 
 model Manufacturer {
-  id          String @id @default(uuid())
+  id          String  @id @default(uuid())
   name        String
-  description String
+  description String?
 
   devices Device[]
 
