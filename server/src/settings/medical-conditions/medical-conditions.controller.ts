@@ -94,7 +94,7 @@ export class MedicalConditionsController {
   ) {
     const user: Payload = request['user'];
 
-    if (user.role !== 'admin') {
+    if (!user.isSuperAdmin) {
       throw new UnauthorizedException();
     }
 

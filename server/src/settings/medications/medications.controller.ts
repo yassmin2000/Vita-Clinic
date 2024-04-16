@@ -88,7 +88,7 @@ export class MedicationsController {
   async deleteMedication(@Param('id') id: string, @Req() request: Request) {
     const user: Payload = request['user'];
 
-    if (user.role !== 'admin') {
+    if (!user.isSuperAdmin) {
       throw new UnauthorizedException();
     }
 

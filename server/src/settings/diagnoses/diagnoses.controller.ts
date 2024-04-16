@@ -83,7 +83,7 @@ export class DiagnosesController {
   async deleteDiagnosis(@Param('id') id: string, @Req() request: Request) {
     const user: Payload = request['user'];
 
-    if (user.role === 'patient') {
+    if (!user.isSuperAdmin) {
       throw new UnauthorizedException();
     }
 
