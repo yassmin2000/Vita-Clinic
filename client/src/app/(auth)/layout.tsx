@@ -17,7 +17,9 @@ export default async function AuthLayout({
   return (
     <div className="h-full">
       <Navbar />
-      <main className="h-full pt-16">{children}</main>
+      <main className="h-full pt-16">
+        <div className="h-full space-y-2 px-4">{children}</div>
+      </main>
     </div>
   );
 }

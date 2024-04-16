@@ -36,6 +36,8 @@ import { Calendar } from '@/components/ui/calendar';
 
 import { useUploadThing } from '@/lib/uploadthing';
 import { cn } from '@/lib/utils';
+import { isValidPhoneNumber } from 'react-phone-number-input';
+import { PhoneInput } from './ui/phone-input';
 
 const formSchema = z.object({
   firstName: z.string().min(1, {
@@ -65,6 +67,10 @@ const formSchema = z.object({
     .max(new Date(), {
       message: 'Birth date cannot be in the future.',
     }),
+  phone: z
+    .string({ required_error: 'Phone number is required.' })
+    .refine(isValidPhoneNumber, { message: 'Invalid phone number.' }),
+  address: z.string({ required_error: 'Address is required.' }),
   speciality: z.string().optional(),
   avatar: z.any().optional(),
 });
@@ -143,6 +149,7 @@ export default function UserForm() {
                 </FormItem>
               )}
             />
+
             <FormField
               name="lastName"
               control={form.control}
@@ -156,6 +163,7 @@ export default function UserForm() {
                 </FormItem>
               )}
             />
+
             <FormField
               name="sex"
               control={form.control}
@@ -221,7 +229,7 @@ export default function UserForm() {
               control={form.control}
               name="birthDate"
               render={({ field }) => (
-                <FormItem className="col-span-2 flex flex-col md:col-span-1">
+                <FormItem className="col-span-2 md:col-span-1">
                   <FormLabel>Date of birth</FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
@@ -229,7 +237,7 @@ export default function UserForm() {
                         <Button
                           variant={'outline'}
                           className={cn(
-                            'pl-3 text-left font-normal',
+                            'flex h-10 w-full pl-3 text-left font-normal',
                             !field.value && 'text-muted-foreground'
                           )}
                         >
@@ -254,6 +262,38 @@ export default function UserForm() {
                       />
                     </PopoverContent>
                   </Popover>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              name="address"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem className="col-span-2 md:col-span-1">
+                  <FormLabel>Address</FormLabel>
+                  <FormControl>
+                    <Input
+                      disabled={isLoading}
+                      placeholder="Address..."
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              name="phone"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem className="col-span-2">
+                  <FormLabel>Phone Number</FormLabel>
+                  <FormControl>
+                    <PhoneInput placeholder="Enter a phone number" {...field} />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}

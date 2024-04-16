@@ -3,10 +3,10 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { signIn } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { isValidPhoneNumber } from 'react-phone-number-input';
 import { format } from 'date-fns';
 import { CalendarIcon, Eye, EyeOff } from 'lucide-react';
 
@@ -19,6 +19,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { PhoneInput } from '@/components/ui/phone-input';
 import {
   Select,
   SelectContent,
@@ -66,6 +67,10 @@ const formSchema = z.object({
     required_error: 'Gender is required.',
     invalid_type_error: 'Gender is invalid.',
   }),
+  address: z.string().optional(),
+  phone: z
+    .string({ required_error: 'Phone number is required.' })
+    .refine(isValidPhoneNumber, { message: 'Invalid phone number.' }),
 });
 
 export default function SignUp() {
@@ -85,12 +90,11 @@ export default function SignUp() {
         message: "Passwords don't match.",
       });
     }
-
     // Register user
   };
 
   return (
-    <div className="container mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[600px]">
+    <div className="container mx-auto flex w-full flex-col justify-center px-4 sm:w-[600px]">
       <div className="flex flex-col space-y-2 text-center">
         <h1 className="text-2xl font-semibold tracking-tight">
           Getting Started
@@ -215,6 +219,38 @@ export default function SignUp() {
                 )}
               />
             </div>
+
+            <FormField
+              name="address"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem className="flex flex-col items-start gap-1">
+                  <FormLabel>Address</FormLabel>
+                  <FormControl>
+                    <Input
+                      disabled={isLoading}
+                      placeholder="johndoe@email.com"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              name="phone"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem className="flex flex-col items-start gap-1">
+                  <FormLabel>Phone Number</FormLabel>
+                  <FormControl>
+                    <PhoneInput placeholder="Enter a phone number" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <FormField
               name="email"
