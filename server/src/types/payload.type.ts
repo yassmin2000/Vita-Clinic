@@ -7,5 +7,6 @@ export type Payload = {
   lastName: string;
   phoneNumber?: string;
   role: Role;
+  isSuperAdmin: boolean;
   avatar: string;
 };

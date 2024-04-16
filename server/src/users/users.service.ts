@@ -170,6 +170,7 @@ export class UsersService {
       data: {
         ...dto,
         role,
+        isSuperAdmin: false,
         password: await hash(dto.password, 10),
         isEmailVerified: verified,
         isPhoneVerified: verified,

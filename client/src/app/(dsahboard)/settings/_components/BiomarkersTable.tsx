@@ -16,7 +16,7 @@ import useSettingsStore from '@/hooks/useSettingsStore';
 import type { Biomarker } from '@/types/settings.type';
 
 export default function BiomarkersTable() {
-  const role = useUserRole();
+  const { role } = useUserRole();
   const accessToken = useAccessToken();
 
   const { data: biomarkers, isLoading } = useQuery({

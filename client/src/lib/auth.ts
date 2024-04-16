@@ -92,7 +92,8 @@ export const getAccessToken = async () => {
 export const getUserRole = async () => {
   const session = await getAuthSession();
   if (session && session.user.role) {
-    return session.user.role;
+    return { role: session.user.role, isSuperAdmin: session.user.isSuperAdmin };
   }
-  return null;
+
+  return { role: null, isSuperAdmin: false };
 };

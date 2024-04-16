@@ -31,7 +31,7 @@ export class UsersController {
       throw new UnauthorizedException();
     }
 
-    if (dto.role === 'admin') {
+    if (dto.role === 'admin' && !user.isSuperAdmin) {
       throw new UnauthorizedException();
     }
 

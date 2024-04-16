@@ -25,7 +25,7 @@ import useSettingsStore from '@/hooks/useSettingsStore';
 import type { Biomarker } from '@/types/settings.type';
 
 const ActionsCell = ({ row }: { row: Row<Biomarker> }) => {
-  const role = useUserRole();
+  const { role, isSuperAdmin } = useUserRole();
   const { openForm, setCurrentBiomarker } = useSettingsStore();
 
   if (role !== 'admin') {
@@ -50,9 +50,11 @@ const ActionsCell = ({ row }: { row: Row<Biomarker> }) => {
         >
           <Pencil className="mr-2 h-4 w-4" /> Edit
         </DropdownMenuItem>
-        <DropdownMenuItem>
-          <Trash className="mr-2 h-4 w-4" /> Delete
-        </DropdownMenuItem>
+        {isSuperAdmin && (
+          <DropdownMenuItem>
+            <Trash className="mr-2 h-4 w-4" /> Delete
+          </DropdownMenuItem>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );

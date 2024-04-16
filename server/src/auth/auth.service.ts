@@ -22,6 +22,7 @@ export class AuthService {
       firstName: user.firstName,
       lastName: user.lastName,
       role: user.role,
+      isSuperAdmin: user.isSuperAdmin,
       avatar: user.avatarURL,
     };
 
@@ -71,6 +72,7 @@ export class AuthService {
       lastName: user.lastName,
       phoneNumber: user.phoneNumber,
       role: user.role,
+      isSuperAdmin: user.isSuperAdmin,
       avatar: user.avatar,
     };
 

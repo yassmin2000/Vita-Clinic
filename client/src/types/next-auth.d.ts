@@ -6,6 +6,7 @@ declare module 'next-auth' {
       id: string;
       email: string;
       role: string;
+      isSuperAdmin: boolean;
       firstName: string;
       lastName: string;
       avatarURL: string;
@@ -32,6 +33,7 @@ declare module 'next-auth/jwt' {
       id: string;
       email: string;
       role: string;
+      isSuperAdmin: boolean;
       firstName: string;
       lastName: string;
       avatarURL: string;

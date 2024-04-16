@@ -25,7 +25,7 @@ import useSettingsStore from '@/hooks/useSettingsStore';
 import type { Lookup } from '@/types/settings.type';
 
 const ActionsCell = ({ row }: { row: Row<Lookup> }) => {
-  const role = useUserRole();
+  const { isSuperAdmin } = useUserRole();
   const { openForm, setCurrentLookup } = useSettingsStore();
 
   return (
@@ -46,7 +46,7 @@ const ActionsCell = ({ row }: { row: Row<Lookup> }) => {
         >
           <Pencil className="mr-2 h-4 w-4" /> Edit
         </DropdownMenuItem>
-        {role === 'admin' && (
+        {isSuperAdmin && (
           <DropdownMenuItem>
             <Trash className="mr-2 h-4 w-4" /> Delete
           </DropdownMenuItem>
