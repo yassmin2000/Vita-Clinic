@@ -109,9 +109,9 @@ model ElectronicMedicalRecord {
   patient   User   @relation(fields: [patientId], references: [id])
   patientId String @unique
 
-  height    Float
-  weight    Float
-  bloodType BloodType
+  height    Float?
+  weight    Float?
+  bloodType BloodType?
   insurance Insurance?
 
   diagnoses         PatientDiganosis[]

@@ -4,11 +4,12 @@ import {
   IsIn,
   IsInt,
   IsNotEmpty,
+  IsNumber,
   IsOptional,
   IsString,
 } from 'class-validator';
 import { Transform } from 'class-transformer';
-import type { Role, Sex } from '@prisma/client';
+import type { BloodType, Role, Sex } from '@prisma/client';
 
 export class CreateUserDto {
   @IsNotEmpty()
@@ -40,8 +41,30 @@ export class CreateUserDto {
   @IsIn(['male', 'female'])
   sex: 'male' | 'female';
 
+  @IsOptional()
   @IsIn(['patient', 'doctor', 'admin'])
-  role?: 'patient' | 'doctor' | 'admin';
+  role?: Role;
+
+  @IsOptional()
+  @IsNumber()
+  height?: number;
+
+  @IsOptional()
+  @IsNumber()
+  weight?: number;
+
+  @IsOptional()
+  @IsIn([
+    'a_positive',
+    'a_negative',
+    'b_positive',
+    'b_negative',
+    'ab_positive',
+    'ab_negative',
+    'o_positive',
+    'o_negative',
+  ])
+  bloodType?: BloodType;
 }
 
 export class VerifyUserEmailDto {

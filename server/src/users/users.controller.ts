@@ -35,6 +35,6 @@ export class UsersController {
       throw new UnauthorizedException();
     }
 
-    return this.userService.create(dto, dto.role, true);
+    return this.userService.create(dto, dto.role || 'patient', true);
   }
 }

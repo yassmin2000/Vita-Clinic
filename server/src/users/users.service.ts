@@ -125,10 +125,14 @@ export class UsersService {
     return user;
   }
 
-  async findByEmail(email: string) {
+  async findByEmail(email: string, skipError?: boolean) {
     const user = await this.prisma.user.findUnique({
       where: { email },
     });
+
+    if (skipError) {
+      return user;
+    }
 
     if (!user) {
       throw new NotFoundException('User not found');
@@ -137,10 +141,14 @@ export class UsersService {
     return user;
   }
 
-  async findByPhone(phone: string) {
+  async findByPhone(phone: string, skipError?: boolean) {
     const user = await this.prisma.user.findUnique({
       where: { phoneNumber: phone },
     });
+
+    if (skipError) {
+      return user;
+    }
 
     if (!user) {
       throw new NotFoundException('User not found');
@@ -154,21 +162,23 @@ export class UsersService {
     role: Role = 'patient',
     verified: boolean = false,
   ) {
-    const isEmailExist = await this.findByEmail(dto.email);
+    const isEmailExist = await this.findByEmail(dto.email, true);
 
     if (isEmailExist) {
       throw new ConflictException('Email already exists');
     }
 
-    const isPhoneExist = await this.findByPhone(dto.phoneNumber);
+    const isPhoneExist = await this.findByPhone(dto.phoneNumber, true);
 
     if (isPhoneExist) {
       throw new ConflictException('Phone number already exists');
     }
 
+    const { weight, height, bloodType, ...userDto } = dto;
+
     const newUser = await this.prisma.user.create({
       data: {
-        ...dto,
+        ...userDto,
         role,
         isSuperAdmin: false,
         password: await hash(dto.password, 10),
@@ -176,6 +186,17 @@ export class UsersService {
         isPhoneVerified: verified,
       },
     });
+
+    if (role === 'patient') {
+      await this.prisma.electronicMedicalRecord.create({
+        data: {
+          patientId: newUser.id,
+          height,
+          weight,
+          bloodType,
+        },
+      });
+    }
 
     if (!verified) {
       await this.otp.create(newUser.id, 'email');
