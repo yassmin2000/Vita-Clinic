@@ -187,7 +187,7 @@ export default function LookupForm({
 
         <div className="flex justify-between gap-2">
           <Button type="submit" size="sm" disabled={isPending}>
-            Create {title}
+            {currentId ? 'Update' : 'Create'} {title}
           </Button>
         </div>
       </form>

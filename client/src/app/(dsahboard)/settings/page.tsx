@@ -7,6 +7,7 @@ import SurgeriesTable from './_components/SurgeriesTable';
 import ModalitiesTable from './_components/ModalitiesTable';
 import BiomarkersTable from './_components/BiomarkersTable';
 import LaboratoryTestsTable from './_components/LaboratoryTestsTable';
+import ManufacturersTable from './_components/ManufacturersTable';
 
 export default function SettingsPage() {
   return (
@@ -32,6 +33,7 @@ export default function SettingsPage() {
             <TabsTrigger value="modalities">Modalities</TabsTrigger>
             <TabsTrigger value="biomarkers">Biomarkers</TabsTrigger>
             <TabsTrigger value="laboratory-tests">Laboratory Tests</TabsTrigger>
+            <TabsTrigger value="manufacturers">Manufacturers</TabsTrigger>
           </TabsList>
           <TabsContent value="diagnosis">
             <DiagnosisTable />
@@ -56,6 +58,9 @@ export default function SettingsPage() {
           </TabsContent>
           <TabsContent value="laboratory-tests">
             <LaboratoryTestsTable />
+          </TabsContent>
+          <TabsContent value="manufacturers">
+            <ManufacturersTable />
           </TabsContent>
         </Tabs>
       </div>
