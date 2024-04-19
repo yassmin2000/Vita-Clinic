@@ -43,6 +43,7 @@ export default function AdminsTable() {
 
       return response.data as Admin[];
     },
+    enabled: !!accessToken,
   });
 
   useEffect(() => {

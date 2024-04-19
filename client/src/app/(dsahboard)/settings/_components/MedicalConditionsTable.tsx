@@ -35,6 +35,7 @@ export default function MedicalConditionsTable() {
 
       return response.data as Lookup[];
     },
+    enabled: !!accessToken,
   });
 
   const { isFormOpen, closeForm, currentLookup } = useSettingsStore();

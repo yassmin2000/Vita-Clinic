@@ -31,6 +31,7 @@ export default function SurgeriesTable() {
 
       return response.data as Lookup[];
     },
+    enabled: !!accessToken,
   });
 
   const { isFormOpen, closeForm, currentLookup } = useSettingsStore();

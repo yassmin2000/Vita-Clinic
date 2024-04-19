@@ -44,6 +44,7 @@ export default function DoctorsTable() {
 
       return response.data as Doctor[];
     },
+    enabled: !!accessToken,
   });
 
   useEffect(() => {

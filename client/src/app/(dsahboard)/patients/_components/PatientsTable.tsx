@@ -44,6 +44,7 @@ export default function PatientsTable() {
 
       return response.data as Patient[];
     },
+    enabled: !!accessToken,
   });
 
   useEffect(() => {

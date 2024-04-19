@@ -33,6 +33,7 @@ export default function BiomarkersTable() {
 
       return response.data as Biomarker[];
     },
+    enabled: !!accessToken,
   });
 
   const { isFormOpen, closeForm, currentBiomarker } = useSettingsStore();
