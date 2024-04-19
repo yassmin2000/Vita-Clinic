@@ -1,5 +1,9 @@
 'use client';
 
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import axios, { type AxiosResponse } from 'axios';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -16,6 +20,7 @@ import {
 } from '@/components/ui/form';
 import ImageUpload from '@/components/ImageUpload';
 import { Input } from '@/components/ui/input';
+import { Textarea } from './ui/textarea';
 import {
   Select,
   SelectContent,
@@ -23,6 +28,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Combobox } from './ui/combobox';
 import {
   Popover,
   PopoverContent,
@@ -31,9 +37,14 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
+import { useToast } from './ui/use-toast';
 
 import { useUploadThing } from '@/lib/uploadthing';
+import useAccessToken from '@/hooks/useAccessToken';
 import { cn } from '@/lib/utils';
+
+import type { Device } from '@/types/devices.type';
+import type { Lookup } from '@/types/settings.type';
 
 const formSchema = z.object({
   deviceName: z.string().min(1, {
@@ -56,34 +67,163 @@ const formSchema = z.object({
     .max(new Date(), {
       message: 'Purchase date cannot be in the future.',
     }),
+  price: z.number(),
+  description: z.string().optional(),
   image: z.any().optional(),
 });
 
-export default function DeviceForm() {
+interface DeviceFormProps {
+  deviceId?: string;
+}
+
+export default function DeviceForm({ deviceId }: DeviceFormProps) {
   const { startUpload } = useUploadThing('imageUploader');
+  const accessToken = useAccessToken();
+  const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
   });
-  const isLoading = form.formState.isSubmitting;
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log(values);
-    if (values.image) {
-      const res = await startUpload([values.image]);
-      if (res) {
-        const [fileResponse] = res;
-        const url = fileResponse.url;
-        console.log(url);
+  const router = useRouter();
+
+  const { data, isLoading } = useQuery({
+    queryKey: [`device_${deviceId}`],
+    queryFn: async () => {
+      if (!deviceId) {
+        return null;
       }
+
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/devices/${deviceId}`,
+        {
+          headers: {
+            authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      return response.data as Device;
+    },
+    enabled: !!accessToken,
+  });
+
+  const { data: manufacturers, isLoading: isLoadingManufacturers } = useQuery({
+    queryKey: ['manufacturers'],
+    queryFn: async () => {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/settings/manufacturers`,
+        {
+          headers: {
+            authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      const data = response.data as Lookup[];
+
+      if (data) {
+        return data.map((manufacturer) => ({
+          label: manufacturer.name,
+          value: manufacturer.id,
+        }));
+      }
+
+      return [];
+    },
+    enabled: !!accessToken,
+  });
+
+  const { mutate: mutateDevice, isPending } = useMutation({
+    mutationFn: async (values: z.infer<typeof formSchema>) => {
+      let url = '';
+      if (values.image && values.image !== data?.imageURL) {
+        const res = await startUpload([values.image]);
+        if (res) {
+          const [fileResponse] = res;
+          url = fileResponse.url;
+        }
+      }
+
+      let response: AxiosResponse<any, any>;
+      const body = {
+        name: values.deviceName,
+        serialNumber: values.serialNumber,
+        price: values.price,
+        imageURL: url || data?.imageURL,
+        manufacturerId: values.manufacturer,
+        purchaseDate: values.purchaseDate.toISOString(),
+        status: values.status,
+        description: values.description,
+      };
+
+      console.log(body);
+
+      if (deviceId) {
+        response = await axios.patch(
+          `${process.env.NEXT_PUBLIC_API_URL}/devices/${deviceId}`,
+          body,
+          {
+            headers: {
+              authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
+
+        if (response.status !== 200) {
+          throw new Error('Failed to update');
+        }
+      } else {
+        response = await axios.post(
+          `${process.env.NEXT_PUBLIC_API_URL}/devices`,
+          body,
+          {
+            headers: {
+              authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
+
+        if (response.status !== 201) {
+          throw new Error('Failed to create');
+        }
+      }
+
+      return router.back();
+    },
+    onError: () => {
+      return toast({
+        title: `Failed to ${deviceId ? 'update' : 'create'} device`,
+        description: 'Please try again later.',
+        variant: 'destructive',
+      });
+    },
+    onSuccess: () => {
+      return toast({
+        title: `${deviceId ? 'Updated' : 'Created'} device successfully`,
+        description: `Device has been ${deviceId ? 'updated' : 'created'} successfully.`,
+      });
+    },
+  });
+
+  useEffect(() => {
+    if (data) {
+      form.setValue('deviceName', data.name);
+      form.setValue('description', data.description);
+      form.setValue('image', data.imageURL);
+      form.setValue('manufacturer', data.manufacturer.id);
+      form.setValue('price', data.price);
+      form.setValue('purchaseDate', new Date(data.purchaseDate));
+      form.setValue('serialNumber', data.serialNumber);
+      form.setValue('status', data.status);
     }
-  };
+  }, [data]);
 
   return (
     <div className="mx-auto h-full max-w-3xl space-y-2 p-4">
       <Form {...form}>
         <form
-          onSubmit={form.handleSubmit(onSubmit)}
+          onSubmit={form.handleSubmit((e) => mutateDevice(e))}
           className="space-y-8 pb-10"
         >
           <div className="w-full space-y-2">
@@ -103,7 +243,7 @@ export default function DeviceForm() {
                   <ImageUpload
                     value={field.value}
                     onChange={field.onChange}
-                    disabled={isLoading}
+                    disabled={isPending || isLoading}
                   />
                 </FormControl>
                 <FormMessage />
@@ -119,7 +259,7 @@ export default function DeviceForm() {
                   <FormLabel>Device Name</FormLabel>
                   <FormControl>
                     <Input
-                      disabled={isLoading}
+                      disabled={isPending || isLoading}
                       placeholder="CT Scanner"
                       {...field}
                     />
@@ -135,16 +275,22 @@ export default function DeviceForm() {
                 <FormItem className="col-span-2 md:col-span-1">
                   <FormLabel>Manufacturer</FormLabel>
                   <FormControl>
-                    <Input
-                      disabled={isLoading}
-                      placeholder="Philips"
-                      {...field}
+                    <Combobox
+                      value={field.value}
+                      onChange={field.onChange}
+                      placeholder="Select manufacturer..."
+                      inputPlaceholder="Search manufacturer..."
+                      options={manufacturers || []}
+                      disabled={
+                        isPending || isLoading || isLoadingManufacturers
+                      }
                     />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
+
             <FormField
               name="serialNumber"
               control={form.control}
@@ -153,7 +299,7 @@ export default function DeviceForm() {
                   <FormLabel>Serial Number</FormLabel>
                   <FormControl>
                     <Input
-                      disabled={isLoading}
+                      disabled={isPending || isLoading}
                       placeholder="XXYYZZ123"
                       {...field}
                     />
@@ -170,7 +316,7 @@ export default function DeviceForm() {
                 <FormItem className="col-span-2 md:col-span-1">
                   <FormLabel>Device Status</FormLabel>
                   <Select
-                    disabled={isLoading}
+                    disabled={isPending || isLoading}
                     onValueChange={field.onChange}
                     value={field.value}
                     defaultValue={field.value}
@@ -194,10 +340,29 @@ export default function DeviceForm() {
             />
 
             <FormField
+              name="price"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem className="col-span-2 md:col-span-1">
+                  <FormLabel>Device Price (USD)</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      disabled={isPending || isLoading}
+                      {...field}
+                      onChange={(event) => field.onChange(+event.target.value)}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
               control={form.control}
               name="purchaseDate"
               render={({ field }) => (
-                <FormItem className="col-span-2 flex flex-col md:col-span-1">
+                <FormItem className="col-span-2 md:col-span-1">
                   <FormLabel>Purchase date</FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
@@ -205,7 +370,7 @@ export default function DeviceForm() {
                         <Button
                           variant={'outline'}
                           className={cn(
-                            'pl-3 text-left font-normal',
+                            'flex h-10 w-full pl-3 text-left font-normal',
                             !field.value && 'text-muted-foreground'
                           )}
                         >
@@ -234,8 +399,30 @@ export default function DeviceForm() {
                 </FormItem>
               )}
             />
+
+            <FormField
+              name="description"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem className="col-span-2">
+                  <FormLabel>Description</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      disabled={isPending || isLoading}
+                      placeholder="Add description..."
+                      minRows={4}
+                      maxRows={8}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </div>
-          <Button type="submit">Submit</Button>
+          <Button type="submit" disabled={isPending || isLoading}>
+            Submit
+          </Button>
         </form>
       </Form>
     </div>

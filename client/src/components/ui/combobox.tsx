@@ -18,7 +18,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
-import { Check } from 'lucide-react';
+import { Check, ChevronDown } from 'lucide-react';
 
 type Status = {
   value: string;
@@ -57,6 +57,7 @@ interface ComboboxProps {
     value: string;
     label: string;
   }[];
+  disabled?: boolean;
 }
 
 export function Combobox({
@@ -65,18 +66,25 @@ export function Combobox({
   inputPlaceholder,
   onChange,
   options,
+  disabled,
 }: ComboboxProps) {
   const [open, setOpen] = React.useState(false);
   const isDesktop = useMediaQuery('(min-width: 768px)');
 
   if (isDesktop) {
     return (
-      <Popover open={open} onOpenChange={setOpen}>
+      <Popover open={open && !disabled} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
-          <Button variant="outline" className="w-full justify-start">
+          <Button
+            variant="outline"
+            className="w-full items-center justify-between"
+            disabled={disabled}
+          >
             {value
               ? options.find((option) => option.value === value)?.label
               : placeholder || 'Select...'}
+
+            <ChevronDown className="h-4 w-4 opacity-50" />
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-full p-0" align="center">
@@ -141,7 +149,6 @@ function OptionsList({
           {options.map((option) => (
             <CommandItem
               key={option.value}
-              value={option.value}
               onSelect={() => {
                 onChange(option.value);
                 setOpen(false);

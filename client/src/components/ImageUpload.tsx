@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 
 import { cn } from '@/lib/utils';
@@ -17,6 +17,12 @@ export default function ImageUpload({
   disabled,
 }: ImageUploadProps) {
   const [image, setImage] = useState(value || '/placeholder.svg');
+
+  useEffect(() => {
+    if (value) {
+      setImage(typeof value === 'string' ? value : URL.createObjectURL(value));
+    }
+  }, [value]);
 
   const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (typeof window === 'undefined') {

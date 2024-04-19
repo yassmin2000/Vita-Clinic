@@ -12,22 +12,7 @@ import Pagination from '@/components/Pagination';
 import useAccessToken from '@/hooks/useAccessToken';
 import { useTableOptions } from '@/hooks/useTableOptions';
 
-type Device = {
-  id: string;
-  name: string;
-  description?: string;
-  status: 'active' | 'inactive';
-  imageURL?: string;
-  serialNumber: string;
-  price: number;
-  purchaseDate: string;
-  createdAt: string;
-  updatedAt: string;
-  manufacturer: {
-    id: string;
-    name: string;
-  };
-};
+import type { Device } from '@/types/devices.type';
 
 export default function DeviceCardsGrid() {
   const accessToken = useAccessToken();
@@ -62,6 +47,7 @@ export default function DeviceCardsGrid() {
 
       return response.data as Device[];
     },
+    enabled: !!accessToken,
   });
 
   useEffect(() => {

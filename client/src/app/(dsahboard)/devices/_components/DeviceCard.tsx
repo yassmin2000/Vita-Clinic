@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { format, formatDistanceToNow, parseISO } from 'date-fns';
 import { Eye, MoreVertical, Pencil, Trash } from 'lucide-react';
 
@@ -43,6 +44,8 @@ export default function DeviceCard({
   status,
   serialNumber,
 }: DeviceCardProps) {
+  const router = useRouter();
+
   return (
     <Card>
       <CardHeader className="p-0">
@@ -68,7 +71,9 @@ export default function DeviceCard({
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                <DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => router.push(`/devices/${id}/edit`)}
+                >
                   <Pencil className="mr-2 h-4 w-4" /> Edit
                 </DropdownMenuItem>
                 <DropdownMenuItem>
