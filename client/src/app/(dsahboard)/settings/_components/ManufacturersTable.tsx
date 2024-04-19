@@ -47,7 +47,7 @@ export default function ManufacturersTable() {
         title="Manufacturer"
         button={<NewEntityButton title="Manufacturer" />}
       />
-      <Modal isOpen={isFormOpen} onClose={closeForm} className="h-fit max-w-lg">
+      <Modal isOpen={isFormOpen} onClose={closeForm} className="h-fit">
         <LookupForm
           title="Manufacturer"
           endpoint="settings/manufacturers"

@@ -3,6 +3,9 @@
 import { useRouter } from 'next/navigation';
 
 import { Dialog, DialogContent, DialogDescription } from './ui/dialog';
+import { Drawer, DrawerContent, DrawerDescription } from './ui/drawer';
+
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { cn } from '@/lib/utils';
 
 interface ModalProps {
@@ -19,17 +22,41 @@ export default function Modal({
   className,
 }: ModalProps) {
   const router = useRouter();
+  const isDesktop = useMediaQuery('(min-width: 768px)');
+
+  if (isDesktop) {
+    return (
+      <Dialog
+        open={isOpen}
+        onOpenChange={onClose ? onClose : () => router.back()}
+      >
+        <DialogContent className={cn('h-[80%] max-w-2xl px-2', className)}>
+          <DialogDescription className="overflow-y-auto">
+            {children}
+          </DialogDescription>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
   return (
-    <Dialog
+    <Drawer
       open={isOpen}
-      onOpenChange={onClose ? onClose : () => router.back()}
+      onOpenChange={(open) => {
+        if (!open) {
+          if (onClose) {
+            onClose();
+          } else {
+            router.back();
+          }
+        }
+      }}
     >
-      <DialogContent className={cn('h-[80%] max-w-2xl px-2', className)}>
-        <DialogDescription className="overflow-y-auto">
+      <DrawerContent className={cn('h-[80%] w-full p-2', className)}>
+        <DrawerDescription className="overflow-y-auto">
           {children}
-        </DialogDescription>
-      </DialogContent>
-    </Dialog>
+        </DrawerDescription>
+      </DrawerContent>
+    </Drawer>
   );
 }

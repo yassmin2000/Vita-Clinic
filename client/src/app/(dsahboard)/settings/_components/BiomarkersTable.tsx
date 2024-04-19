@@ -51,7 +51,7 @@ export default function BiomarkersTable() {
           role === 'admin' ? <NewEntityButton title="Biomarker" /> : undefined
         }
       />
-      <Modal isOpen={isFormOpen} onClose={closeForm} className="h-fit max-w-lg">
+      <Modal isOpen={isFormOpen} onClose={closeForm} className="h-fit">
         <BiomarkerForm
           currentId={currentBiomarker ? currentBiomarker.id : undefined}
           defaultValues={

@@ -47,7 +47,7 @@ export default function AllergiesTable() {
         title="Allergy"
         button={<NewEntityButton title="Allergy" />}
       />
-      <Modal isOpen={isFormOpen} onClose={closeForm} className="h-fit max-w-lg">
+      <Modal isOpen={isFormOpen} onClose={closeForm} className="h-fit">
         <LookupForm
           title="Allergy"
           endpoint="settings/allergies"

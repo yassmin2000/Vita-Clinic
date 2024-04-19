@@ -51,7 +51,7 @@ export default function MedicalConditionsTable() {
         title="Medical Condition"
         button={<NewEntityButton title="Medical Condition" />}
       />
-      <Modal isOpen={isFormOpen} onClose={closeForm} className="h-fit max-w-lg">
+      <Modal isOpen={isFormOpen} onClose={closeForm} className="h-fit">
         <LookupForm
           title="Medical Condition"
           endpoint="settings/medical-conditions"

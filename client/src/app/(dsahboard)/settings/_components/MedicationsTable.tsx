@@ -47,7 +47,7 @@ export default function MedicationsTable() {
         title="Medication"
         button={<NewEntityButton title="Medication" />}
       />
-      <Modal isOpen={isFormOpen} onClose={closeForm} className="h-fit max-w-lg">
+      <Modal isOpen={isFormOpen} onClose={closeForm} className="h-fit">
         <LookupForm
           title="Medication"
           endpoint="settings/medications"
