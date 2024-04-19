@@ -97,6 +97,9 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  speciality   Speciality? @relation(fields: [specialityId], references: [id])
+  specialityId String?
+
   emr      ElectronicMedicalRecord?
   messages Message[]
 
@@ -451,6 +454,17 @@ model Maintenance {
 
   device   Device @relation(fields: [deviceId], references: [id])
   deviceId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Speciality {
+  id          String  @id @default(uuid())
+  name        String
+  description String?
+
+  doctors User[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
