@@ -9,10 +9,12 @@ import FiltersBar from '@/components/FiltersBar';
 import Pagination from '@/components/Pagination';
 
 import useAccessToken from '@/hooks/useAccessToken';
+import useUserRole from '@/hooks/useUserRole';
 import { useTableOptions } from '@/hooks/useTableOptions';
 
 export default function AdminsTable() {
   const accessToken = useAccessToken();
+  const { isSuperAdmin } = useUserRole();
 
   const {
     sortBy,
@@ -61,7 +63,7 @@ export default function AdminsTable() {
         sortByNameEnabled
         sortByAgeEnabled
         sortByDateEnabled
-        addNewButton
+        addNewButton={isSuperAdmin}
         addNewRoute="/users/new?role=admin"
         addNewContent="New Admin"
       />

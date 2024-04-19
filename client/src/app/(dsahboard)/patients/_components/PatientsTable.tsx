@@ -10,10 +10,12 @@ import FiltersBar from '@/components/FiltersBar';
 import Pagination from '@/components/Pagination';
 
 import useAccessToken from '@/hooks/useAccessToken';
+import useUserRole from '@/hooks/useUserRole';
 import { useTableOptions } from '@/hooks/useTableOptions';
 
 export default function PatientsTable() {
   const accessToken = useAccessToken();
+  const { role } = useUserRole();
 
   const {
     sortBy,
@@ -62,7 +64,7 @@ export default function PatientsTable() {
         sortByNameEnabled
         sortByAgeEnabled
         sortByDateEnabled
-        addNewButton
+        addNewButton={role === 'admin'}
         addNewRoute="/users/new?role=patient"
         addNewContent="New Patient"
       />

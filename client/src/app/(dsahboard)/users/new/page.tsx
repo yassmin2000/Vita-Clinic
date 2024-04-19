@@ -1,6 +1,15 @@
-import UserForm from '@/components/UserForm';
+import { redirect } from 'next/navigation';
 
-export default function CreateUserPage() {
+import UserForm from '@/components/UserForm';
+import { getUserRole } from '@/lib/auth';
+
+export default async function CreateUserPage() {
+  const { role } = await getUserRole();
+
+  if (role !== 'admin') {
+    return redirect('/devices');
+  }
+
   return (
     <div className="py-4">
       <UserForm />

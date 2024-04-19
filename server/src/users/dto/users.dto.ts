@@ -20,6 +20,10 @@ export class CreateUserDto {
   @IsString()
   lastName: string;
 
+  @IsOptional()
+  @IsString()
+  avatarURL: string;
+
   @IsNotEmpty()
   @IsEmail()
   email: string;

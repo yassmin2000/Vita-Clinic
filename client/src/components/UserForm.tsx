@@ -1,11 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
+import axios from 'axios';
+import { useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';
+import { isValidPhoneNumber } from 'react-phone-number-input';
 import { CalendarIcon, Eye, EyeOff } from 'lucide-react';
 
 import {
@@ -18,6 +21,7 @@ import {
 } from '@/components/ui/form';
 import ImageUpload from '@/components/ImageUpload';
 import { Input } from '@/components/ui/input';
+import { PhoneInput } from './ui/phone-input';
 import {
   Select,
   SelectContent,
@@ -33,11 +37,13 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
+import { useToast } from './ui/use-toast';
 
+import useAccessToken from '@/hooks/useAccessToken';
+import useUserRole from '@/hooks/useUserRole';
 import { useUploadThing } from '@/lib/uploadthing';
+
 import { cn } from '@/lib/utils';
-import { isValidPhoneNumber } from 'react-phone-number-input';
-import { PhoneInput } from './ui/phone-input';
 
 const formSchema = z.object({
   firstName: z.string().min(1, {
@@ -76,39 +82,91 @@ const formSchema = z.object({
 });
 
 export default function UserForm() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const role = searchParams.get('role')?.toLocaleLowerCase();
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+
   const { startUpload } = useUploadThing('imageUploader');
+  const accessToken = useAccessToken();
+  const { isSuperAdmin } = useUserRole();
+  const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       role:
-        role && (role === 'admin' || role === 'patient' || role === 'doctor')
+        (isSuperAdmin && role === 'admin') ||
+        role === 'patient' ||
+        role === 'doctor'
           ? role
           : undefined,
     },
   });
-  const isLoading = form.formState.isSubmitting;
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log(values);
-    if (values.avatar) {
-      const res = await startUpload([values.avatar]);
-      if (res) {
-        const [fileResponse] = res;
-        const url = fileResponse.url;
-        console.log(url);
+  const { mutate: createUser, isPending } = useMutation({
+    mutationFn: async (values: z.infer<typeof formSchema>) => {
+      let url = '';
+      if (values.avatar) {
+        const res = await startUpload([values.avatar]);
+        if (res) {
+          const [fileResponse] = res;
+          url = fileResponse.url;
+        }
       }
-    }
-  };
+
+      const body = {
+        firstName: values.firstName,
+        lastName: values.lastName,
+        email: values.email,
+        password: values.password,
+        avatarURL: url,
+        birthDate: values.birthDate.toISOString(),
+        phoneNumber: values.phone,
+        address: values.address,
+        sex: values.sex,
+        role: values.role,
+      };
+
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/users`,
+        body,
+        {
+          headers: {
+            authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      if (response.status !== 201) {
+        throw new Error('Failed to create user');
+      }
+
+      return router.back();
+    },
+    onError: (error) => {
+      // @ts-ignore
+      const message = error.response?.data?.message || 'Failed to create user';
+
+      return toast({
+        title: `Failed to create user`,
+        description: message,
+        variant: 'destructive',
+      });
+    },
+    onSuccess: () => {
+      return toast({
+        title: 'Created user successfully',
+        description: `Device has been created successfully.`,
+      });
+    },
+  });
 
   return (
     <div className="mx-auto h-full max-w-3xl space-y-2 p-4">
       <Form {...form}>
         <form
-          onSubmit={form.handleSubmit(onSubmit)}
+          onSubmit={form.handleSubmit((e) => createUser(e))}
           className="space-y-8 pb-10"
         >
           <div className="w-full space-y-2">
@@ -128,7 +186,7 @@ export default function UserForm() {
                   <ImageUpload
                     value={field.value}
                     onChange={field.onChange}
-                    disabled={isLoading}
+                    disabled={isPending}
                   />
                 </FormControl>
                 <FormMessage />
@@ -143,7 +201,7 @@ export default function UserForm() {
                 <FormItem className="col-span-2 md:col-span-1">
                   <FormLabel>First Name</FormLabel>
                   <FormControl>
-                    <Input disabled={isLoading} placeholder="John" {...field} />
+                    <Input disabled={isPending} placeholder="John" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -157,7 +215,7 @@ export default function UserForm() {
                 <FormItem className="col-span-2 md:col-span-1">
                   <FormLabel>Last Name</FormLabel>
                   <FormControl>
-                    <Input disabled={isLoading} placeholder="Doe" {...field} />
+                    <Input disabled={isPending} placeholder="Doe" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -171,7 +229,7 @@ export default function UserForm() {
                 <FormItem className="col-span-2 md:col-span-1">
                   <FormLabel>Gender</FormLabel>
                   <Select
-                    disabled={isLoading}
+                    disabled={isPending}
                     onValueChange={field.onChange}
                     value={field.value}
                     defaultValue={field.value}
@@ -201,7 +259,7 @@ export default function UserForm() {
                 <FormItem className="col-span-2 md:col-span-1">
                   <FormLabel>Role</FormLabel>
                   <Select
-                    disabled={isLoading}
+                    disabled={isPending}
                     onValueChange={field.onChange}
                     value={field.value}
                     defaultValue={field.value}
@@ -215,7 +273,9 @@ export default function UserForm() {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="admin">Admin</SelectItem>
+                      {isSuperAdmin && (
+                        <SelectItem value="admin">Admin</SelectItem>
+                      )}
                       <SelectItem value="doctor">Doctor</SelectItem>
                       <SelectItem value="patient">Patient</SelectItem>
                     </SelectContent>
@@ -275,7 +335,7 @@ export default function UserForm() {
                   <FormLabel>Address</FormLabel>
                   <FormControl>
                     <Input
-                      disabled={isLoading}
+                      disabled={isPending}
                       placeholder="Address..."
                       {...field}
                     />
@@ -318,7 +378,7 @@ export default function UserForm() {
                 <FormLabel>Email</FormLabel>
                 <FormControl>
                   <Input
-                    disabled={isLoading}
+                    disabled={isPending}
                     placeholder="johndoe@email.com"
                     type="email"
                     {...field}
@@ -338,7 +398,7 @@ export default function UserForm() {
                 <FormControl>
                   <div className="relative">
                     <Input
-                      disabled={isLoading}
+                      disabled={isPending}
                       placeholder="strong@password##"
                       type={isPasswordVisible ? 'text' : 'password'}
                       {...field}
@@ -361,7 +421,9 @@ export default function UserForm() {
             )}
           />
 
-          <Button type="submit">Submit</Button>
+          <Button type="submit" disabled={isPending}>
+            Submit
+          </Button>
         </form>
       </Form>
     </div>
