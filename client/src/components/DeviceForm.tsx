@@ -87,7 +87,7 @@ export default function DeviceForm({ deviceId }: DeviceFormProps) {
 
   const router = useRouter();
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: [`device_${deviceId}`],
     queryFn: async () => {
       if (!deviceId) {
@@ -102,6 +102,15 @@ export default function DeviceForm({ deviceId }: DeviceFormProps) {
           },
         }
       );
+
+      if (response.status === 404) {
+        toast({
+          title: 'Device not found',
+          description: 'The device you are looking for does not exist.',
+          variant: 'destructive',
+        });
+        return router.push('/devices');
+      }
 
       return response.data as Device;
     },
@@ -156,8 +165,6 @@ export default function DeviceForm({ deviceId }: DeviceFormProps) {
         status: values.status,
         description: values.description,
       };
-
-      console.log(body);
 
       if (deviceId) {
         response = await axios.patch(
@@ -218,6 +225,18 @@ export default function DeviceForm({ deviceId }: DeviceFormProps) {
       form.setValue('status', data.status);
     }
   }, [data]);
+
+  useEffect(() => {
+    if (deviceId && error) {
+      toast({
+        title: 'Device not found',
+        description: 'The device you are looking for does not exist.',
+        variant: 'destructive',
+      });
+
+      return router.push('/devices');
+    }
+  }, [deviceId, error]);
 
   return (
     <div className="mx-auto h-full max-w-3xl space-y-2 p-4">
