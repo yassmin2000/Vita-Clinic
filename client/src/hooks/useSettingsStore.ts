@@ -1,8 +1,7 @@
 import { create } from 'zustand';
 
-import type { Biomarker, Lookup } from '@/types/settings.type';
+import type { Biomarker, Lookup, Modality } from '@/types/settings.type';
 import type { LaboratoryTest } from '@/app/(dsahboard)/settings/_components/LaboratoryTestsColumn';
-import type { Modality } from '@/app/(dsahboard)/settings/_components/ModalitiesColumn';
 
 type useSettingsStoreProps = {
   isFormOpen: boolean;

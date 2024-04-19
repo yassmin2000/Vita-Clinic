@@ -14,3 +14,11 @@ export type Biomarker = {
   description?: string;
   createdAt: string;
 };
+
+export type Modality = {
+  id: string | number;
+  name: string;
+  price: number;
+  description?: string;
+  createdAt: string;
+};
