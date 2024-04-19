@@ -23,6 +23,8 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 
+import useUserRole from '@/hooks/useUserRole';
+
 interface DeviceCardProps {
   id: string;
   deviceImage: string;
@@ -45,6 +47,7 @@ export default function DeviceCard({
   serialNumber,
 }: DeviceCardProps) {
   const router = useRouter();
+  const { role, isSuperAdmin } = useUserRole();
 
   return (
     <Card>
@@ -62,34 +65,38 @@ export default function DeviceCard({
               <p className="text-base text-muted-foreground">{manufacturer}</p>
             </div>
 
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="h-8 w-8 p-0">
-                  <span className="sr-only">Open menu</span>
-                  <MoreVertical className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                <DropdownMenuItem
-                  onClick={() => router.push(`/devices/${id}/edit`)}
-                >
-                  <Pencil className="mr-2 h-4 w-4" /> Edit
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Trash className="mr-2 h-4 w-4" /> Delete
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <Link href={`/users/${id}`}>
-                  <DropdownMenuItem asChild>
-                    <div className="flex items-center gap-2">
-                      <Eye className="h-4 w-4" />
-                      View
-                    </div>
+            {role === 'admin' && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="h-8 w-8 p-0">
+                    <span className="sr-only">Open menu</span>
+                    <MoreVertical className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                  <DropdownMenuItem
+                    onClick={() => router.push(`/devices/${id}/edit`)}
+                  >
+                    <Pencil className="mr-2 h-4 w-4" /> Edit
                   </DropdownMenuItem>
-                </Link>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                  {isSuperAdmin && (
+                    <DropdownMenuItem>
+                      <Trash className="mr-2 h-4 w-4" /> Delete
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuSeparator />
+                  <Link href={`/users/${id}`}>
+                    <DropdownMenuItem asChild>
+                      <div className="flex items-center gap-2">
+                        <Eye className="h-4 w-4" />
+                        View
+                      </div>
+                    </DropdownMenuItem>
+                  </Link>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <Badge

@@ -1,4 +1,7 @@
+import { redirect } from 'next/navigation';
+
 import DeviceForm from '@/components/DeviceForm';
+import { getUserRole } from '@/lib/auth';
 
 interface EditDevicePageProps {
   params: {
@@ -6,9 +9,15 @@ interface EditDevicePageProps {
   };
 }
 
-export default function EditDevicePage({
+export default async function EditDevicePage({
   params: { id },
 }: EditDevicePageProps) {
+  const { role } = await getUserRole();
+
+  if (role !== 'admin') {
+    return redirect('/devices');
+  }
+
   return (
     <div className="py-4">
       <DeviceForm deviceId={id} />

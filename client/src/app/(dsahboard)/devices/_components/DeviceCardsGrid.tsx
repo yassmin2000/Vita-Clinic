@@ -10,12 +10,14 @@ import FiltersBar from '@/components/FiltersBar';
 import Pagination from '@/components/Pagination';
 
 import useAccessToken from '@/hooks/useAccessToken';
+import useUserRole from '@/hooks/useUserRole';
 import { useTableOptions } from '@/hooks/useTableOptions';
 
 import type { Device } from '@/types/devices.type';
 
 export default function DeviceCardsGrid() {
   const accessToken = useAccessToken();
+  const { role } = useUserRole();
 
   const {
     sortBy,
@@ -66,7 +68,7 @@ export default function DeviceCardsGrid() {
         sortByNameEnabled
         sortByPurchaseDateEnabled
         sortByLastMaintenanceDateEnabled
-        addNewButton
+        addNewButton={role === 'admin'}
         addNewRoute="/devices/new"
         addNewContent="New Device"
       />
