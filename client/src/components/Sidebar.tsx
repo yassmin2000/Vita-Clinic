@@ -83,12 +83,21 @@ export default function Sidebar() {
                             'bg-primary/10 text-primary'
                         )}
                       >
-                        <Link href={route.href}>
+                        <Link
+                          href={route.href}
+                          className="flex items-center gap-8"
+                        >
                           <route.icon className="h-5 w-5" />
+
+                          <p className="md:hidden">{route.label}</p>
                         </Link>
                       </div>
                     </TooltipTrigger>
-                    <TooltipContent side="right" align="start">
+                    <TooltipContent
+                      side="right"
+                      align="start"
+                      className="hidden md:block"
+                    >
                       <p>{route.label}</p>
                     </TooltipContent>
                   </Tooltip>
@@ -109,12 +118,20 @@ export default function Sidebar() {
                             'bg-primary/10 text-primary'
                         )}
                       >
-                        <Link href={route.href}>
+                        <Link
+                          href={route.href}
+                          className="flex items-center gap-8"
+                        >
                           <route.icon className="h-5 w-5" />
+                          <p className="md:hidden">{route.label}</p>
                         </Link>
                       </div>
                     </TooltipTrigger>
-                    <TooltipContent side="right" align="start">
+                    <TooltipContent
+                      side="right"
+                      align="start"
+                      className="hidden md:block"
+                    >
                       <p>{route.label}</p>
                     </TooltipContent>
                   </Tooltip>

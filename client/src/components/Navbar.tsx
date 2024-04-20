@@ -8,6 +8,7 @@ import UserButton from './UserButton';
 import ModeToggle from './ModeToggle';
 import { cn } from '@/lib/utils';
 import { useSession } from 'next-auth/react';
+import MobileSidebar from './MobileSidebar';
 
 const poppins = Poppins({
   weight: '600',
@@ -21,7 +22,7 @@ export default function Navbar() {
   return (
     <div className="fixed z-50 flex h-16 w-full items-center justify-between border-b border-primary/10 bg-secondary px-4 py-2">
       <div className="flex items-center">
-        {/* <MobileSidebar isPro={isPro} /> */}
+        <MobileSidebar />
         <Link href="/">
           <p
             className={cn(
