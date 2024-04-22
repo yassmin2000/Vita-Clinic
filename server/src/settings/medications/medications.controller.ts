@@ -11,32 +11,21 @@ import {
   Param,
   Delete,
   NotFoundException,
+  ValidationPipe,
 } from '@nestjs/common';
+
 import { MedicationsService } from './medications.service';
+import { JwtGuard } from 'src/auth/guards/jwt.guard';
+
 import {
   UpdateMedicationDto,
   CreateMedicationDto,
 } from './dto/medications.dto';
-import { JwtGuard } from 'src/auth/guards/jwt.guard';
 import type { Payload } from 'src/types/payload.type';
 
 @Controller('settings/medications')
 export class MedicationsController {
   constructor(private readonly medicationsService: MedicationsService) {}
-
-  @UseGuards(JwtGuard)
-  @Post()
-  async createMedication(
-    @Body() dto: CreateMedicationDto,
-    @Req() request: Request,
-  ) {
-    const user: Payload = request['user'];
-
-    if (user.role === 'patient') {
-      throw new UnauthorizedException();
-    }
-    return this.medicationsService.createMedication(dto);
-  }
 
   @UseGuards(JwtGuard)
   @Get()
@@ -59,19 +48,29 @@ export class MedicationsController {
       throw new UnauthorizedException();
     }
 
-    const medication = await this.medicationsService.findById(id);
-    if (!medication) {
-      throw new NotFoundException('Medication not found');
+    return this.medicationsService.findById(id);
+  }
+
+  @UseGuards(JwtGuard)
+  @Post()
+  async createMedication(
+    @Body(ValidationPipe) createMeidicationDto: CreateMedicationDto,
+    @Req() request: Request,
+  ) {
+    const user: Payload = request['user'];
+
+    if (user.role === 'patient') {
+      throw new UnauthorizedException();
     }
 
-    return medication;
+    return this.medicationsService.createMedication(createMeidicationDto);
   }
 
   @UseGuards(JwtGuard)
   @Patch(':id')
   async updateMedication(
     @Param('id') id: string,
-    @Body() updateMedicationDto: UpdateMedicationDto,
+    @Body(ValidationPipe) updateMedicationDto: UpdateMedicationDto,
     @Req() request: Request,
   ) {
     const user: Payload = request['user'];
