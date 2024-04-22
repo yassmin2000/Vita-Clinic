@@ -9,6 +9,9 @@ import { MedicalConditionsModule } from './medical-conditions/medical-conditions
 import { MedicationsModule } from './medications/medications.module';
 import { ModalitiesModule } from './modalities/modalities.module';
 import { SurgeriesModule } from './surgeries/surgeries.module';
+import { SpecialitiesModule } from './specialities/specialities.module';
+
+
 
 @Module({
   imports: [
@@ -21,6 +24,8 @@ import { SurgeriesModule } from './surgeries/surgeries.module';
     MedicalConditionsModule,
     ModalitiesModule,
     SurgeriesModule,
+    SpecialitiesModule,
   ],
+
 })
 export class SettingsModule {}
