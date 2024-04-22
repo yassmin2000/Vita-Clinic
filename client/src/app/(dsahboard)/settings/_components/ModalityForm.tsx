@@ -37,7 +37,7 @@ const formSchema = z.object({
   description: z.string().optional(),
 });
 
-interface BiomarkerFormsProps {
+interface ModalityFormProps {
   currentId?: string | number;
   defaultValues?: z.infer<typeof formSchema>;
 }
@@ -45,7 +45,7 @@ interface BiomarkerFormsProps {
 export default function ModalityForm({
   currentId,
   defaultValues,
-}: BiomarkerFormsProps) {
+}: ModalityFormProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues,
@@ -55,13 +55,13 @@ export default function ModalityForm({
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { mutate: mutateLookup, isPending } = useMutation({
+  const { mutate: mutateModality, isPending } = useMutation({
     mutationFn: async (values: z.infer<typeof formSchema>) => {
       let response: AxiosResponse<any, any>;
       const body = {
         name: values.name,
         description: values.description,
-        price: values.price
+        price: values.price,
       };
 
       if (currentId) {
@@ -121,8 +121,8 @@ export default function ModalityForm({
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit((e) => mutateLookup(e))}
-        className="space-y-6 px-4 text-gray-900"
+        onSubmit={form.handleSubmit((e) => mutateModality(e))}
+        className="space-y-6 px-4 text-foreground"
       >
         <div className="w-full space-y-2">
           {currentId ? (
@@ -152,37 +152,32 @@ export default function ModalityForm({
               <FormItem>
                 <FormLabel>Modality Name</FormLabel>
                 <FormControl>
-                  <Input
-                    disabled={isPending}
-                    placeholder="MRI"
-                    {...field}
-                  />
+                  <Input disabled={isPending} placeholder="MRI" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
 
-
-            <FormField
-              name="price"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Price (USD)</FormLabel>
-                  <FormControl>
-                    <Input
-                      disabled={isPending}
-                      type="number"
-                      placeholder="100"
-                      {...field}
-                      onChange={(event) => field.onChange(+event.target.value)}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+          <FormField
+            name="price"
+            control={form.control}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Price (USD)</FormLabel>
+                <FormControl>
+                  <Input
+                    disabled={isPending}
+                    type="number"
+                    placeholder="100"
+                    {...field}
+                    onChange={(event) => field.onChange(+event.target.value)}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
           <FormField
             name="description"

@@ -4,7 +4,7 @@ import axios from 'axios';
 import { useQuery } from '@tanstack/react-query';
 
 import { DataTable } from '@/components/DataTable';
-import { columns } from './BiomarkersColumn';
+import { columns } from './ModalitiesColumn';
 import NewEntityButton from './NewEntityButton';
 import Modal from '@/components/Modal';
 import ModalityForm from './ModalityForm';
@@ -13,7 +13,8 @@ import useUserRole from '@/hooks/useUserRole';
 import useAccessToken from '@/hooks/useAccessToken';
 import useSettingsStore from '@/hooks/useSettingsStore';
 
-import type { Biomarker } from '@/types/settings.type';
+import type { Modality } from '@/types/settings.type';
+
 export default function ModalitiesTable() {
   const { role } = useUserRole();
   const accessToken = useAccessToken();
@@ -30,7 +31,7 @@ export default function ModalitiesTable() {
         }
       );
 
-      return response.data as Biomarker[];
+      return response.data as Modality[];
     },
     enabled: !!accessToken,
   });
