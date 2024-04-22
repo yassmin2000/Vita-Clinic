@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+
 import { PrismaService } from 'src/prisma.service';
 import {
   CreateMedicationDto,
@@ -9,19 +10,25 @@ import {
 export class MedicationsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async createMedication(createMedicationDto: CreateMedicationDto) {
-    return this.prisma.medication.create({
-      data: createMedicationDto,
-    });
-  }
-
   async findAll() {
     return this.prisma.medication.findMany();
   }
 
   async findById(id: string) {
-    return this.prisma.medication.findUnique({
+    const medication = await this.prisma.medication.findUnique({
       where: { id },
+    });
+
+    if (!medication) {
+      throw new NotFoundException('Diagnosis not found');
+    }
+
+    return medication;
+  }
+
+  async createMedication(createMedicationDto: CreateMedicationDto) {
+    return this.prisma.medication.create({
+      data: createMedicationDto,
     });
   }
 

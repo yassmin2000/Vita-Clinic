@@ -5,6 +5,33 @@ export type Lookup = {
   createdAt: string;
 };
 
+export type Medication = {
+  id: string;
+  name: string;
+  description?: string;
+  strength: number;
+  unit: string;
+  dosageForm:
+    | 'capsule'
+    | 'injection'
+    | 'liquid'
+    | 'suppository'
+    | 'tablet'
+    | 'topical';
+  routeOfAdministration:
+    | 'inhalation'
+    | 'intramuscular'
+    | 'intravenous'
+    | 'nasal'
+    | 'ophthalmic'
+    | 'oral'
+    | 'rectal'
+    | 'subcutaneous'
+    | 'transdermal'
+    | 'vaginal';
+  createdAt: string;
+};
+
 export type Biomarker = {
   id: string;
   name: string;
@@ -20,5 +47,17 @@ export type Modality = {
   name: string;
   price: number;
   description?: string;
+  createdAt: string;
+};
+
+export type LaboratoryTest = {
+  id: string | number;
+  name: string;
+  description?: string;
+  price: Number;
+  biomarkers: {
+    id: string | number;
+    name: string;
+  }[];
   createdAt: string;
 };

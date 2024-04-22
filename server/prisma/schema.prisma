@@ -29,6 +29,28 @@ enum BloodType {
   o_negative
 }
 
+enum DosageForm {
+  capsule
+  injection
+  liquid
+  suppository
+  tablet
+  topical
+}
+
+enum RouteOfAdministration {
+  inhalation
+  intramuscular
+  intravenous
+  nasal
+  ophthalmic
+  oral
+  rectal
+  subcutaneous
+  transdermal
+  vaginal
+}
+
 enum Frequency {
   daily
   weekly
@@ -237,6 +259,11 @@ model Medication {
   name        String
   description String?
 
+  dosageForm            DosageForm
+  strength              Float
+  unit                  String
+  routeOfAdministration RouteOfAdministration
+
   patientMedication PatientMedication[]
 
   createdAt DateTime @default(now())
@@ -248,14 +275,18 @@ model PatientMedication {
   medication   Medication @relation(fields: [medicationId], references: [id])
   medicationId String
 
-  notes          String?
-  dosage         Float
-  frequency      Frequency
-  required       Boolean
-  medicationDate DateTime
+  notes     String?
+  dosage    Float
+  frequency Frequency
+  required  Boolean
+  startDate DateTime
+  endDate   DateTime?
 
   emr   ElectronicMedicalRecord @relation(fields: [emrId], references: [id])
   emrId String
+
+  appointment   Appointment @relation(fields: [appointmentId], references: [id])
+  appointmentId String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -289,12 +320,26 @@ model Appointment {
   status  AppointmentStatus
   billing Billing?
 
+  vitals                Vitals[]
+  medications           PatientMedication[]
   reports               Report[]
   scans                 Scan[]
   laboratoryTestResults LaboratoryTestResult[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Vitals {
+  id               String  @id @default(uuid())
+  temperature      Float?
+  bloodPressure    String?
+  heartRate        Int?
+  respiratoryRate  Int?
+  oxygenSaturation Int?
+
+  appointment   Appointment @relation(fields: [appointmentId], references: [id])
+  appointmentId String
 }
 
 model Report {
