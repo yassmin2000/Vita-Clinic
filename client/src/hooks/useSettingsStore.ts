@@ -1,7 +1,12 @@
 import { create } from 'zustand';
 
-import type { Biomarker, Lookup, Modality } from '@/types/settings.type';
-import type { LaboratoryTest } from '@/app/(dsahboard)/settings/_components/LaboratoryTestsColumn';
+import type {
+  Biomarker,
+  LaboratoryTest,
+  Lookup,
+  Medication,
+  Modality,
+} from '@/types/settings.type';
 
 type useSettingsStoreProps = {
   isFormOpen: boolean;
@@ -9,6 +14,8 @@ type useSettingsStoreProps = {
   closeForm: () => void;
   currentLookup: Lookup | null;
   setCurrentLookup: (lookup: Lookup | null) => void;
+  currentMedication: Medication | null;
+  setCurrentMedication: (medication: Medication | null) => void;
   currentModality: Modality | null;
   setCurrentModality: (modality: Modality | null) => void;
   currentLaboratoryTest: LaboratoryTest | null;
@@ -24,6 +31,8 @@ const useSettingsStore = create<useSettingsStoreProps>((set) => ({
   closeForm: () => set({ isFormOpen: false }),
   currentLookup: null,
   setCurrentLookup: (lookup) => set({ currentLookup: lookup }),
+  currentMedication: null,
+  setCurrentMedication: (medication) => set({ currentMedication: medication }),
   currentModality: null,
   setCurrentModality: (modality) => set({ currentModality: modality }),
   currentLaboratoryTest: null,
