@@ -11,8 +11,8 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
 
   const config = new DocumentBuilder()
-    .setTitle('Nexus Scan API')
-    .setDescription('Nexus Scan API Documentation')
+    .setTitle('Vita Clinic API')
+    .setDescription('Vita Clinic API Documentation')
     .setVersion('0.0')
     .build();
   const document = SwaggerModule.createDocument(app, config);

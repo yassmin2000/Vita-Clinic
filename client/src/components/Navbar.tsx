@@ -30,7 +30,7 @@ export default function Navbar() {
               poppins.className
             )}
           >
-            Nexus Scan
+            Vita Clinic
           </p>
         </Link>
       </div>

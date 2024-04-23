@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
 
     // Create the user message in the database
 
-    const pineconeIndex = pinecone.index('nexus-scan');
+    const pineconeIndex = pinecone.index('vita-clinic');
     const embeddings = new OpenAIEmbeddings({
       openAIApiKey: process.env.OPENAI_API_KEY!,
     });

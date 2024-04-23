@@ -27,7 +27,7 @@ export const ourFileRouter = {
 
         const pageLevelDocs = await loader.load();
 
-        const pineconeIndex = pinecone.index('nexus-scan');
+        const pineconeIndex = pinecone.index('vita-clinic');
         const embeddings = new OpenAIEmbeddings({
           openAIApiKey: process.env.OPENAI_API_KEY!,
         });
