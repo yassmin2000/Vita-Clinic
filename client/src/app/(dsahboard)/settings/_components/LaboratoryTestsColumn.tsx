@@ -19,17 +19,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 
-export type LaboratoryTest = {
-  id: string | number;
-  name: string;
-  description?: string;
-  price: Number;
-  biomarkers: {
-    id: string | number;
-    name: string;
-  }[];
-  createdAt: string;
-};
+import type { LaboratoryTest } from '@/types/settings.type';
 
 export const columns: ColumnDef<LaboratoryTest>[] = [
   {
