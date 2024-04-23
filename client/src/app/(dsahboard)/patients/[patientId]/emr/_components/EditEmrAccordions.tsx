@@ -13,6 +13,8 @@ import {
 import GeneralInformationForm from './GeneralInformationForm';
 import PatientAllergies from './PatientAllergies';
 import PatientDiagnoses from './PatientDiagnoses';
+import PatientMedicalConditions from './PatientMedicalConditions';
+import PatientSurgeries from './PatientSurgeries';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/components/ui/use-toast';
 
@@ -144,14 +146,24 @@ export default function EditEmrAccordions({
         <AccordionTrigger className="rounded-t-md bg-primary px-4 text-lg font-semibold text-white transition-all hover:bg-primary/90 hover:no-underline">
           Patient Medical Conditions
         </AccordionTrigger>
-        <AccordionContent className="rounded-b-md border-b-2 border-l-2 border-r-2 border-secondary px-4 py-6 md:px-8"></AccordionContent>
+        <AccordionContent className="rounded-b-md border-b-2 border-l-2 border-r-2 border-secondary px-4 py-6 md:px-8">
+          <PatientMedicalConditions
+            patientId={patientId}
+            patientMedicalConditions={data.medicalConditions}
+          />
+        </AccordionContent>
       </AccordionItem>
 
       <AccordionItem value="patient-surgeries" className="border-none">
         <AccordionTrigger className="rounded-t-md bg-primary px-4 text-lg font-semibold text-white transition-all hover:bg-primary/90 hover:no-underline">
           Patient Surgeries
         </AccordionTrigger>
-        <AccordionContent className="rounded-b-md border-b-2 border-l-2 border-r-2 border-secondary px-4 py-6 md:px-8"></AccordionContent>
+        <AccordionContent className="rounded-b-md border-b-2 border-l-2 border-r-2 border-secondary px-4 py-6 md:px-8">
+          <PatientSurgeries
+            patientId={patientId}
+            patientSurgeries={data.surgeries}
+          />
+        </AccordionContent>
       </AccordionItem>
 
       <AccordionItem value="patient-medications" className="border-none">

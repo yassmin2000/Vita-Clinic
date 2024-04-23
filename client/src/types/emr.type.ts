@@ -32,6 +32,30 @@ export type PatientDiagnosis = {
   };
 };
 
+export type PatientMedicalCondition = {
+  id: string;
+  medicalConditionId: string;
+  notes?: string;
+  date: string;
+  createdAt: string;
+  updatedAt: string;
+  medicalCondition: {
+    name: string;
+  };
+};
+
+export type PatientSurgery = {
+  id: string;
+  surgeryId: string;
+  notes?: string;
+  date: string;
+  createdAt: string;
+  updatedAt: string;
+  surgery: {
+    name: string;
+  };
+};
+
 export type EMR = {
   id: string;
   patientId: string;
@@ -45,4 +69,6 @@ export type EMR = {
   updatedAt: string;
   allergies: PatientAllergy[];
   diagnoses: PatientDiagnosis[];
+  medicalConditions: PatientMedicalCondition[];
+  surgeries: PatientSurgery[];
 };

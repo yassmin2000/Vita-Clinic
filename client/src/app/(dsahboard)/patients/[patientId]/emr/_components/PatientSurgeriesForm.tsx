@@ -30,52 +30,52 @@ import { Button } from '@/components/ui/button';
 import useAccessToken from '@/hooks/useAccessToken';
 import { cn } from '@/lib/utils';
 
-import type { PatientDiagnosisField } from './PatientDiagnoses';
+import type { PatientSurgeryField } from './PatientSurgeries';
 import type { Lookup } from '@/types/settings.type';
 
 const formSchema = z.object({
-  diagnosis: z.object(
+  surgery: z.object(
     {
       label: z.string(),
       value: z.string(),
     },
     {
-      required_error: 'Diagnosis is required',
+      required_error: 'Surgery is required',
     }
   ),
   date: z
     .date({
-      required_error: 'Diagnosis date is required.',
+      required_error: 'Surgery date is required.',
     })
     .max(new Date(), {
-      message: 'Diagnosis date cannot be in the future.',
+      message: 'Surgery date cannot be in the future.',
     }),
   notes: z.string().optional().nullable(),
 });
 
-interface PatientDiagnosesFormProps {
-  patientDiagnoses: PatientDiagnosisField[];
-  setDiagnoses: Dispatch<SetStateAction<PatientDiagnosisField[]>>;
-  currentDiagnosis: PatientDiagnosisField | null;
-  setCurrentDiagnosis: Dispatch<SetStateAction<PatientDiagnosisField | null>>;
+interface PatientSurgeriesFormProps {
+  patientSurgeries: PatientSurgeryField[];
+  setSurgeries: Dispatch<SetStateAction<PatientSurgeryField[]>>;
+  currentSurgery: PatientSurgeryField | null;
+  setCurrentSurgery: Dispatch<SetStateAction<PatientSurgeryField | null>>;
 }
 
-export default function PatientDiagnosesForm({
-  patientDiagnoses,
-  setDiagnoses,
-  currentDiagnosis,
-  setCurrentDiagnosis,
-}: PatientDiagnosesFormProps) {
+export default function PatientSurgeriesForm({
+  patientSurgeries,
+  setSurgeries,
+  currentSurgery,
+  setCurrentSurgery,
+}: PatientSurgeriesFormProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
   });
   const accessToken = useAccessToken();
 
-  const { data: diagnoses, isLoading: isLoadingDiagnoses } = useQuery({
-    queryKey: ['diagnoses_form'],
+  const { data: surgeries, isLoading: isLoadingSurgeries } = useQuery({
+    queryKey: ['surgeries_form'],
     queryFn: async () => {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/settings/diagnoses`,
+        `${process.env.NEXT_PUBLIC_API_URL}/settings/surgeries`,
         {
           headers: {
             authorization: `Bearer ${accessToken}`,
@@ -86,9 +86,9 @@ export default function PatientDiagnosesForm({
       const data = response.data as Lookup[];
 
       if (data) {
-        return data.map((diagnosis) => ({
-          label: diagnosis.name,
-          value: diagnosis.id,
+        return data.map((surgery) => ({
+          label: surgery.name,
+          value: surgery.id,
         }));
       }
 
@@ -98,35 +98,35 @@ export default function PatientDiagnosesForm({
   });
 
   const onSubmit = (data: z.infer<typeof formSchema>) => {
-    if (currentDiagnosis) {
-      setDiagnoses((prev) =>
-        prev.map((diagnosis) =>
-          diagnosis.id === currentDiagnosis.id
+    if (currentSurgery) {
+      setSurgeries((prev) =>
+        prev.map((surgery) =>
+          surgery.id === currentSurgery.id
             ? {
-                ...diagnosis,
-                diagnosisId: data.diagnosis.value,
+                ...surgery,
+                surgeryId: data.surgery.value,
                 date: data.date.toISOString(),
                 notes: data.notes || undefined,
-                diagnosis: {
-                  name: data.diagnosis.label,
+                surgery: {
+                  name: data.surgery.label,
                 },
                 updatedAt: new Date().toISOString(),
-                isNew: currentDiagnosis.isNew,
+                isNew: currentSurgery.isNew,
                 isUpdated: true,
               }
-            : diagnosis
+            : surgery
         )
       );
     } else {
-      setDiagnoses((prev) => [
+      setSurgeries((prev) => [
         ...prev,
         {
           id: Math.random().toString(36).substr(2, 9),
-          diagnosisId: data.diagnosis.value,
+          surgeryId: data.surgery.value,
           date: data.date.toISOString(),
           notes: data.notes || undefined,
-          diagnosis: {
-            name: data.diagnosis.label,
+          surgery: {
+            name: data.surgery.label,
           },
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
@@ -136,22 +136,22 @@ export default function PatientDiagnosesForm({
     }
 
     form.reset();
-    // form.resetField('diagnosis');
+    // form.resetField('surgery');
     // form.setValue('reaction', '');
     form.setValue('notes', '');
-    setCurrentDiagnosis(null);
+    setCurrentSurgery(null);
   };
 
   useEffect(() => {
-    if (currentDiagnosis) {
-      form.setValue('diagnosis', {
-        label: currentDiagnosis.diagnosis.name,
-        value: currentDiagnosis.diagnosisId,
+    if (currentSurgery) {
+      form.setValue('surgery', {
+        label: currentSurgery.surgery.name,
+        value: currentSurgery.surgeryId,
       });
-      form.setValue('date', new Date(currentDiagnosis.date));
-      form.setValue('notes', currentDiagnosis.notes);
+      form.setValue('date', new Date(currentSurgery.date));
+      form.setValue('notes', currentSurgery.notes);
     }
-  }, [currentDiagnosis]);
+  }, [currentSurgery]);
 
   return (
     <Form {...form}>
@@ -162,39 +162,38 @@ export default function PatientDiagnosesForm({
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-4 md:flex-row">
             <FormField
-              name="diagnosis"
+              name="surgery"
               control={form.control}
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel>Diagnosis</FormLabel>
+                  <FormLabel>Surgery</FormLabel>
                   <FormControl>
                     <Combobox
                       value={field.value?.value || ''}
                       onChange={(e) =>
                         field.onChange({
                           label:
-                            diagnoses?.find(
-                              (diagnosis) => diagnosis.value === e
-                            )?.label || '',
+                            surgeries?.find((surgery) => surgery.value === e)
+                              ?.label || '',
                           value: e,
                         })
                       }
-                      placeholder="Select diagnosis..."
-                      inputPlaceholder="Search diagnoses..."
+                      placeholder="Select surgery..."
+                      inputPlaceholder="Search surgeries..."
                       options={
-                        diagnoses
-                          ? diagnoses.map((diagnosis) => ({
-                              label: diagnosis.label,
-                              value: diagnosis.value,
-                              disabled: patientDiagnoses.some(
+                        surgeries
+                          ? surgeries.map((surgery) => ({
+                              label: surgery.label,
+                              value: surgery.value,
+                              disabled: patientSurgeries.some(
                                 (alg) =>
                                   !alg.isDeleted &&
-                                  alg.diagnosisId === diagnosis.value
+                                  alg.surgeryId === surgery.value
                               ),
                             }))
                           : []
                       }
-                      disabled={isLoadingDiagnoses || currentDiagnosis !== null}
+                      disabled={isLoadingSurgeries || currentSurgery !== null}
                     />
                   </FormControl>
                   <FormMessage />
@@ -207,7 +206,7 @@ export default function PatientDiagnosesForm({
               name="date"
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel>Diagnosis Date</FormLabel>
+                  <FormLabel>Surgery date</FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
                       <FormControl>
@@ -221,7 +220,7 @@ export default function PatientDiagnosesForm({
                           {field.value ? (
                             format(field.value, 'PPP')
                           ) : (
-                            <span>Pick diagnosis date</span>
+                            <span>Pick surgery date</span>
                           )}
                           <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                         </Button>
@@ -265,12 +264,12 @@ export default function PatientDiagnosesForm({
           />
 
           <div className="flex flex-wrap gap-4">
-            {currentDiagnosis && (
+            {currentSurgery && (
               <Button
                 variant="secondary"
                 type="button"
                 onClick={() => {
-                  setCurrentDiagnosis(null);
+                  setCurrentSurgery(null);
                   form.reset();
                 }}
                 className="flex w-full items-center gap-2 sm:w-[100px]"
@@ -281,12 +280,12 @@ export default function PatientDiagnosesForm({
             )}
 
             <Button className="flex w-full items-center gap-2 sm:w-[100px]">
-              {currentDiagnosis ? (
+              {currentSurgery ? (
                 <Edit className="h-5 w-5" />
               ) : (
                 <Plus className="h-5 w-5" />
               )}
-              {currentDiagnosis ? 'Edit' : 'Add'}
+              {currentSurgery ? 'Edit' : 'Add'}
             </Button>
           </div>
         </div>

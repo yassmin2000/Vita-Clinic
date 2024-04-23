@@ -30,103 +30,108 @@ import { Button } from '@/components/ui/button';
 import useAccessToken from '@/hooks/useAccessToken';
 import { cn } from '@/lib/utils';
 
-import type { PatientDiagnosisField } from './PatientDiagnoses';
+import type { PatientMedicalConditionField } from './PatientMedicalConditions';
 import type { Lookup } from '@/types/settings.type';
 
 const formSchema = z.object({
-  diagnosis: z.object(
+  medicalCondition: z.object(
     {
       label: z.string(),
       value: z.string(),
     },
     {
-      required_error: 'Diagnosis is required',
+      required_error: 'MedicalCondition is required',
     }
   ),
   date: z
     .date({
-      required_error: 'Diagnosis date is required.',
+      required_error: 'MedicalCondition date is required.',
     })
     .max(new Date(), {
-      message: 'Diagnosis date cannot be in the future.',
+      message: 'MedicalCondition date cannot be in the future.',
     }),
   notes: z.string().optional().nullable(),
 });
 
-interface PatientDiagnosesFormProps {
-  patientDiagnoses: PatientDiagnosisField[];
-  setDiagnoses: Dispatch<SetStateAction<PatientDiagnosisField[]>>;
-  currentDiagnosis: PatientDiagnosisField | null;
-  setCurrentDiagnosis: Dispatch<SetStateAction<PatientDiagnosisField | null>>;
+interface PatientMedicalConditionsFormProps {
+  patientMedicalConditions: PatientMedicalConditionField[];
+  setMedicalConditions: Dispatch<
+    SetStateAction<PatientMedicalConditionField[]>
+  >;
+  currentMedicalCondition: PatientMedicalConditionField | null;
+  setCurrentMedicalCondition: Dispatch<
+    SetStateAction<PatientMedicalConditionField | null>
+  >;
 }
 
-export default function PatientDiagnosesForm({
-  patientDiagnoses,
-  setDiagnoses,
-  currentDiagnosis,
-  setCurrentDiagnosis,
-}: PatientDiagnosesFormProps) {
+export default function PatientMedicalConditionsForm({
+  patientMedicalConditions,
+  setMedicalConditions,
+  currentMedicalCondition,
+  setCurrentMedicalCondition,
+}: PatientMedicalConditionsFormProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
   });
   const accessToken = useAccessToken();
 
-  const { data: diagnoses, isLoading: isLoadingDiagnoses } = useQuery({
-    queryKey: ['diagnoses_form'],
-    queryFn: async () => {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/settings/diagnoses`,
-        {
-          headers: {
-            authorization: `Bearer ${accessToken}`,
-          },
+  const { data: medicalConditions, isLoading: isLoadingMedicalConditions } =
+    useQuery({
+      queryKey: ['medical-conditions_form'],
+      queryFn: async () => {
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_URL}/settings/medical-conditions`,
+          {
+            headers: {
+              authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
+
+        const data = response.data as Lookup[];
+
+        if (data) {
+          return data.map((medicalCondition) => ({
+            label: medicalCondition.name,
+            value: medicalCondition.id,
+          }));
         }
-      );
 
-      const data = response.data as Lookup[];
-
-      if (data) {
-        return data.map((diagnosis) => ({
-          label: diagnosis.name,
-          value: diagnosis.id,
-        }));
-      }
-
-      return [];
-    },
-    enabled: !!accessToken,
-  });
+        return [];
+      },
+      enabled: !!accessToken,
+    });
 
   const onSubmit = (data: z.infer<typeof formSchema>) => {
-    if (currentDiagnosis) {
-      setDiagnoses((prev) =>
-        prev.map((diagnosis) =>
-          diagnosis.id === currentDiagnosis.id
+    if (currentMedicalCondition) {
+      setMedicalConditions((prev) =>
+        prev.map((medicalCondition) =>
+          medicalCondition.id === currentMedicalCondition.id
             ? {
-                ...diagnosis,
-                diagnosisId: data.diagnosis.value,
+                ...medicalCondition,
+                medicalConditionId: data.medicalCondition.value,
                 date: data.date.toISOString(),
                 notes: data.notes || undefined,
-                diagnosis: {
-                  name: data.diagnosis.label,
+                medicalCondition: {
+                  name: data.medicalCondition.label,
                 },
                 updatedAt: new Date().toISOString(),
-                isNew: currentDiagnosis.isNew,
+                isNew: currentMedicalCondition.isNew,
                 isUpdated: true,
               }
-            : diagnosis
+            : medicalCondition
         )
       );
     } else {
-      setDiagnoses((prev) => [
+      setMedicalConditions((prev) => [
         ...prev,
         {
           id: Math.random().toString(36).substr(2, 9),
-          diagnosisId: data.diagnosis.value,
+          medicalConditionId: data.medicalCondition.value,
           date: data.date.toISOString(),
           notes: data.notes || undefined,
-          diagnosis: {
-            name: data.diagnosis.label,
+          medicalCondition: {
+            name: data.medicalCondition.label,
           },
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
@@ -136,22 +141,22 @@ export default function PatientDiagnosesForm({
     }
 
     form.reset();
-    // form.resetField('diagnosis');
+    // form.resetField('medicalCondition');
     // form.setValue('reaction', '');
     form.setValue('notes', '');
-    setCurrentDiagnosis(null);
+    setCurrentMedicalCondition(null);
   };
 
   useEffect(() => {
-    if (currentDiagnosis) {
-      form.setValue('diagnosis', {
-        label: currentDiagnosis.diagnosis.name,
-        value: currentDiagnosis.diagnosisId,
+    if (currentMedicalCondition) {
+      form.setValue('medicalCondition', {
+        label: currentMedicalCondition.medicalCondition.name,
+        value: currentMedicalCondition.medicalConditionId,
       });
-      form.setValue('date', new Date(currentDiagnosis.date));
-      form.setValue('notes', currentDiagnosis.notes);
+      form.setValue('date', new Date(currentMedicalCondition.date));
+      form.setValue('notes', currentMedicalCondition.notes);
     }
-  }, [currentDiagnosis]);
+  }, [currentMedicalCondition]);
 
   return (
     <Form {...form}>
@@ -162,39 +167,43 @@ export default function PatientDiagnosesForm({
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-4 md:flex-row">
             <FormField
-              name="diagnosis"
+              name="medicalCondition"
               control={form.control}
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel>Diagnosis</FormLabel>
+                  <FormLabel>Medical Condition</FormLabel>
                   <FormControl>
                     <Combobox
                       value={field.value?.value || ''}
                       onChange={(e) =>
                         field.onChange({
                           label:
-                            diagnoses?.find(
-                              (diagnosis) => diagnosis.value === e
+                            medicalConditions?.find(
+                              (medicalCondition) => medicalCondition.value === e
                             )?.label || '',
                           value: e,
                         })
                       }
-                      placeholder="Select diagnosis..."
-                      inputPlaceholder="Search diagnoses..."
+                      placeholder="Select medical condition..."
+                      inputPlaceholder="Search medical conditions..."
                       options={
-                        diagnoses
-                          ? diagnoses.map((diagnosis) => ({
-                              label: diagnosis.label,
-                              value: diagnosis.value,
-                              disabled: patientDiagnoses.some(
+                        medicalConditions
+                          ? medicalConditions.map((medicalCondition) => ({
+                              label: medicalCondition.label,
+                              value: medicalCondition.value,
+                              disabled: patientMedicalConditions.some(
                                 (alg) =>
                                   !alg.isDeleted &&
-                                  alg.diagnosisId === diagnosis.value
+                                  alg.medicalConditionId ===
+                                    medicalCondition.value
                               ),
                             }))
                           : []
                       }
-                      disabled={isLoadingDiagnoses || currentDiagnosis !== null}
+                      disabled={
+                        isLoadingMedicalConditions ||
+                        currentMedicalCondition !== null
+                      }
                     />
                   </FormControl>
                   <FormMessage />
@@ -207,7 +216,7 @@ export default function PatientDiagnosesForm({
               name="date"
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel>Diagnosis Date</FormLabel>
+                  <FormLabel>Medical Condition Date</FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
                       <FormControl>
@@ -221,7 +230,7 @@ export default function PatientDiagnosesForm({
                           {field.value ? (
                             format(field.value, 'PPP')
                           ) : (
-                            <span>Pick diagnosis date</span>
+                            <span>Pick medical condition date</span>
                           )}
                           <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                         </Button>
@@ -265,12 +274,12 @@ export default function PatientDiagnosesForm({
           />
 
           <div className="flex flex-wrap gap-4">
-            {currentDiagnosis && (
+            {currentMedicalCondition && (
               <Button
                 variant="secondary"
                 type="button"
                 onClick={() => {
-                  setCurrentDiagnosis(null);
+                  setCurrentMedicalCondition(null);
                   form.reset();
                 }}
                 className="flex w-full items-center gap-2 sm:w-[100px]"
@@ -281,12 +290,12 @@ export default function PatientDiagnosesForm({
             )}
 
             <Button className="flex w-full items-center gap-2 sm:w-[100px]">
-              {currentDiagnosis ? (
+              {currentMedicalCondition ? (
                 <Edit className="h-5 w-5" />
               ) : (
                 <Plus className="h-5 w-5" />
               )}
-              {currentDiagnosis ? 'Edit' : 'Add'}
+              {currentMedicalCondition ? 'Edit' : 'Add'}
             </Button>
           </div>
         </div>
