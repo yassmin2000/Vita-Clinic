@@ -199,7 +199,7 @@ export default function UserForm() {
               control={form.control}
               render={({ field }) => (
                 <FormItem className="col-span-2 md:col-span-1">
-                  <FormLabel>First Name</FormLabel>
+                  <FormLabel required>First Name</FormLabel>
                   <FormControl>
                     <Input disabled={isPending} placeholder="John" {...field} />
                   </FormControl>
