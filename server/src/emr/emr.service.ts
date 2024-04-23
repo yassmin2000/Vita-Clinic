@@ -7,13 +7,22 @@ import {
 import { PrismaService } from 'src/prisma.service';
 import { AllergiesService } from 'src/settings/allergies/allergies.service';
 import { DiagnosesService } from 'src/settings/diagnoses/diagnoses.service';
+import { MedicalConditionsService } from 'src/settings/medical-conditions/medical-conditions.service';
+import { SurgeriesService } from 'src/settings/surgeries/surgeries.service';
 
 import {
   EmrDto,
   PatientAllergiesDto,
   PatientDiagnosesDto,
+  PatientMedicalConditionsDto,
+  PatientSurgeriesDto,
 } from './dto/emr.dto';
-import type { PatientAllergy, PatientDiagnosis } from '@prisma/client';
+import type {
+  PatientAllergy,
+  PatientDiagnosis,
+  PatientMedicalCondition,
+  PatientSurgery,
+} from '@prisma/client';
 
 @Injectable()
 export class EmrService {
@@ -21,6 +30,8 @@ export class EmrService {
     private prisma: PrismaService,
     private allergiesService: AllergiesService,
     private diagnosesService: DiagnosesService,
+    private medicalConditionsService: MedicalConditionsService,
+    private surgeriesService: SurgeriesService,
   ) {}
 
   async getById(patientId: string) {
@@ -60,13 +71,40 @@ export class EmrService {
             },
           },
         },
+        medicalConditions: {
+          include: {
+            medicalCondition: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+        surgeries: {
+          include: {
+            surgery: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+        medications: {
+          include: {
+            medication: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
       },
     });
   }
 
-  async create(patientId: string, emrDto: EmrDto) {
+  async create(patientId: string) {
     const user = await this.prisma.user.findUnique({
-      where: { id: patientId },
+      where: { id: patientId, role: 'patient' },
       include: {
         emr: true,
       },
@@ -76,32 +114,13 @@ export class EmrService {
       throw new NotFoundException('User not found');
     }
 
-    if (user.role !== 'patient') {
-      throw new ConflictException('User is not a patient');
-    }
-
     if (user.emr) {
       throw new ConflictException('EMR already exists');
     }
 
-    const {
-      height,
-      weight,
-      bloodType,
-      smokingStatus,
-      alcoholStatus,
-      drugsUsage,
-    } = emrDto;
-
     return await this.prisma.electronicMedicalRecord.create({
       data: {
         patientId,
-        height,
-        weight,
-        bloodType,
-        smokingStatus,
-        alcoholStatus,
-        drugsUsage,
       },
     });
   }
@@ -124,6 +143,9 @@ export class EmrService {
         id: true,
         allergies: true,
         diagnoses: true,
+        medicalConditions: true,
+        surgeries: true,
+        medications: true,
       },
     });
 
@@ -136,32 +158,21 @@ export class EmrService {
       drugsUsage,
       allergies,
       diagnoses,
+      medicalConditions,
+      surgeries,
     } = emrDto;
 
+    let emrId: string;
     if (!emr) {
-      const newEmr = await this.create(patientId, {
-        height,
-        weight,
-        bloodType,
-        smokingStatus,
-        alcoholStatus,
-        drugsUsage,
-      });
-
-      if (allergies) {
-        await this.updateAllergies(newEmr.id, [], allergies);
-      }
-
-      if (diagnoses) {
-        await this.updateDiagnoses(newEmr.id, [], diagnoses);
-      }
-
-      return newEmr;
+      const newEmr = await this.create(patientId);
+      emrId = newEmr.id;
+    } else {
+      emrId = emr.id;
     }
 
     await this.prisma.electronicMedicalRecord.update({
       where: {
-        id: emr.id,
+        id: emrId,
       },
       data: {
         height,
@@ -174,11 +185,23 @@ export class EmrService {
     });
 
     if (allergies) {
-      await this.updateAllergies(emr.id, emr.allergies, allergies);
+      await this.updateAllergies(emrId, emr.allergies || [], allergies);
     }
 
     if (diagnoses) {
-      await this.updateDiagnoses(emr.id, emr.diagnoses, diagnoses);
+      await this.updateDiagnoses(emrId, emr.diagnoses || [], diagnoses);
+    }
+
+    if (medicalConditions) {
+      await this.updateMedicalConditions(
+        emrId,
+        emr.medicalConditions || [],
+        medicalConditions,
+      );
+    }
+
+    if (surgeries) {
+      await this.updateSurgeries(emrId, emr.surgeries || [], surgeries);
     }
 
     return emr;
@@ -342,6 +365,171 @@ export class EmrService {
     } catch (error) {
       console.error(error);
       throw new Error('Failed to update diagnoses');
+    }
+  }
+
+  async updateMedicalConditions(
+    emrId: string,
+    patientMedicalConditions: PatientMedicalCondition[],
+    medicalConditions: PatientMedicalConditionsDto,
+  ): Promise<boolean> {
+    try {
+      // Create new medical conditions
+      await Promise.all(
+        medicalConditions.new.map(async (medicalCondition) => {
+          if (
+            patientMedicalConditions.find(
+              (patientMedicalCondition) =>
+                patientMedicalCondition.medicalConditionId ===
+                medicalCondition.medicalConditionId,
+            )
+          ) {
+            return;
+          }
+
+          const currentMedicalCondition =
+            await this.medicalConditionsService.findById(
+              medicalCondition.medicalConditionId,
+            );
+
+          if (currentMedicalCondition) {
+            return this.prisma.patientMedicalCondition.create({
+              data: {
+                emrId,
+                medicalConditionId: currentMedicalCondition.id,
+                notes: medicalCondition.notes,
+                date: medicalCondition.date,
+              },
+            });
+          }
+        }),
+      );
+
+      // Update existing medical conditions
+      await Promise.all(
+        medicalConditions.updated.map(async (medicalCondition) => {
+          const currentPatientMedicalCondition = patientMedicalConditions.find(
+            (patientMedicalCondition) =>
+              patientMedicalCondition.medicalConditionId ===
+              medicalCondition.medicalConditionId,
+          );
+
+          if (currentPatientMedicalCondition) {
+            return this.prisma.patientMedicalCondition.update({
+              where: {
+                id: currentPatientMedicalCondition.id,
+              },
+              data: {
+                notes: medicalCondition.notes,
+                date: medicalCondition.date,
+              },
+            });
+          }
+        }),
+      );
+
+      // Delete medical conditions
+      await Promise.all(
+        medicalConditions.deleted.map(async (id) => {
+          const currentPatientMedicalCondition = patientMedicalConditions.find(
+            (patientMedicalCondition) =>
+              patientMedicalCondition.medicalConditionId === id,
+          );
+
+          if (currentPatientMedicalCondition) {
+            return this.prisma.patientMedicalCondition.delete({
+              where: {
+                id: currentPatientMedicalCondition.id,
+              },
+            });
+          }
+        }),
+      );
+
+      return true;
+    } catch (error) {
+      console.error(error);
+      throw new Error('Failed to update medical conditions');
+    }
+  }
+
+  async updateSurgeries(
+    emrId: string,
+    patientSurgeries: PatientSurgery[],
+    surgeries: PatientSurgeriesDto,
+  ): Promise<boolean> {
+    try {
+      // Create new surgeries
+      await Promise.all(
+        surgeries.new.map(async (surgery) => {
+          if (
+            patientSurgeries.find(
+              (patientSurgery) =>
+                patientSurgery.surgeryId === surgery.surgeryId,
+            )
+          ) {
+            return;
+          }
+
+          const currentSurgery = await this.surgeriesService.findById(
+            surgery.surgeryId,
+          );
+
+          if (currentSurgery) {
+            return this.prisma.patientSurgery.create({
+              data: {
+                emrId,
+                surgeryId: currentSurgery.id,
+                notes: surgery.notes,
+                date: surgery.date,
+              },
+            });
+          }
+        }),
+      );
+
+      // Update existing surgeries
+      await Promise.all(
+        surgeries.updated.map(async (surgery) => {
+          const currentPatientSurgery = patientSurgeries.find(
+            (patientSurgery) => patientSurgery.surgeryId === surgery.surgeryId,
+          );
+
+          if (currentPatientSurgery) {
+            return this.prisma.patientSurgery.update({
+              where: {
+                id: currentPatientSurgery.id,
+              },
+              data: {
+                notes: surgery.notes,
+                date: surgery.date,
+              },
+            });
+          }
+        }),
+      );
+
+      // Delete surgeries
+      await Promise.all(
+        surgeries.deleted.map(async (id) => {
+          const currentPatientSurgery = patientSurgeries.find(
+            (patientSurgery) => patientSurgery.surgeryId === id,
+          );
+
+          if (currentPatientSurgery) {
+            return this.prisma.patientSurgery.delete({
+              where: {
+                id: currentPatientSurgery.id,
+              },
+            });
+          }
+        }),
+      );
+
+      return true;
+    } catch (error) {
+      console.error(error);
+      throw new Error('Failed to update surgeries');
     }
   }
 }

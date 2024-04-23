@@ -73,6 +73,62 @@ export class PatientDiagnosesDto {
   updated: DiagnosisDto[];
 }
 
+class MedicalConditionDto {
+  @IsString()
+  medicalConditionId: string;
+
+  @IsOptional()
+  @IsString()
+  notes?: string;
+
+  @IsDateString()
+  date: Date;
+}
+
+export class PatientMedicalConditionsDto {
+  @IsArray()
+  @IsString({ each: true })
+  deleted: string[];
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => MedicalConditionDto)
+  new: MedicalConditionDto[];
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => MedicalConditionDto)
+  updated: MedicalConditionDto[];
+}
+
+class SurgeryDto {
+  @IsString()
+  surgeryId: string;
+
+  @IsOptional()
+  @IsString()
+  notes?: string;
+
+  @IsDateString()
+  date: Date;
+}
+
+export class PatientSurgeriesDto {
+  @IsArray()
+  @IsString({ each: true })
+  deleted: string[];
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => SurgeryDto)
+  new: SurgeryDto[];
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => SurgeryDto)
+  updated: SurgeryDto[];
+}
+
 export class EmrDto {
   @IsOptional()
   @IsNumber()
@@ -116,4 +172,14 @@ export class EmrDto {
   @ValidateNested()
   @Type(() => PatientDiagnosesDto)
   diagnoses?: PatientDiagnosesDto;
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => PatientMedicalConditionsDto)
+  medicalConditions?: PatientMedicalConditionsDto;
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => PatientSurgeriesDto)
+  surgeries?: PatientSurgeriesDto;
 }
