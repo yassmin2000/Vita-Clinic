@@ -56,6 +56,7 @@ interface ComboboxProps {
   options: {
     value: string;
     label: string;
+    disabed?: boolean;
   }[];
   disabled?: boolean;
 }
@@ -138,6 +139,7 @@ function OptionsList({
   options: {
     value: string;
     label: string;
+    disabled?: boolean;
   }[];
 }) {
   return (
@@ -153,6 +155,7 @@ function OptionsList({
                 onChange(option.value);
                 setOpen(false);
               }}
+              disabled={option.disabled}
             >
               {value === option.value && <Check className="mr-2 h-4 w-4" />}
               {option.label}
