@@ -54,7 +54,12 @@ export default function LaboratoryTestsTable() {
                   name: currentLaboratoryTest.name,
                   description: currentLaboratoryTest.description,
                   price: currentLaboratoryTest.price,
-                  biomarkers: currentLaboratoryTest.biomarkers,
+                  biomarkers: currentLaboratoryTest.biomarkers.map(
+                    (biomarker) => ({
+                      label: biomarker.name,
+                      value: biomarker.id,
+                    })
+                  ),
                 }
               : undefined
           }

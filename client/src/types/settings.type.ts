@@ -54,9 +54,9 @@ export type LaboratoryTest = {
   id: string | number;
   name: string;
   description?: string;
-  price: Number;
+  price: number;
   biomarkers: {
-    id: string | number;
+    id: string;
     name: string;
   }[];
   createdAt: string;
