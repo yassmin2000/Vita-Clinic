@@ -5,10 +5,9 @@ import { AdminsController } from './admins.controller';
 import { UsersService } from '../users.service';
 import { PrismaService } from 'src/prisma.service';
 import { OtpService } from 'src/otp/otp.service';
-import { EmrService } from 'src/emr/emr.service';
 
 @Module({
   controllers: [AdminsController],
-  providers: [PrismaService, JwtService, OtpService, UsersService, EmrService],
+  providers: [PrismaService, JwtService, OtpService, UsersService],
 })
 export class AdminsModule {}

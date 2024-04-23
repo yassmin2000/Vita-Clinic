@@ -4,6 +4,7 @@ import { JwtModule } from '@nestjs/jwt';
 
 import { AuthModule } from './auth/auth.module';
 import { DevicesModule } from './devices/devices.module';
+import { EmrModule } from './emr/emr.module';
 import { SettingsModule } from './settings/settings.module';
 import { UsersModule } from './users/users.module';
 
@@ -19,6 +20,7 @@ import { AppService } from './app.service';
     DevicesModule,
     SettingsModule,
     UsersModule,
+    EmrModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -7,7 +7,6 @@ import { hash } from 'bcrypt';
 import type { Role } from '@prisma/client';
 
 import { PrismaService } from 'src/prisma.service';
-import { EmrService } from 'src/emr/emr.service';
 import { OtpService } from 'src/otp/otp.service';
 
 import {
@@ -23,7 +22,6 @@ import {
 export class UsersService {
   constructor(
     private prisma: PrismaService,
-    private emr: EmrService,
     private otp: OtpService,
   ) {}
 
@@ -180,7 +178,14 @@ export class UsersService {
     });
 
     if (role === 'patient') {
-      await this.emr.create(newUser.id, { height, weight, bloodType });
+      await this.prisma.electronicMedicalRecord.create({
+        data: {
+          patientId: newUser.id,
+          height,
+          weight,
+          bloodType,
+        },
+      });
     }
 
     if (!verified) {

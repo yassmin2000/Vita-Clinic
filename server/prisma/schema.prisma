@@ -29,6 +29,24 @@ enum BloodType {
   o_negative
 }
 
+enum SmokingStatus {
+  never
+  former
+  current
+}
+
+enum AlcoholStatus {
+  never
+  former
+  current
+}
+
+enum DrugsUsage {
+  never
+  former
+  current
+}
+
 enum DosageForm {
   capsule
   injection
@@ -134,12 +152,15 @@ model ElectronicMedicalRecord {
   patient   User   @relation(fields: [patientId], references: [id])
   patientId String @unique
 
-  height    Float?
-  weight    Float?
-  bloodType BloodType?
-  insurance Insurance?
+  height        Float?
+  weight        Float?
+  bloodType     BloodType?
+  smokingStatus SmokingStatus?
+  alcoholStatus AlcoholStatus?
+  drugsUsage    DrugsUsage?
+  insurance     Insurance?
 
-  diagnoses         PatientDiganosis[]
+  diagnoses         PatientDiagnosis[]
   surgeries         PatientSurgery[]
   medicalConditions PatientMedicalCondition[]
   allergies         PatientAllergy[]
@@ -155,19 +176,19 @@ model Diagnosis {
   name        String
   description String?
 
-  patientDiganosis PatientDiganosis[]
+  patientDiagnosis PatientDiagnosis[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-model PatientDiganosis {
+model PatientDiagnosis {
   id          String    @id @default(uuid())
   diagnosis   Diagnosis @relation(fields: [diagnosisId], references: [id])
   diagnosisId String
 
-  notes         String?
-  diganosisDate DateTime
+  notes String?
+  date  DateTime
 
   emr   ElectronicMedicalRecord @relation(fields: [emrId], references: [id])
   emrId String
@@ -192,8 +213,8 @@ model PatientSurgery {
   surgery   Surgery @relation(fields: [surgeryId], references: [id])
   surgeryId String
 
-  notes       String?
-  surgeryDate DateTime
+  notes String?
+  date  DateTime
 
   emr   ElectronicMedicalRecord @relation(fields: [emrId], references: [id])
   emrId String
@@ -218,8 +239,8 @@ model PatientMedicalCondition {
   medicalCondition   MedicalCondition @relation(fields: [medicalConditionId], references: [id])
   medicalConditionId String
 
-  notes         String?
-  diganosisDate DateTime
+  notes String?
+  date  DateTime
 
   emr   ElectronicMedicalRecord @relation(fields: [emrId], references: [id])
   emrId String
