@@ -61,7 +61,7 @@ export default function BiomarkerForm({
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { mutate: mutateLookup, isPending } = useMutation({
+  const { mutate: mutateBiomarker, isPending } = useMutation({
     mutationFn: async (values: z.infer<typeof formSchema>) => {
       let response: AxiosResponse<any, any>;
       const body = {
@@ -129,8 +129,8 @@ export default function BiomarkerForm({
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit((e) => mutateLookup(e))}
-        className="space-y-6 px-4 text-gray-900"
+        onSubmit={form.handleSubmit((e) => mutateBiomarker(e))}
+        className="space-y-6 px-4 text-foreground"
       >
         <div className="w-full space-y-2">
           {currentId ? (

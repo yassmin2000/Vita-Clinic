@@ -118,7 +118,7 @@ export default function DeviceForm({ deviceId }: DeviceFormProps) {
   });
 
   const { data: manufacturers, isLoading: isLoadingManufacturers } = useQuery({
-    queryKey: ['manufacturers'],
+    queryKey: ['manufacturers_form'],
     queryFn: async () => {
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_API_URL}/settings/manufacturers`,
