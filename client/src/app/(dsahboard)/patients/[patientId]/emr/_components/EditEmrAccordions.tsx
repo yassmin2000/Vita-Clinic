@@ -79,8 +79,8 @@ export default function EditEmrAccordions({
     return (
       <>
         {Array.from({ length: 5 }).map((_, index) => (
-          <div className="flex flex-col">
-            <Skeleton key={index} className="h-14 rounded-b-none bg-primary" />
+          <div key={index} className="flex flex-col">
+            <Skeleton className="h-14 rounded-b-none bg-primary" />
             {index === 0 && (
               <Skeleton className="h-32 rounded-b-md rounded-t-none border-2 border-t-0 border-secondary bg-background" />
             )}
