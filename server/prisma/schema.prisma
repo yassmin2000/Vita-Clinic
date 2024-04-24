@@ -297,17 +297,17 @@ model PatientMedication {
   medicationId String
 
   notes     String?
-  dosage    Float
-  frequency Frequency
-  required  Boolean
-  startDate DateTime
+  dosage    Float?
+  frequency Frequency?
+  required  Boolean    @default(true)
+  startDate DateTime?
   endDate   DateTime?
 
   emr   ElectronicMedicalRecord @relation(fields: [emrId], references: [id])
   emrId String
 
-  appointment   Appointment @relation(fields: [appointmentId], references: [id])
-  appointmentId String
+  appointment   Appointment? @relation(fields: [appointmentId], references: [id])
+  appointmentId String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

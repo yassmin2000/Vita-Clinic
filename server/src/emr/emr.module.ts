@@ -8,6 +8,7 @@ import { AllergiesService } from 'src/settings/allergies/allergies.service';
 import { DiagnosesService } from 'src/settings/diagnoses/diagnoses.service';
 import { MedicalConditionsService } from 'src/settings/medical-conditions/medical-conditions.service';
 import { SurgeriesService } from 'src/settings/surgeries/surgeries.service';
+import { MedicationsService } from 'src/settings/medications/medications.service';
 
 @Module({
   controllers: [EmrController],
@@ -18,6 +19,7 @@ import { SurgeriesService } from 'src/settings/surgeries/surgeries.service';
     DiagnosesService,
     MedicalConditionsService,
     SurgeriesService,
+    MedicationsService,
     JwtService,
   ],
 })

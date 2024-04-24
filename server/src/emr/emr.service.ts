@@ -9,18 +9,21 @@ import { AllergiesService } from 'src/settings/allergies/allergies.service';
 import { DiagnosesService } from 'src/settings/diagnoses/diagnoses.service';
 import { MedicalConditionsService } from 'src/settings/medical-conditions/medical-conditions.service';
 import { SurgeriesService } from 'src/settings/surgeries/surgeries.service';
+import { MedicationsService } from 'src/settings/medications/medications.service';
 
 import {
   EmrDto,
   PatientAllergiesDto,
   PatientDiagnosesDto,
   PatientMedicalConditionsDto,
+  PatientMedicationsDto,
   PatientSurgeriesDto,
 } from './dto/emr.dto';
 import type {
   PatientAllergy,
   PatientDiagnosis,
   PatientMedicalCondition,
+  PatientMedication,
   PatientSurgery,
 } from '@prisma/client';
 
@@ -32,6 +35,7 @@ export class EmrService {
     private diagnosesService: DiagnosesService,
     private medicalConditionsService: MedicalConditionsService,
     private surgeriesService: SurgeriesService,
+    private medicationsService: MedicationsService,
   ) {}
 
   async getById(patientId: string) {
@@ -94,6 +98,7 @@ export class EmrService {
             medication: {
               select: {
                 name: true,
+                unit: true,
               },
             },
           },
@@ -160,6 +165,7 @@ export class EmrService {
       diagnoses,
       medicalConditions,
       surgeries,
+      medications,
     } = emrDto;
 
     let emrId: string;
@@ -202,6 +208,10 @@ export class EmrService {
 
     if (surgeries) {
       await this.updateSurgeries(emrId, emr.surgeries || [], surgeries);
+    }
+
+    if (medications) {
+      await this.updateMedications(emrId, emr.medications || [], medications);
     }
 
     return emr;
@@ -530,6 +540,95 @@ export class EmrService {
     } catch (error) {
       console.error(error);
       throw new Error('Failed to update surgeries');
+    }
+  }
+
+  async updateMedications(
+    emrId: string,
+    patientMedications: PatientMedication[],
+    medications: PatientMedicationsDto,
+  ): Promise<boolean> {
+    try {
+      // Create new medications
+      await Promise.all(
+        medications.new.map(async (medication) => {
+          if (
+            patientMedications.find(
+              (patientMedication) =>
+                patientMedication.medicationId === medication.medicationId,
+            )
+          ) {
+            return;
+          }
+
+          const currentMedication = await this.medicationsService.findById(
+            medication.medicationId,
+          );
+
+          if (currentMedication) {
+            return this.prisma.patientMedication.create({
+              data: {
+                emrId,
+                medicationId: currentMedication.id,
+                notes: medication.notes,
+                startDate: medication.startDate,
+                endDate: medication.endDate,
+                dosage: medication.dosage,
+                frequency: medication.frequency,
+                required: medication.required,
+              },
+            });
+          }
+        }),
+      );
+
+      // Update existing medications
+      await Promise.all(
+        medications.updated.map(async (medication) => {
+          const currentPatientMedication = patientMedications.find(
+            (patientMedication) =>
+              patientMedication.medicationId === medication.medicationId,
+          );
+
+          if (currentPatientMedication) {
+            return this.prisma.patientMedication.update({
+              where: {
+                id: currentPatientMedication.id,
+              },
+              data: {
+                notes: medication.notes,
+                startDate: medication.startDate,
+                endDate: medication.endDate,
+                dosage: medication.dosage,
+                frequency: medication.frequency,
+                required: medication.required,
+              },
+            });
+          }
+        }),
+      );
+
+      // Delete medications
+      await Promise.all(
+        medications.deleted.map(async (id) => {
+          const currentPatientMedication = patientMedications.find(
+            (patientMedication) => patientMedication.medicationId === id,
+          );
+
+          if (currentPatientMedication) {
+            return this.prisma.patientMedication.delete({
+              where: {
+                id: currentPatientMedication.id,
+              },
+            });
+          }
+        }),
+      );
+
+      return true;
+    } catch (error) {
+      console.error(error);
+      throw new Error('Failed to update medications');
     }
   }
 }

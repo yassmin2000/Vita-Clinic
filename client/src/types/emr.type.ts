@@ -8,6 +8,8 @@ export type BloodType =
   | 'o_positive'
   | 'o_negative';
 
+export type Frequency = 'daily' | 'weekly' | 'monthly' | 'yearly';
+
 export type PatientAllergy = {
   id: string;
   allergyId: string;
@@ -56,6 +58,23 @@ export type PatientSurgery = {
   };
 };
 
+export type PatientMedication = {
+  id: string;
+  medicationId: string;
+  notes?: string;
+  startDate?: string;
+  endDate?: string;
+  dosage?: number;
+  frequency?: Frequency;
+  required: boolean;
+  createdAt: string;
+  updatedAt: string;
+  medication: {
+    name: string;
+    unit: string;
+  };
+};
+
 export type EMR = {
   id: string;
   patientId: string;
@@ -71,4 +90,5 @@ export type EMR = {
   diagnoses: PatientDiagnosis[];
   medicalConditions: PatientMedicalCondition[];
   surgeries: PatientSurgery[];
+  medications: PatientMedication[];
 };

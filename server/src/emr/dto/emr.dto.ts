@@ -1,5 +1,6 @@
 import {
   IsArray,
+  IsBoolean,
   IsDateString,
   IsIn,
   IsNumber,
@@ -13,6 +14,7 @@ import type {
   AlcoholStatus,
   BloodType,
   DrugsUsage,
+  Frequency,
   SmokingStatus,
 } from '@prisma/client';
 
@@ -129,6 +131,50 @@ export class PatientSurgeriesDto {
   updated: SurgeryDto[];
 }
 
+class MedicationDto {
+  @IsString()
+  medicationId: string;
+
+  @IsOptional()
+  @IsString()
+  notes?: string;
+
+  @IsOptional()
+  @IsDateString()
+  startDate?: Date;
+
+  @IsOptional()
+  @IsDateString()
+  endDate?: Date;
+
+  @IsOptional()
+  @IsNumber()
+  dosage?: number;
+
+  @IsOptional()
+  @IsIn(['daily', 'weekly', 'monthly', 'yearly'])
+  frequency?: Frequency;
+
+  @IsBoolean()
+  required: boolean;
+}
+
+export class PatientMedicationsDto {
+  @IsArray()
+  @IsString({ each: true })
+  deleted: string[];
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => MedicationDto)
+  new: MedicationDto[];
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => MedicationDto)
+  updated: MedicationDto[];
+}
+
 export class EmrDto {
   @IsOptional()
   @IsNumber()
@@ -182,4 +228,9 @@ export class EmrDto {
   @ValidateNested()
   @Type(() => PatientSurgeriesDto)
   surgeries?: PatientSurgeriesDto;
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => PatientMedicationsDto)
+  medications?: PatientMedicationsDto;
 }
