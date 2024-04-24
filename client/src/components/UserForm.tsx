@@ -213,7 +213,7 @@ export default function UserForm() {
               control={form.control}
               render={({ field }) => (
                 <FormItem className="col-span-2 md:col-span-1">
-                  <FormLabel>Last Name</FormLabel>
+                  <FormLabel required>Last Name</FormLabel>
                   <FormControl>
                     <Input disabled={isPending} placeholder="Doe" {...field} />
                   </FormControl>
@@ -227,7 +227,7 @@ export default function UserForm() {
               control={form.control}
               render={({ field }) => (
                 <FormItem className="col-span-2 md:col-span-1">
-                  <FormLabel>Gender</FormLabel>
+                  <FormLabel required>Gender</FormLabel>
                   <Select
                     disabled={isPending}
                     onValueChange={field.onChange}
@@ -257,7 +257,7 @@ export default function UserForm() {
               control={form.control}
               render={({ field }) => (
                 <FormItem className="col-span-2 md:col-span-1">
-                  <FormLabel>Role</FormLabel>
+                  <FormLabel required>Role</FormLabel>
                   <Select
                     disabled={isPending}
                     onValueChange={field.onChange}
@@ -290,7 +290,7 @@ export default function UserForm() {
               name="birthDate"
               render={({ field }) => (
                 <FormItem className="col-span-2 md:col-span-1">
-                  <FormLabel>Date of birth</FormLabel>
+                  <FormLabel required>Date of birth</FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
                       <FormControl>
@@ -332,7 +332,7 @@ export default function UserForm() {
               control={form.control}
               render={({ field }) => (
                 <FormItem className="col-span-2 md:col-span-1">
-                  <FormLabel>Address</FormLabel>
+                  <FormLabel required>Address</FormLabel>
                   <FormControl>
                     <Input
                       disabled={isPending}
@@ -350,7 +350,7 @@ export default function UserForm() {
               control={form.control}
               render={({ field }) => (
                 <FormItem className="col-span-2">
-                  <FormLabel>Phone Number</FormLabel>
+                  <FormLabel required>Phone Number</FormLabel>
                   <FormControl>
                     <PhoneInput placeholder="Enter a phone number" {...field} />
                   </FormControl>
@@ -375,7 +375,7 @@ export default function UserForm() {
             control={form.control}
             render={({ field }) => (
               <FormItem className="col-span-2 md:col-span-1">
-                <FormLabel>Email</FormLabel>
+                <FormLabel required>Email</FormLabel>
                 <FormControl>
                   <Input
                     disabled={isPending}
@@ -394,12 +394,12 @@ export default function UserForm() {
             control={form.control}
             render={({ field }) => (
               <FormItem className="col-span-2 md:col-span-1">
-                <FormLabel>Password</FormLabel>
+                <FormLabel required>Password</FormLabel>
                 <FormControl>
                   <div className="relative">
                     <Input
                       disabled={isPending}
-                      placeholder="strong@password##"
+                      placeholder="••••••••••••"
                       type={isPasswordVisible ? 'text' : 'password'}
                       {...field}
                     />

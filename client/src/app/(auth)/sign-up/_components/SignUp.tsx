@@ -115,7 +115,7 @@ export default function SignUp() {
                 control={form.control}
                 render={({ field }) => (
                   <FormItem className="flex flex-1 flex-col items-start gap-1">
-                    <FormLabel>First Name</FormLabel>
+                    <FormLabel required>First Name</FormLabel>
                     <FormControl>
                       <Input
                         disabled={isLoading}
@@ -132,7 +132,7 @@ export default function SignUp() {
                 control={form.control}
                 render={({ field }) => (
                   <FormItem className="flex flex-1 flex-col items-start gap-1">
-                    <FormLabel>Last Name</FormLabel>
+                    <FormLabel required>Last Name</FormLabel>
                     <FormControl>
                       <Input
                         disabled={isLoading}
@@ -152,7 +152,7 @@ export default function SignUp() {
                 name="birthDate"
                 render={({ field }) => (
                   <FormItem className="flex flex-1 flex-col items-start gap-1">
-                    <FormLabel>Date of birth</FormLabel>
+                    <FormLabel required>Date of birth</FormLabel>
                     <Popover>
                       <PopoverTrigger asChild>
                         <FormControl>
@@ -194,7 +194,7 @@ export default function SignUp() {
                 control={form.control}
                 render={({ field }) => (
                   <FormItem className="flex flex-1 flex-col items-start gap-1">
-                    <FormLabel>Gender</FormLabel>
+                    <FormLabel required>Gender</FormLabel>
                     <Select
                       disabled={isLoading}
                       onValueChange={field.onChange}
@@ -243,7 +243,7 @@ export default function SignUp() {
               control={form.control}
               render={({ field }) => (
                 <FormItem className="flex flex-col items-start gap-1">
-                  <FormLabel>Phone Number</FormLabel>
+                  <FormLabel required>Phone Number</FormLabel>
                   <FormControl>
                     <PhoneInput placeholder="Enter a phone number" {...field} />
                   </FormControl>
@@ -257,7 +257,7 @@ export default function SignUp() {
               control={form.control}
               render={({ field }) => (
                 <FormItem className="flex flex-col items-start gap-1">
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel required>Email</FormLabel>
                   <FormControl>
                     <Input
                       disabled={isLoading}
@@ -276,12 +276,12 @@ export default function SignUp() {
               control={form.control}
               render={({ field }) => (
                 <FormItem className="flex flex-col items-start gap-1">
-                  <FormLabel>Password</FormLabel>
+                  <FormLabel required>Password</FormLabel>
                   <FormControl>
                     <div className="relative w-full">
                       <Input
                         disabled={isLoading}
-                        placeholder="strong@password##"
+                        placeholder="••••••••••••"
                         type={isPasswordVisible ? 'text' : 'password'}
                         {...field}
                       />
@@ -308,12 +308,12 @@ export default function SignUp() {
               control={form.control}
               render={({ field }) => (
                 <FormItem className="flex flex-col items-start gap-1">
-                  <FormLabel>Confirm Password</FormLabel>
+                  <FormLabel required>Confirm Password</FormLabel>
                   <FormControl>
                     <div className="relative w-full">
                       <Input
                         disabled={isLoading}
-                        placeholder="strong@password##"
+                        placeholder="••••••••••••"
                         type={isPasswordVisible ? 'text' : 'password'}
                         {...field}
                       />

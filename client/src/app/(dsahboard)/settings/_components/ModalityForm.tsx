@@ -150,7 +150,7 @@ export default function ModalityForm({
             control={form.control}
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Modality Name</FormLabel>
+                <FormLabel required>Modality Name</FormLabel>
                 <FormControl>
                   <Input disabled={isPending} placeholder="MRI" {...field} />
                 </FormControl>
@@ -164,7 +164,7 @@ export default function ModalityForm({
             control={form.control}
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Price (USD)</FormLabel>
+                <FormLabel required>Price (USD)</FormLabel>
                 <FormControl>
                   <Input
                     disabled={isPending}

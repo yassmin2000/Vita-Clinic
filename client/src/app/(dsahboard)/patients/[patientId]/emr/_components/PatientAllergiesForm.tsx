@@ -152,7 +152,7 @@ export default function PatientAllergiesForm({
               control={form.control}
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel>Allergy</FormLabel>
+                  <FormLabel required>Allergy</FormLabel>
                   <FormControl>
                     <Combobox
                       value={field.value?.value || ''}

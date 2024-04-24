@@ -115,7 +115,7 @@ export default function CreateReportForm({ onClose }: CreateReportFormProps) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 px-2">
         {currentStep === 1 && (
           <>
             <div className="w-full space-y-2">
@@ -133,7 +133,7 @@ export default function CreateReportForm({ onClose }: CreateReportFormProps) {
                 control={form.control}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Report Name</FormLabel>
+                    <FormLabel required>Report Name</FormLabel>
                     <FormControl>
                       <Input
                         disabled={isLoading}

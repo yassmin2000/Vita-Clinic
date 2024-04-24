@@ -171,7 +171,7 @@ export default function PatientMedicalConditionsForm({
               control={form.control}
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel>Medical Condition</FormLabel>
+                  <FormLabel required>Medical Condition</FormLabel>
                   <FormControl>
                     <Combobox
                       value={field.value?.value || ''}
@@ -216,7 +216,7 @@ export default function PatientMedicalConditionsForm({
               name="date"
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel>Medical Condition Date</FormLabel>
+                  <FormLabel required>Medical Condition Date</FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
                       <FormControl>

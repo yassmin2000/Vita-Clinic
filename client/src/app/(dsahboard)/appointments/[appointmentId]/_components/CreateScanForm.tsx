@@ -101,7 +101,7 @@ export default function CreateScanForm({ onClose }: CreateScanFormProps) {
                 control={form.control}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Scan Name</FormLabel>
+                    <FormLabel required>Scan Name</FormLabel>
                     <FormControl>
                       <Input
                         disabled={isLoading}

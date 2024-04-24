@@ -152,7 +152,7 @@ export default function LookupForm({
             control={form.control}
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{title} Name</FormLabel>
+                <FormLabel required>{title} Name</FormLabel>
                 <FormControl>
                   <Input
                     disabled={isPending}

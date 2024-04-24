@@ -158,11 +158,11 @@ export default function BiomarkerForm({
             control={form.control}
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Biomarker Name</FormLabel>
+                <FormLabel required>Biomarker Name</FormLabel>
                 <FormControl>
                   <Input
                     disabled={isPending}
-                    placeholder="Milk Biomarker"
+                    placeholder="White Blood Cells (WBCs)"
                     {...field}
                   />
                 </FormControl>
@@ -177,7 +177,7 @@ export default function BiomarkerForm({
               control={form.control}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Unit</FormLabel>
+                  <FormLabel required>Unit</FormLabel>
                   <FormControl>
                     <Input disabled={isPending} placeholder="mg" {...field} />
                   </FormControl>
@@ -191,7 +191,7 @@ export default function BiomarkerForm({
               control={form.control}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Minimum</FormLabel>
+                  <FormLabel required>Minimum</FormLabel>
                   <FormControl>
                     <Input
                       disabled={isPending}
@@ -211,7 +211,7 @@ export default function BiomarkerForm({
               control={form.control}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Maximum</FormLabel>
+                  <FormLabel required>Maximum</FormLabel>
                   <FormControl>
                     <Input
                       disabled={isPending}

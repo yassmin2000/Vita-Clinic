@@ -199,7 +199,7 @@ export default function PatientMedicationsForm({
               control={form.control}
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel>Medication</FormLabel>
+                  <FormLabel required>Medication</FormLabel>
                   <FormControl>
                     <Combobox
                       value={field.value?.value || ''}

@@ -109,7 +109,7 @@ export default function SignIn() {
                     <div className="relative w-full">
                       <Input
                         disabled={isLoading}
-                        placeholder="strong@password##"
+                        placeholder="••••••••••••"
                         type={isPasswordVisible ? 'text' : 'password'}
                         {...field}
                       />

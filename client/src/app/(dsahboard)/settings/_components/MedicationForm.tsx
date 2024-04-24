@@ -245,9 +245,13 @@ export default function MedicationForm({
             control={form.control}
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Medication Name</FormLabel>
+                <FormLabel required>Medication Name</FormLabel>
                 <FormControl>
-                  <Input disabled={isPending} placeholder="MRI" {...field} />
+                  <Input
+                    disabled={isPending}
+                    placeholder="Docetaxel"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -260,7 +264,7 @@ export default function MedicationForm({
               control={form.control}
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel>Strength</FormLabel>
+                  <FormLabel required>Strength</FormLabel>
                   <FormControl>
                     <Input
                       disabled={isPending}
@@ -280,7 +284,7 @@ export default function MedicationForm({
               control={form.control}
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel>Unit</FormLabel>
+                  <FormLabel required>Unit</FormLabel>
                   <FormControl>
                     <Input disabled={isPending} placeholder="mg" {...field} />
                   </FormControl>
@@ -296,7 +300,7 @@ export default function MedicationForm({
               control={form.control}
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel>Dosage Form</FormLabel>
+                  <FormLabel required>Dosage Form</FormLabel>
                   <Select
                     disabled={isPending}
                     onValueChange={field.onChange}
@@ -329,7 +333,7 @@ export default function MedicationForm({
               control={form.control}
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel>Route Of Administration</FormLabel>
+                  <FormLabel required>Route Of Administration</FormLabel>
                   <Select
                     disabled={isPending}
                     onValueChange={field.onChange}

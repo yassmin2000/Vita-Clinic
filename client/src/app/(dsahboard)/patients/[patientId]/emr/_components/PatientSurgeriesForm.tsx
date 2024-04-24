@@ -166,7 +166,7 @@ export default function PatientSurgeriesForm({
               control={form.control}
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel>Surgery</FormLabel>
+                  <FormLabel required>Surgery</FormLabel>
                   <FormControl>
                     <Combobox
                       value={field.value?.value || ''}
@@ -206,7 +206,7 @@ export default function PatientSurgeriesForm({
               name="date"
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel>Surgery date</FormLabel>
+                  <FormLabel required>Surgery date</FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
                       <FormControl>

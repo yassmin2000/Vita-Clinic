@@ -17,18 +17,21 @@ const Label = React.forwardRef<
       required?: boolean;
     }
 >(({ className, ...props }, ref) => (
-  <>
+  <p className="inline-flex items-end gap-0.5">
     <LabelPrimitive.Root
       ref={ref}
       className={cn(labelVariants(), className)}
       {...props}
     />
     {props.required && (
-      <span className="text-destructive" aria-hidden="true">
+      <span
+        className="pointer-events-none -mb-0.5 select-none text-destructive"
+        aria-hidden="true"
+      >
         *
       </span>
     )}
-  </>
+  </p>
 ));
 Label.displayName = LabelPrimitive.Root.displayName;
 

@@ -203,7 +203,7 @@ export default function LaboratoryTestForm({
             control={form.control}
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Laboratory Test Name</FormLabel>
+                <FormLabel required>Laboratory Test Name</FormLabel>
                 <FormControl>
                   <Input
                     disabled={isPending || isLoadingBiomarkers}
@@ -221,7 +221,7 @@ export default function LaboratoryTestForm({
             control={form.control}
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Price (USD)</FormLabel>
+                <FormLabel required>Price (USD)</FormLabel>
                 <FormControl>
                   <Input
                     disabled={isPending || isLoadingBiomarkers}

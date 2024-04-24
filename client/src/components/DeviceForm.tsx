@@ -275,7 +275,7 @@ export default function DeviceForm({ deviceId }: DeviceFormProps) {
               control={form.control}
               render={({ field }) => (
                 <FormItem className="col-span-2 md:col-span-1">
-                  <FormLabel>Device Name</FormLabel>
+                  <FormLabel required>Device Name</FormLabel>
                   <FormControl>
                     <Input
                       disabled={isPending || isLoading}
@@ -292,7 +292,7 @@ export default function DeviceForm({ deviceId }: DeviceFormProps) {
               control={form.control}
               render={({ field }) => (
                 <FormItem className="col-span-2 md:col-span-1">
-                  <FormLabel>Manufacturer</FormLabel>
+                  <FormLabel required>Manufacturer</FormLabel>
                   <FormControl>
                     <Combobox
                       value={field.value}
@@ -315,7 +315,7 @@ export default function DeviceForm({ deviceId }: DeviceFormProps) {
               control={form.control}
               render={({ field }) => (
                 <FormItem className="col-span-2 md:col-span-1">
-                  <FormLabel>Serial Number</FormLabel>
+                  <FormLabel required>Serial Number</FormLabel>
                   <FormControl>
                     <Input
                       disabled={isPending || isLoading}
@@ -333,7 +333,7 @@ export default function DeviceForm({ deviceId }: DeviceFormProps) {
               control={form.control}
               render={({ field }) => (
                 <FormItem className="col-span-2 md:col-span-1">
-                  <FormLabel>Device Status</FormLabel>
+                  <FormLabel required>Device Status</FormLabel>
                   <Select
                     disabled={isPending || isLoading}
                     onValueChange={field.onChange}
@@ -363,11 +363,12 @@ export default function DeviceForm({ deviceId }: DeviceFormProps) {
               control={form.control}
               render={({ field }) => (
                 <FormItem className="col-span-2 md:col-span-1">
-                  <FormLabel>Device Price (USD)</FormLabel>
+                  <FormLabel required>Device Price (USD)</FormLabel>
                   <FormControl>
                     <Input
                       type="number"
                       disabled={isPending || isLoading}
+                      placeholder="10000"
                       {...field}
                       onChange={(event) => field.onChange(+event.target.value)}
                     />
@@ -382,7 +383,7 @@ export default function DeviceForm({ deviceId }: DeviceFormProps) {
               name="purchaseDate"
               render={({ field }) => (
                 <FormItem className="col-span-2 md:col-span-1">
-                  <FormLabel>Purchase date</FormLabel>
+                  <FormLabel required>Purchase date</FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
                       <FormControl>
