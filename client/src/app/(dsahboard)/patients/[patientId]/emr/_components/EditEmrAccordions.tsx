@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import { useQuery } from '@tanstack/react-query';
@@ -17,11 +18,11 @@ import PatientMedicalConditions from './PatientMedicalConditions';
 import PatientSurgeries from './PatientSurgeries';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/components/ui/use-toast';
+import PatientMedications from './PatientMedications';
 
 import useAccessToken from '@/hooks/useAccessToken';
 
 import type { EMR } from '@/types/emr.type';
-import { useEffect } from 'react';
 
 interface EditEmrAccordionsProps {
   patientId: string;
@@ -170,7 +171,12 @@ export default function EditEmrAccordions({
         <AccordionTrigger className="rounded-t-md bg-primary px-4 text-lg font-semibold text-white transition-all hover:bg-primary/90 hover:no-underline">
           Patient Medications
         </AccordionTrigger>
-        <AccordionContent className="rounded-b-md border-b-2 border-l-2 border-r-2 border-secondary px-4 py-6 md:px-8"></AccordionContent>
+        <AccordionContent className="rounded-b-md border-b-2 border-l-2 border-r-2 border-secondary px-4 py-6 md:px-8">
+          <PatientMedications
+            patientId={patientId}
+            patientMedications={data.medications}
+          />
+        </AccordionContent>
       </AccordionItem>
     </Accordion>
   );
