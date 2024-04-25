@@ -1,13 +1,13 @@
 'use client';
 
+import { useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { Poppins } from 'next/font/google';
 
 import UserButton from './UserButton';
 import ModeToggle from './ModeToggle';
 import { cn } from '@/lib/utils';
-import { useSession } from 'next-auth/react';
+import { signOut, useSession } from 'next-auth/react';
 import MobileSidebar from './MobileSidebar';
 
 const poppins = Poppins({
@@ -16,8 +16,19 @@ const poppins = Poppins({
 });
 
 export default function Navbar() {
-  const router = useRouter();
   const { data: session } = useSession();
+
+  useEffect(() => {
+    if (
+      session &&
+      session?.error &&
+      session.error === 'RefreshAccessTokenError'
+    ) {
+      signOut();
+    }
+
+    return () => {};
+  }, [session]);
 
   return (
     <div className="fixed z-50 flex h-16 w-full items-center justify-between border-b border-primary/10 bg-secondary px-4 py-2">

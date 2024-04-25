@@ -2,22 +2,30 @@ import { getServerSession, NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import type { JWT } from 'next-auth/jwt';
 import axios from 'axios';
+import { signOut } from 'next-auth/react';
 
 async function refreshToken(token: JWT): Promise<JWT> {
-  const response = await axios.post(
-    `${process.env.NEXT_PUBLIC_API_URL}/auth/refresh`,
-    {},
-    {
-      headers: {
-        authorization: `Refresh ${token.backendTokens.refreshToken}`,
-      },
-    }
-  );
+  try {
+    const response = await axios.post(
+      `${process.env.NEXT_PUBLIC_API_URL}/auth/refresh`,
+      {},
+      {
+        headers: {
+          authorization: `Refresh ${token.backendTokens.refreshToken}`,
+        },
+      }
+    );
 
-  return {
-    ...token,
-    backendTokens: response.data,
-  };
+    return {
+      ...token,
+      backendTokens: response.data,
+    };
+  } catch (error) {
+    return {
+      ...token,
+      error: 'RefreshAccessTokenError',
+    };
+  }
 }
 
 export const authOptions: NextAuthOptions = {
@@ -72,8 +80,11 @@ export const authOptions: NextAuthOptions = {
     },
 
     async session({ token, session }) {
-      session.user = token.user;
-      session.backendTokens = token.backendTokens;
+      if (token) {
+        session.user = token.user;
+        session.backendTokens = token.backendTokens;
+        session.error = token.error;
+      }
       return session;
     },
   },
