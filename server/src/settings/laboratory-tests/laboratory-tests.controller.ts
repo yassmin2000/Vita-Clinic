@@ -30,37 +30,33 @@ export class LaboratoryTestsController {
 
   @UseGuards(JwtGuard)
   @Get()
-  async getAllLabTests(@Req() request: Request) {
-    const user: Payload = request['user'];
-
-    if (user.role === 'patient') {
-      throw new UnauthorizedException();
-    }
-
+  async getAllLaboratoryTests(@Req() request: Request) {
     return this.laboratoryTestsService.findAll();
   }
 
   @UseGuards(JwtGuard)
   @Get(':id')
-  async getlabTestById(@Param('id') id: string, @Req() request: Request) {
+  async getLaboratoryTestById(
+    @Param('id') id: string,
+    @Req() request: Request,
+  ) {
     const user: Payload = request['user'];
 
     if (user.role === 'patient') {
       throw new UnauthorizedException();
     }
 
-    const labTest = await this.laboratoryTestsService.findById(id);
-
-    return labTest;
+    return this.laboratoryTestsService.findById(id);
   }
 
   @UseGuards(JwtGuard)
   @Post()
-  async createLabTest(
+  async createLaboratoryTest(
     @Body(ValidationPipe) dto: CreateLaboratoryTestDto,
     @Req() request: Request,
   ) {
     const user: Payload = request['user'];
+
     if (user.role === 'patient') {
       throw new UnauthorizedException();
     }
@@ -69,7 +65,7 @@ export class LaboratoryTestsController {
 
   @UseGuards(JwtGuard)
   @Patch(':id')
-  async updateLabTest(
+  async updateLaboratoryTest(
     @Param('id') id: string,
     @Body(ValidationPipe) dto: UpdateLaboratoryTestDto,
     @Req() request: Request,
@@ -79,12 +75,13 @@ export class LaboratoryTestsController {
     if (user.role === 'patient') {
       throw new UnauthorizedException();
     }
+
     return this.laboratoryTestsService.update(id, dto);
   }
 
   @UseGuards(JwtGuard)
   @Delete(':id')
-  async deleteLabTest(@Param('id') id: string, @Req() request: Request) {
+  async deleteLaboratoryTest(@Param('id') id: string, @Req() request: Request) {
     const user: Payload = request['user'];
 
     if (!user.isSuperAdmin) {

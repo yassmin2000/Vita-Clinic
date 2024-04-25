@@ -158,7 +158,7 @@ export default function LaboratoryTestForm({
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['laboratory_tests'],
+        queryKey: ['laboratory-tests'],
       });
 
       closeForm();
