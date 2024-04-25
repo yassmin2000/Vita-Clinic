@@ -1,8 +1,8 @@
 'use client';
 
-import { ColumnDef } from '@tanstack/react-table';
+import type { ColumnDef, Row } from '@tanstack/react-table';
 import { parseISO, format, formatDistanceToNow } from 'date-fns';
-import { ArrowUpDown, Copy, MoreHorizontal, Pencil, Trash } from 'lucide-react';
+import { ArrowUpDown, MoreHorizontal, Pencil, Trash } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -19,7 +19,46 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 
+import useUserRole from '@/hooks/useUserRole';
+import useSettingsStore from '@/hooks/useSettingsStore';
+
 import type { LaboratoryTest } from '@/types/settings.type';
+
+const ActionsCell = ({ row }: { row: Row<LaboratoryTest> }) => {
+  const { role, isSuperAdmin } = useUserRole();
+  const { openForm, setCurrentLaboratoryTest } = useSettingsStore();
+
+  if (role !== 'admin') {
+    return null;
+  }
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" className="h-8 w-8 p-0">
+          <span className="sr-only">Open menu</span>
+          <MoreHorizontal className="h-4 w-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+        <DropdownMenuItem
+          onClick={() => {
+            setCurrentLaboratoryTest(row.original);
+            openForm();
+          }}
+        >
+          <Pencil className="mr-2 h-4 w-4" /> Edit
+        </DropdownMenuItem>
+        {isSuperAdmin && (
+          <DropdownMenuItem>
+            <Trash className="mr-2 h-4 w-4" /> Delete
+          </DropdownMenuItem>
+        )}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};
 
 export const columns: ColumnDef<LaboratoryTest>[] = [
   {
@@ -175,26 +214,6 @@ export const columns: ColumnDef<LaboratoryTest>[] = [
   },
   {
     id: 'actions',
-    cell: ({ row }) => {
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem>
-              <Pencil className="mr-2 h-4 w-4" /> Edit
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Trash className="mr-2 h-4 w-4" /> Delete
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
-    },
+    cell: ActionsCell,
   },
 ];

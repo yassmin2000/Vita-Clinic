@@ -43,7 +43,7 @@ export type Biomarker = {
 };
 
 export type Modality = {
-  id: string | number;
+  id: string;
   name: string;
   price: number;
   description?: string;
@@ -51,7 +51,7 @@ export type Modality = {
 };
 
 export type LaboratoryTest = {
-  id: string | number;
+  id: string;
   name: string;
   description?: string;
   price: number;

@@ -73,7 +73,7 @@ export default function LaboratoryTestForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       ...defaultValues,
-      biomarkers: [],
+      biomarkers: defaultValues?.biomarkers || [],
     },
   });
   const accessToken = useAccessToken();

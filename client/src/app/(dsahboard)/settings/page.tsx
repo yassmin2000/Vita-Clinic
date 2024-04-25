@@ -12,7 +12,7 @@ import SpecialitiesTable from './_components/SpecialitiesTable';
 
 export default function SettingsPage() {
   return (
-    <section className="container mx-auto px-4 py-8">
+    <section className="container mx-auto px-2 py-8 md:px-4">
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-1">
           <h2 className="text-sm font-semibold uppercase text-primary">

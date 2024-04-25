@@ -1,8 +1,7 @@
 'use client';
 
+import axios from 'axios';
 import { useQuery } from '@tanstack/react-query';
-
-import { data } from './laboratoryTestsData';
 
 import { DataTable } from '@/components/DataTable';
 import { columns } from './LaboratoryTestsColumn';
@@ -13,6 +12,8 @@ import NewEntityButton from './NewEntityButton';
 import Modal from '@/components/Modal';
 import LaboratoryTestForm from './LaboratoryTestForm';
 
+import type { LaboratoryTest } from '@/types/settings.type';
+
 export default function LaboratoryTestsTable() {
   const { role } = useUserRole();
   const accessToken = useAccessToken();
@@ -20,9 +21,18 @@ export default function LaboratoryTestsTable() {
   const { data: laboratoryTests, isLoading } = useQuery({
     queryKey: ['laboratory-tests'],
     queryFn: async () => {
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      return data;
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/settings/laboratory-tests`,
+        {
+          headers: {
+            authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      return response.data as LaboratoryTest[];
     },
+    enabled: !!accessToken,
   });
 
   const { isFormOpen, closeForm, currentLaboratoryTest } = useSettingsStore();

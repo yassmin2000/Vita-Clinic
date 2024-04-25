@@ -21,11 +21,9 @@ export class CreateLaboratoryTestDto {
   @IsNumber()
   price: number;
 
-  @ArrayNotEmpty()
   @ArrayUnique()
   @IsString({ each: true })
-  @IsNotEmpty({ each: true })
-  biomarkerIds: string[]; // Array of biomarker IDs
+  biomarkers: string[];
 }
 export class UpdateLaboratoryTestDto extends PartialType(
   CreateLaboratoryTestDto,

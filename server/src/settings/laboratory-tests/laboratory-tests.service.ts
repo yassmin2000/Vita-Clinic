@@ -29,10 +29,10 @@ export class LaboratoryTestsService {
   }
 
   async create(createLaboratoryTestDto: CreateLaboratoryTestDto) {
-    const { name, description, price, biomarkerIds } = createLaboratoryTestDto;
+    const { biomarkers, ...dto } = createLaboratoryTestDto;
 
     const validBiomarkerIds: string[] = [];
-    for (const biomarkerId of biomarkerIds) {
+    for (const biomarkerId of biomarkers) {
       const biomarker = await this.prisma.biomarker.findUnique({
         where: { id: biomarkerId },
       });
@@ -46,9 +46,7 @@ export class LaboratoryTestsService {
 
     return this.prisma.laboratoryTest.create({
       data: {
-        name,
-        description,
-        price,
+        ...dto,
         biomarkers: {
           connect: validBiomarkerIds.map((id) => ({ id })),
         },
@@ -58,7 +56,7 @@ export class LaboratoryTestsService {
   }
 
   async update(id: string, updateLabTest: UpdateLaboratoryTestDto) {
-    const { name, description, price, biomarkerIds } = updateLabTest;
+    const { biomarkers, ...dto } = updateLabTest;
 
     // Retrieve the existing lab test
     const labTest = await this.prisma.laboratoryTest.findUnique({
@@ -72,7 +70,7 @@ export class LaboratoryTestsService {
 
     // Check if all biomarker IDs exist in the biomarker table
     const existingBiomarkerIds: string[] = [];
-    for (const biomarkerId of biomarkerIds) {
+    for (const biomarkerId of biomarkers) {
       const biomarker = await this.prisma.biomarker.findUnique({
         where: { id: biomarkerId },
       });
@@ -85,9 +83,7 @@ export class LaboratoryTestsService {
     await this.prisma.laboratoryTest.update({
       where: { id },
       data: {
-        name: name ?? labTest.name, // If not provided, keep the existing name
-        description: description ?? labTest.description, // If not provided, keep the existing description
-        price: price ?? labTest.price, // If not provided, keep the existing price
+        ...dto,
         biomarkers: {
           disconnect: labTest.biomarkers.map((b) => ({ id: b.id })),
           connect: existingBiomarkerIds.map((id) => ({ id })),
