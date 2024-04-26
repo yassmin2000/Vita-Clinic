@@ -88,6 +88,7 @@ export default function AppointmentScans({ id }: AppointmentScansProps) {
           scans.length > 0 &&
           scans.map((scan) => (
             <ScanItem
+              key={scan.id}
               id={scan.id}
               title={scan.name}
               modality={scan.modality}
