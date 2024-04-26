@@ -1,4 +1,4 @@
-import ScansList from '../scans/_components/ScansList';
+import ReportsList from './_components/ReportsList';
 
 export default function ReportsPage() {
   return (
@@ -13,7 +13,7 @@ export default function ReportsPage() {
           </h3>
         </div>
 
-        <ScansList />
+        <ReportsList />
       </div>
     </section>
   );
