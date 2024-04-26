@@ -41,9 +41,11 @@ export class LaboratoryTestsService {
   async create(createLaboratoryTestDto: CreateLaboratoryTestDto) {
     const { biomarkers, ...dto } = createLaboratoryTestDto;
 
-    for (const biomarkerId of biomarkers) {
-      await this.biomarkersService.findById(biomarkerId);
-    }
+    await Promise.all(
+      biomarkers.map(async (biomarkerId) => {
+        await this.biomarkersService.findById(biomarkerId);
+      }),
+    );
 
     return this.prisma.laboratoryTest.create({
       data: {
@@ -61,9 +63,11 @@ export class LaboratoryTestsService {
 
     const laboratoryTest = await this.findById(id);
 
-    for (const biomarkerId of biomarkers) {
-      await this.biomarkersService.findById(biomarkerId);
-    }
+    await Promise.all(
+      biomarkers.map(async (biomarkerId) => {
+        await this.biomarkersService.findById(biomarkerId);
+      }),
+    );
 
     return this.prisma.laboratoryTest.update({
       where: { id },

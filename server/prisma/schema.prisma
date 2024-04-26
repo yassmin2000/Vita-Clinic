@@ -143,8 +143,8 @@ model User {
   emr      ElectronicMedicalRecord?
   messages Message[]
 
-  appointmentsAsDoctor  Appointment[] @relation("appointmentsAsDoctor")
-  appointmentsAsPatient Appointment[] @relation("appointmentsAsPatient")
+  doctorAppointments  Appointment[] @relation("doctorAppointments")
+  patientAppointments Appointment[] @relation("patientAppointments")
 }
 
 model ElectronicMedicalRecord {
@@ -329,17 +329,20 @@ model Appointment {
   id   String   @id @default(uuid())
   date DateTime
 
-  doctor   User   @relation("appointmentsAsDoctor", fields: [doctorId], references: [id])
-  doctorId String
+  doctor   User?   @relation("doctorAppointments", fields: [doctorId], references: [id])
+  doctorId String?
 
-  patient   User   @relation("appointmentsAsPatient", fields: [patientId], references: [id])
+  patient   User   @relation("patientAppointments", fields: [patientId], references: [id])
   patientId String
 
   ElectronicMedicalRecord   ElectronicMedicalRecord? @relation(fields: [electronicMedicalRecordId], references: [id])
   electronicMedicalRecordId String?
 
-  status  AppointmentStatus
-  billing Billing?
+  status                AppointmentStatus
+  services              AppointmentServices @relation(fields: [appointmentServicesId], references: [id])
+  appointmentServicesId String              @unique
+  billing               Billing             @relation(fields: [billingId], references: [id])
+  billingId             String              @unique
 
   vitals                Vitals[]
   medications           PatientMedication[]
@@ -349,6 +352,20 @@ model Appointment {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model AppointmentServices {
+  id String @id @default(uuid())
+
+  services  Service?         @relation(fields: [serviceId], references: [id])
+  serviceId String?
+  therapies Therapy?         @relation(fields: [therapyId], references: [id])
+  therapyId String?
+  scans     Modality[]
+  labWorks  LaboratoryTest[]
+  notes     String?
+
+  appointment Appointment?
 }
 
 model Vitals {
@@ -402,8 +419,9 @@ model Modality {
 
   scan Scan[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  appointmentServices AppointmentServices[]
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @updatedAt
 }
 
 model Scan {
@@ -430,8 +448,7 @@ model Billing {
   amount Float
   status BillingStatus @default(initial)
 
-  appointment   Appointment @relation(fields: [appointmentId], references: [id])
-  appointmentId String      @unique
+  appointment Appointment?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -460,6 +477,7 @@ model LaboratoryTest {
 
   biomarkers           Biomarker[]
   laboratoryTestResult LaboratoryTestResult[]
+  appointmentServices  AppointmentServices[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -483,20 +501,22 @@ model LaboratoryTestResult {
 }
 
 model Service {
-  id          String  @id @default(uuid())
-  name        String
-  description String?
-  price       Float
+  id                  String                @id @default(uuid())
+  name                String
+  description         String?
+  price               Float
+  appointmentServices AppointmentServices[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Therapy {
-  id          String  @id @default(uuid())
-  name        String
-  description String?
-  price       Float
+  id                  String                @id @default(uuid())
+  name                String
+  description         String?
+  price               Float
+  appointmentServices AppointmentServices[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

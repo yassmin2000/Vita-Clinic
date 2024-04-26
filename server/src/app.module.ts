@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 
+import { AppointmentsModule } from './appointments/appointments.module';
 import { AuthModule } from './auth/auth.module';
 import { DevicesModule } from './devices/devices.module';
 import { EmrModule } from './emr/emr.module';
@@ -16,6 +17,7 @@ import { AppService } from './app.service';
   imports: [
     ConfigModule.forRoot(),
     JwtModule.register({}),
+    AppointmentsModule,
     AuthModule,
     DevicesModule,
     SettingsModule,
