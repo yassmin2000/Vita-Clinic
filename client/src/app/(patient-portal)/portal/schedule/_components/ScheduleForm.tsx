@@ -1,7 +1,8 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import axios from 'axios';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -25,6 +26,7 @@ import {
 import MultipleSelector from '@/components/ui/multiple-selector';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
+import { useToast } from '@/components/ui/use-toast';
 
 import useAccessToken from '@/hooks/useAccessToken';
 
@@ -46,6 +48,7 @@ const formSchema = z.object({
 });
 
 export default function ScheduleForm() {
+  const router = useRouter();
   const accessToken = useAccessToken();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -54,6 +57,7 @@ export default function ScheduleForm() {
       dateTime: new Date(new Date().setHours(0, 0, 0, 0)),
     },
   });
+  const { toast } = useToast();
 
   const { data: services, isLoading: isLoadingServices } = useQuery({
     queryKey: ['services_form'],
@@ -144,20 +148,55 @@ export default function ScheduleForm() {
       enabled: !!accessToken,
     });
 
+  const { mutate: createAppointment, isPending } = useMutation({
+    mutationFn: async (values: z.infer<typeof formSchema>) => {
+      const body = {
+        date: values.dateTime.toISOString(),
+        service: values.service,
+        therapy: values.treatment,
+        scans: values.imaging?.map((imaging) => imaging.value) || [],
+        labWorks: values.lab?.map((lab) => lab.value) || [],
+        notes: values.notes,
+      };
+
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/appointments`,
+        body,
+        {
+          headers: {
+            authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      return response;
+    },
+    onError: () => {
+      return toast({
+        title: `Failed to book an appointment`,
+        description: 'Please try again later.',
+        variant: 'destructive',
+      });
+    },
+    onSuccess: () => {
+      router.push('/portal');
+      return toast({
+        title: `Booked successfully`,
+        description: `Your appointment has been booked successfully.`,
+      });
+    },
+  });
+
   const isLoading =
     isLoadingServices ||
     isLoadingTherapies ||
     isLoadingModalities ||
     isLoadingLaboratoryTests;
 
-  const onSubmit = (data: z.infer<typeof formSchema>) => {
-    console.log(data);
-  };
-
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit(onSubmit)}
+        onSubmit={form.handleSubmit((e) => createAppointment(e))}
         className="flex flex-col gap-8 md:flex-row"
       >
         <FormField
@@ -195,7 +234,7 @@ export default function ScheduleForm() {
                   <Select
                     onValueChange={field.onChange}
                     value={field.value}
-                    disabled={isLoading}
+                    disabled={isLoading || isPending}
                   >
                     <FormControl>
                       <SelectTrigger className="bg-background">
@@ -229,7 +268,7 @@ export default function ScheduleForm() {
                   <Select
                     onValueChange={field.onChange}
                     value={field.value}
-                    disabled={isLoading}
+                    disabled={isLoading || isPending}
                   >
                     <FormControl>
                       <SelectTrigger className="bg-background">
@@ -267,7 +306,7 @@ export default function ScheduleForm() {
                     <MultipleSelector
                       value={field.value}
                       onChange={field.onChange}
-                      disabled={isLoading}
+                      disabled={isLoading || isPending}
                       defaultOptions={modalities || []}
                       placeholder="Select imaging..."
                       emptyIndicator={
@@ -294,7 +333,7 @@ export default function ScheduleForm() {
                     <MultipleSelector
                       value={field.value}
                       onChange={field.onChange}
-                      disabled={isLoading}
+                      disabled={isLoading || isPending}
                       defaultOptions={laboratoryTests || []}
                       placeholder="Select lab work..."
                       emptyIndicator={
@@ -321,7 +360,7 @@ export default function ScheduleForm() {
                 </FormLabel>
                 <FormControl>
                   <Textarea
-                    disabled={isLoading}
+                    disabled={isLoading || isPending}
                     {...field}
                     minRows={5}
                     placeholder="Add notes..."
@@ -333,8 +372,8 @@ export default function ScheduleForm() {
 
           <Button
             className="w-fit self-start"
-            onClick={form.handleSubmit(onSubmit)}
             type="submit"
+            disabled={isLoading || isPending}
           >
             Submit
           </Button>
