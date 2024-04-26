@@ -42,13 +42,14 @@ interface FiltersBarProps {
   sortByDoctorNameEnabled?: boolean;
   sortByAgeEnabled?: boolean;
   sortByDateEnabled?: boolean;
+  dateTitle?: string;
   sortByLastMaintenanceDateEnabled?: boolean;
   sortByPurchaseDateEnabled?: boolean;
   sortByAppointmentDateEnabled?: boolean;
   searchPlaceholder?: string;
   addNewButton?: boolean;
-  addNewRoute: string;
-  addNewContent: string;
+  addNewRoute?: string;
+  addNewContent?: string;
   refetch: () => void;
 }
 
@@ -63,12 +64,13 @@ export default function FiltersBar({
   sortByDoctorNameEnabled = false,
   sortByAgeEnabled = false,
   sortByDateEnabled = false,
+  dateTitle = 'Joined at',
   sortByLastMaintenanceDateEnabled = false,
   sortByPurchaseDateEnabled = false,
   sortByAppointmentDateEnabled = false,
   searchPlaceholder,
-  addNewButton = true,
-  addNewRoute,
+  addNewButton = false,
+  addNewRoute = '',
   addNewContent,
   refetch,
 }: FiltersBarProps) {
@@ -220,7 +222,7 @@ export default function FiltersBar({
 
               {sortByDateEnabled && (
                 <SelectGroup>
-                  <SelectLabel>Joined at</SelectLabel>
+                  <SelectLabel>{dateTitle}</SelectLabel>
                   <SelectItem value="createdAt-asc">Oldest first</SelectItem>
                   <SelectItem value="createdAt-desc">Newest first</SelectItem>
                 </SelectGroup>

@@ -1,10 +1,14 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
+import FiltersBar from '@/components/FiltersBar';
 import ReportItem from '@/components/ReportItem';
-import NewReportButton from './NewReportButton';
+import Pagination from '@/components/Pagination';
 import ReportItemSkeleton from '@/components/ReportItemSkeleton';
+
+import { useTableOptions } from '@/hooks/useTableOptions';
 
 const reportsData = [
   {
@@ -72,28 +76,39 @@ const reportsData = [
   },
 ];
 
-interface AppointmentReportsProps {
-  id: string;
-}
+export default function ReportsList() {
+  const { currentPage, countPerPage, reset, setSortBy } = useTableOptions();
 
-export default function AppointmentReports({ id }: AppointmentReportsProps) {
-  const { data: reports, isLoading } = useQuery({
-    queryKey: [`reports_${id}`],
+  const {
+    data: reports,
+    refetch,
+    isLoading,
+  } = useQuery({
+    // Handle real data fetching later
+    queryKey: [`reports`],
     queryFn: async () => {
       await new Promise((resolve) => setTimeout(resolve, 500));
       return reportsData;
     },
   });
 
-  return (
-    <div className="flex flex-col gap-4 px-6">
-      <div className="flex items-center justify-between">
-        <span className="text-xl font-semibold text-primary">
-          Appointment Reports
-        </span>
+  useEffect(() => {
+    reset();
+    setSortBy('createdAt-desc');
+  }, []);
 
-        <NewReportButton />
-      </div>
+  return (
+    <>
+      <FiltersBar
+        refetch={refetch}
+        searchFilter
+        searchPlaceholder="Search by report title"
+        sortingEnabled
+        sortByNameEnabled
+        sortByDateEnabled
+        dateTitle="Created at"
+      />
+
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         {isLoading &&
           Array.from({ length: 5 }).map((_, index) => (
@@ -111,6 +126,11 @@ export default function AppointmentReports({ id }: AppointmentReportsProps) {
             />
           ))}
       </div>
-    </div>
+
+      <Pagination
+        previousDisabled={currentPage === 1 || isLoading}
+        nextDisabled={(reports && reports.length < countPerPage) || isLoading}
+      />
+    </>
   );
 }

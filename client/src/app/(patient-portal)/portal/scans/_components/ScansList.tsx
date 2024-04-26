@@ -1,10 +1,14 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
+import FiltersBar from '@/components/FiltersBar';
 import ScanItem from '@/components/ScanItem';
-import NewScanButton from './NewScanButton';
+import Pagination from '@/components/Pagination';
 import ScanItemSkeleton from '@/components/ScanItemSkeleton';
+
+import { useTableOptions } from '@/hooks/useTableOptions';
 
 const scansData = [
   {
@@ -57,29 +61,40 @@ const scansData = [
   },
 ];
 
-interface AppointmentScansProps {
-  id: string;
-}
+export default function ScansList() {
+  const { currentPage, countPerPage, reset, setSortBy } = useTableOptions();
 
-export default function AppointmentScans({ id }: AppointmentScansProps) {
-  const { data: scans, isLoading } = useQuery({
-    queryKey: [`scans_${id}`],
+  const {
+    data: scans,
+    refetch,
+    isLoading,
+  } = useQuery({
+    // Handle real data fetching later
+    queryKey: [`scans`],
     queryFn: async () => {
       await new Promise((resolve) => setTimeout(resolve, 500));
       return scansData;
     },
   });
 
-  return (
-    <div className="flex flex-col gap-4 px-6">
-      <div className="flex items-center justify-between">
-        <span className="text-xl font-semibold text-primary">
-          Appointment Scans
-        </span>
+  useEffect(() => {
+    reset();
+    setSortBy('createdAt-desc');
+  }, []);
 
-        <NewScanButton />
-      </div>
-      <div className="grid grid-cols-1 gap-6 divide-y divide-accent md:grid-cols-2 lg:grid-cols-3">
+  return (
+    <>
+      <FiltersBar
+        refetch={refetch}
+        searchFilter
+        searchPlaceholder="Search by scan title"
+        sortingEnabled
+        sortByNameEnabled
+        sortByDateEnabled
+        dateTitle="Created at"
+      />
+
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         {isLoading &&
           Array.from({ length: 5 }).map((_, index) => (
             <ScanItemSkeleton key={index} />
@@ -88,6 +103,7 @@ export default function AppointmentScans({ id }: AppointmentScansProps) {
           scans.length > 0 &&
           scans.map((scan) => (
             <ScanItem
+              key={scan.id}
               id={scan.id}
               title={scan.name}
               modality={scan.modality}
@@ -95,6 +111,11 @@ export default function AppointmentScans({ id }: AppointmentScansProps) {
             />
           ))}
       </div>
-    </div>
+
+      <Pagination
+        previousDisabled={currentPage === 1 || isLoading}
+        nextDisabled={(scans && scans.length < countPerPage) || isLoading}
+      />
+    </>
   );
 }
