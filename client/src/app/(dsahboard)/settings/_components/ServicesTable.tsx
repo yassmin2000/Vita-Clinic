@@ -15,15 +15,15 @@ import useSettingsStore from '@/hooks/useSettingsStore';
 
 import type { PriceLookup } from '@/types/settings.type';
 
-export default function ModalitiesTable() {
+export default function ServicesTable() {
   const { role } = useUserRole();
   const accessToken = useAccessToken();
 
-  const { data: modalities, isLoading } = useQuery({
-    queryKey: ['modalities'],
+  const { data: services, isLoading } = useQuery({
+    queryKey: ['services'],
     queryFn: async () => {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/settings/modalities`,
+        `${process.env.NEXT_PUBLIC_API_URL}/settings/services`,
         {
           headers: {
             authorization: `Bearer ${accessToken}`,
@@ -42,21 +42,21 @@ export default function ModalitiesTable() {
     <>
       <DataTable
         columns={columns}
-        data={modalities || []}
+        data={services || []}
         isLoading={isLoading}
         pagination
         filtering
-        title="Modality"
+        title="Service"
         button={
-          role === 'admin' ? <NewEntityButton title="Modality" /> : undefined
+          role === 'admin' ? <NewEntityButton title="Service" /> : undefined
         }
       />
       <Modal isOpen={isFormOpen} onClose={closeForm} className="h-fit">
         <PriceLookupForm
-          title="Modality"
-          endpoint="settings/modalities"
-          queryKey="modalities"
-          placeholder="MRI"
+          title="Service"
+          endpoint="settings/services"
+          queryKey="services"
+          placeholder="Consultation"
           currentId={currentPriceLookup ? currentPriceLookup.id : undefined}
           defaultValues={
             currentPriceLookup

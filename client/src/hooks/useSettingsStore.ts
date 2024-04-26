@@ -5,7 +5,7 @@ import type {
   LaboratoryTest,
   Lookup,
   Medication,
-  Modality,
+  PriceLookup,
 } from '@/types/settings.type';
 
 type useSettingsStoreProps = {
@@ -16,8 +16,8 @@ type useSettingsStoreProps = {
   setCurrentLookup: (lookup: Lookup | null) => void;
   currentMedication: Medication | null;
   setCurrentMedication: (medication: Medication | null) => void;
-  currentModality: Modality | null;
-  setCurrentModality: (modality: Modality | null) => void;
+  currentPriceLookup: PriceLookup | null;
+  setCurrentPriceLookup: (priceLookup: PriceLookup | null) => void;
   currentLaboratoryTest: LaboratoryTest | null;
   setCurrentLaboratoryTest: (laboratoryTest: LaboratoryTest | null) => void;
   currentBiomarker: Biomarker | null;
@@ -33,8 +33,9 @@ const useSettingsStore = create<useSettingsStoreProps>((set) => ({
   setCurrentLookup: (lookup) => set({ currentLookup: lookup }),
   currentMedication: null,
   setCurrentMedication: (medication) => set({ currentMedication: medication }),
-  currentModality: null,
-  setCurrentModality: (modality) => set({ currentModality: modality }),
+  currentPriceLookup: null,
+  setCurrentPriceLookup: (priceLookup) =>
+    set({ currentPriceLookup: priceLookup }),
   currentLaboratoryTest: null,
   setCurrentLaboratoryTest: (laboratoryTest) =>
     set({ currentLaboratoryTest: laboratoryTest }),
@@ -43,7 +44,7 @@ const useSettingsStore = create<useSettingsStoreProps>((set) => ({
   resetEntity: () =>
     set({
       currentLookup: null,
-      currentModality: null,
+      currentPriceLookup: null,
       currentLaboratoryTest: null,
       currentBiomarker: null,
     }),

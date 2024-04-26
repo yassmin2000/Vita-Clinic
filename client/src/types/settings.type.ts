@@ -42,7 +42,7 @@ export type Biomarker = {
   createdAt: string;
 };
 
-export type Modality = {
+export type PriceLookup = {
   id: string;
   name: string;
   price: number;

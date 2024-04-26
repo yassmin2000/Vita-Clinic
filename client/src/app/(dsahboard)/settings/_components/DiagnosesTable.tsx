@@ -14,14 +14,10 @@ import useSettingsStore from '@/hooks/useSettingsStore';
 
 import type { Lookup } from '@/types/settings.type';
 
-export default function DiagnosisTable() {
+export default function DiagnosesTable() {
   const accessToken = useAccessToken();
 
-  const {
-    data: diagnosis,
-    refetch,
-    isLoading,
-  } = useQuery({
+  const { data: diagnoses, isLoading } = useQuery({
     queryKey: ['diagnoses'],
     queryFn: async () => {
       const response = await axios.get(
@@ -44,7 +40,7 @@ export default function DiagnosisTable() {
     <>
       <DataTable
         columns={columns}
-        data={diagnosis || []}
+        data={diagnoses || []}
         isLoading={isLoading}
         pagination
         filtering

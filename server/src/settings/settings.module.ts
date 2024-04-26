@@ -8,10 +8,10 @@ import { ManufacturersModule } from './manufacturers/manufacturers.module';
 import { MedicalConditionsModule } from './medical-conditions/medical-conditions.module';
 import { MedicationsModule } from './medications/medications.module';
 import { ModalitiesModule } from './modalities/modalities.module';
+import { ServicesModule } from './services/services.module';
 import { SurgeriesModule } from './surgeries/surgeries.module';
 import { SpecialitiesModule } from './specialities/specialities.module';
-
-
+import { TherapiesModule } from './therapies/therapies.module';
 
 @Module({
   imports: [
@@ -23,9 +23,10 @@ import { SpecialitiesModule } from './specialities/specialities.module';
     MedicationsModule,
     MedicalConditionsModule,
     ModalitiesModule,
+    ServicesModule,
     SurgeriesModule,
     SpecialitiesModule,
+    TherapiesModule,
   ],
-
 })
 export class SettingsModule {}

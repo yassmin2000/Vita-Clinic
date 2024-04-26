@@ -1,5 +1,5 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import DiagnosisTable from './_components/DiagnosisTable';
+import DiagnosesTable from './_components/DiagnosesTable';
 import MedicalConditionsTable from './_components/MedicalConditionsTable';
 import AllergiesTable from './_components/AllergiesTable';
 import MedicationsTable from './_components/MedicationsTable';
@@ -7,8 +7,10 @@ import SurgeriesTable from './_components/SurgeriesTable';
 import ModalitiesTable from './_components/ModalitiesTable';
 import BiomarkersTable from './_components/BiomarkersTable';
 import LaboratoryTestsTable from './_components/LaboratoryTestsTable';
-import ManufacturersTable from './_components/ManufacturersTable';
+import ServicesTable from './_components/ServicesTable';
+import TherapiesTable from './_components/TherapiesTable';
 import SpecialitiesTable from './_components/SpecialitiesTable';
+import ManufacturersTable from './_components/ManufacturersTable';
 
 export default function SettingsPage() {
   return (
@@ -22,9 +24,9 @@ export default function SettingsPage() {
             Manage your clinic settings
           </h3>
         </div>
-        <Tabs defaultValue="diagnosis">
+        <Tabs defaultValue="diagnoses">
           <TabsList className="flex h-full w-fit flex-wrap justify-start gap-0.5">
-            <TabsTrigger value="diagnosis">Diagnosis</TabsTrigger>
+            <TabsTrigger value="diagnoses">Diagnoses</TabsTrigger>
             <TabsTrigger value="medical-conditions">
               Medical Conditions
             </TabsTrigger>
@@ -34,11 +36,13 @@ export default function SettingsPage() {
             <TabsTrigger value="modalities">Modalities</TabsTrigger>
             <TabsTrigger value="biomarkers">Biomarkers</TabsTrigger>
             <TabsTrigger value="laboratory-tests">Laboratory Tests</TabsTrigger>
-            <TabsTrigger value="manufacturers">Manufacturers</TabsTrigger>
+            <TabsTrigger value="services">Services</TabsTrigger>
+            <TabsTrigger value="therapies">Therapies</TabsTrigger>
             <TabsTrigger value="specialities">Specialities</TabsTrigger>
+            <TabsTrigger value="manufacturers">Manufacturers</TabsTrigger>
           </TabsList>
-          <TabsContent value="diagnosis">
-            <DiagnosisTable />
+          <TabsContent value="diagnoses">
+            <DiagnosesTable />
           </TabsContent>
           <TabsContent value="medical-conditions">
             <MedicalConditionsTable />
@@ -61,11 +65,17 @@ export default function SettingsPage() {
           <TabsContent value="laboratory-tests">
             <LaboratoryTestsTable />
           </TabsContent>
-          <TabsContent value="manufacturers">
-            <ManufacturersTable />
+          <TabsContent value="services">
+            <ServicesTable />
+          </TabsContent>
+          <TabsContent value="therapies">
+            <TherapiesTable />
           </TabsContent>
           <TabsContent value="specialities">
             <SpecialitiesTable />
+          </TabsContent>
+          <TabsContent value="manufacturers">
+            <ManufacturersTable />
           </TabsContent>
         </Tabs>
       </div>

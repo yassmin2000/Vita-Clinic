@@ -13,22 +13,22 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 
-import { ModalitiesService } from './modalities.service';
+import { ServicesService } from './services.service';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
 
-import { CreateModalityDto, UpdateModalityDto } from './dto/modalities.dto';
+import { CreateServiceDto, UpdateServiceDto } from './dto/services.dto';
 import { Payload } from 'src/types/payload.type';
 
-@Controller('settings/modalities')
-export class ModalitiesController {
-  constructor(private readonly modalitiesService: ModalitiesService) {}
+@Controller('settings/services')
+export class ServicesController {
+  constructor(private readonly servicesService: ServicesService) {}
 
   @UseGuards(JwtGuard)
   @Get()
-  async getAllModalities(@Req() request: Request) {
+  async getAllServices(@Req() request: Request) {
     const user: Payload = request['user'];
 
-    return this.modalitiesService.findAll();
+    return this.servicesService.findAll();
   }
 
   @UseGuards(JwtGuard)
@@ -40,15 +40,15 @@ export class ModalitiesController {
       throw new UnauthorizedException();
     }
 
-    const modality = await this.modalitiesService.findById(id);
+    const service = await this.servicesService.findById(id);
 
-    return modality;
+    return service;
   }
 
   @UseGuards(JwtGuard)
   @Post()
-  async createModality(
-    @Body(ValidationPipe) dto: CreateModalityDto,
+  async createService(
+    @Body(ValidationPipe) dto: CreateServiceDto,
     @Req() request: Request,
   ) {
     const user: Payload = request['user'];
@@ -56,14 +56,14 @@ export class ModalitiesController {
     if (user.role === 'patient') {
       throw new UnauthorizedException();
     }
-    return this.modalitiesService.create(dto);
+    return this.servicesService.create(dto);
   }
 
   @UseGuards(JwtGuard)
   @Patch(':id')
-  async updateModality(
+  async updateService(
     @Param('id') id: string,
-    @Body(ValidationPipe) updateModalityDto: UpdateModalityDto,
+    @Body(ValidationPipe) updateServiceDto: UpdateServiceDto,
     @Req() request: Request,
   ) {
     const user: Payload = request['user'];
@@ -72,18 +72,18 @@ export class ModalitiesController {
       throw new UnauthorizedException();
     }
 
-    return this.modalitiesService.update(id, updateModalityDto);
+    return this.servicesService.update(id, updateServiceDto);
   }
 
   @UseGuards(JwtGuard)
   @Delete(':id')
-  async deleteModality(@Param('id') id: string, @Req() request: Request) {
+  async deleteService(@Param('id') id: string, @Req() request: Request) {
     const user: Payload = request['user'];
 
     if (!user.isSuperAdmin) {
       throw new UnauthorizedException();
     }
 
-    return this.modalitiesService.delete(id);
+    return this.servicesService.delete(id);
   }
 }

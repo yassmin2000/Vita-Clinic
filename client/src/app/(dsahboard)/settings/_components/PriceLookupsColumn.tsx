@@ -22,11 +22,11 @@ import {
 import useUserRole from '@/hooks/useUserRole';
 import useSettingsStore from '@/hooks/useSettingsStore';
 
-import type { Modality } from '@/types/settings.type';
+import type { PriceLookup } from '@/types/settings.type';
 
-const ActionsCell = ({ row }: { row: Row<Modality> }) => {
+const ActionsCell = ({ row }: { row: Row<PriceLookup> }) => {
   const { role, isSuperAdmin } = useUserRole();
-  const { openForm, setCurrentModality } = useSettingsStore();
+  const { openForm, setCurrentPriceLookup } = useSettingsStore();
 
   if (role !== 'admin') {
     return null;
@@ -44,7 +44,7 @@ const ActionsCell = ({ row }: { row: Row<Modality> }) => {
         <DropdownMenuLabel>Actions</DropdownMenuLabel>
         <DropdownMenuItem
           onClick={() => {
-            setCurrentModality(row.original);
+            setCurrentPriceLookup(row.original);
             openForm();
           }}
         >
@@ -60,7 +60,7 @@ const ActionsCell = ({ row }: { row: Row<Modality> }) => {
   );
 };
 
-export const columns: ColumnDef<Modality>[] = [
+export const columns: ColumnDef<PriceLookup>[] = [
   {
     id: 'name',
     accessorKey: 'name',

@@ -13,22 +13,22 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 
-import { ModalitiesService } from './modalities.service';
+import { TherapiesService } from './therapies.service';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
 
-import { CreateModalityDto, UpdateModalityDto } from './dto/modalities.dto';
+import { CreateTherapyDto, UpdateTherapyDto } from './dto/therapies.dto';
 import { Payload } from 'src/types/payload.type';
 
-@Controller('settings/modalities')
-export class ModalitiesController {
-  constructor(private readonly modalitiesService: ModalitiesService) {}
+@Controller('settings/therapies')
+export class TherapiesController {
+  constructor(private readonly therapiesService: TherapiesService) {}
 
   @UseGuards(JwtGuard)
   @Get()
-  async getAllModalities(@Req() request: Request) {
+  async getAllTherapies(@Req() request: Request) {
     const user: Payload = request['user'];
 
-    return this.modalitiesService.findAll();
+    return this.therapiesService.findAll();
   }
 
   @UseGuards(JwtGuard)
@@ -40,15 +40,15 @@ export class ModalitiesController {
       throw new UnauthorizedException();
     }
 
-    const modality = await this.modalitiesService.findById(id);
+    const therapy = await this.therapiesService.findById(id);
 
-    return modality;
+    return therapy;
   }
 
   @UseGuards(JwtGuard)
   @Post()
-  async createModality(
-    @Body(ValidationPipe) dto: CreateModalityDto,
+  async createTherapy(
+    @Body(ValidationPipe) dto: CreateTherapyDto,
     @Req() request: Request,
   ) {
     const user: Payload = request['user'];
@@ -56,14 +56,14 @@ export class ModalitiesController {
     if (user.role === 'patient') {
       throw new UnauthorizedException();
     }
-    return this.modalitiesService.create(dto);
+    return this.therapiesService.create(dto);
   }
 
   @UseGuards(JwtGuard)
   @Patch(':id')
-  async updateModality(
+  async updateTherapy(
     @Param('id') id: string,
-    @Body(ValidationPipe) updateModalityDto: UpdateModalityDto,
+    @Body(ValidationPipe) updateTherapyDto: UpdateTherapyDto,
     @Req() request: Request,
   ) {
     const user: Payload = request['user'];
@@ -72,18 +72,18 @@ export class ModalitiesController {
       throw new UnauthorizedException();
     }
 
-    return this.modalitiesService.update(id, updateModalityDto);
+    return this.therapiesService.update(id, updateTherapyDto);
   }
 
   @UseGuards(JwtGuard)
   @Delete(':id')
-  async deleteModality(@Param('id') id: string, @Req() request: Request) {
+  async deleteTherapy(@Param('id') id: string, @Req() request: Request) {
     const user: Payload = request['user'];
 
     if (!user.isSuperAdmin) {
       throw new UnauthorizedException();
     }
 
-    return this.modalitiesService.delete(id);
+    return this.therapiesService.delete(id);
   }
 }

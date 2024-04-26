@@ -37,15 +37,23 @@ const formSchema = z.object({
   description: z.string().optional(),
 });
 
-interface ModalityFormProps {
+interface PriceLookupFormProps {
+  title: string;
+  endpoint: string;
+  queryKey: string;
+  placeholder: string;
   currentId?: string | number;
   defaultValues?: z.infer<typeof formSchema>;
 }
 
-export default function ModalityForm({
+export default function PriceLookupForm({
+  title,
+  endpoint,
+  queryKey,
+  placeholder,
   currentId,
   defaultValues,
-}: ModalityFormProps) {
+}: PriceLookupFormProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues,
@@ -55,7 +63,7 @@ export default function ModalityForm({
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { mutate: mutateModality, isPending } = useMutation({
+  const { mutate: mutatePriceLookup, isPending } = useMutation({
     mutationFn: async (values: z.infer<typeof formSchema>) => {
       let response: AxiosResponse<any, any>;
       const body = {
@@ -66,7 +74,7 @@ export default function ModalityForm({
 
       if (currentId) {
         response = await axios.patch(
-          `${process.env.NEXT_PUBLIC_API_URL}/settings/modalities/${currentId}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/${endpoint}/${currentId}`,
           body,
           {
             headers: {
@@ -80,7 +88,7 @@ export default function ModalityForm({
         }
       } else {
         response = await axios.post(
-          `${process.env.NEXT_PUBLIC_API_URL}/settings/modalities`,
+          `${process.env.NEXT_PUBLIC_API_URL}/${endpoint}`,
           body,
           {
             headers: {
@@ -98,22 +106,22 @@ export default function ModalityForm({
     },
     onError: () => {
       return toast({
-        title: `Failed to ${currentId ? 'update' : 'create'} modality`,
+        title: `Failed to ${currentId ? 'update' : 'create'} ${title.toLowerCase()}`,
         description: 'Please try again later.',
         variant: 'destructive',
       });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['modalities'],
+        queryKey: [queryKey],
       });
 
       closeForm();
       resetEntity();
 
       return toast({
-        title: `${currentId ? 'Updated' : 'Created'} modality successfully`,
-        description: `Modality has been ${currentId ? 'updated' : 'created'} successfully.`,
+        title: `${currentId ? 'Updated' : 'Created'} ${title.toLowerCase()} successfully`,
+        description: `${title} has been ${currentId ? 'updated' : 'created'} successfully.`,
       });
     },
   });
@@ -121,7 +129,7 @@ export default function ModalityForm({
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit((e) => mutateModality(e))}
+        onSubmit={form.handleSubmit((e) => mutatePriceLookup(e))}
         className="space-y-6 px-4 text-foreground"
       >
         <div className="w-full space-y-2">
@@ -136,9 +144,9 @@ export default function ModalityForm({
             </div>
           ) : (
             <div>
-              <h3 className="text-lg font-medium">New Modality</h3>
+              <h3 className="text-lg font-medium">New {title}</h3>
               <p className="text-sm text-muted-foreground">
-                Add a new modality to the list.
+                Add a new {title.toLowerCase()} to the list.
               </p>
             </div>
           )}
@@ -150,9 +158,13 @@ export default function ModalityForm({
             control={form.control}
             render={({ field }) => (
               <FormItem>
-                <FormLabel required>Modality Name</FormLabel>
+                <FormLabel required>{title} Name</FormLabel>
                 <FormControl>
-                  <Input disabled={isPending} placeholder="MRI" {...field} />
+                  <Input
+                    disabled={isPending}
+                    placeholder={placeholder}
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -202,7 +214,7 @@ export default function ModalityForm({
 
         <div className="flex justify-between gap-2">
           <Button type="submit" size="sm" disabled={isPending}>
-            {currentId ? 'Update' : 'Create'} Modality
+            {currentId ? 'Update' : 'Create'} {title}
           </Button>
         </div>
       </form>
