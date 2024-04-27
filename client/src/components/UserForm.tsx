@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import axios from 'axios';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -29,14 +29,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Combobox } from './ui/combobox';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
-import { Calendar } from '@/components/ui/calendar';
 import { useToast } from './ui/use-toast';
 
 import useAccessToken from '@/hooks/useAccessToken';
@@ -44,6 +45,7 @@ import useUserRole from '@/hooks/useUserRole';
 import { useUploadThing } from '@/lib/uploadthing';
 
 import { cn } from '@/lib/utils';
+import type { Lookup } from '@/types/settings.type';
 
 const formSchema = z.object({
   firstName: z.string().min(1, {
@@ -104,6 +106,32 @@ export default function UserForm() {
     },
   });
 
+  const { data: specialities, isLoading: isLoadingSpecialities } = useQuery({
+    queryKey: ['specialities_form'],
+    queryFn: async () => {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/settings/specialities`,
+        {
+          headers: {
+            authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      const data = response.data as Lookup[];
+
+      if (data) {
+        return data.map((manufacturer) => ({
+          label: manufacturer.name,
+          value: manufacturer.id,
+        }));
+      }
+
+      return [];
+    },
+    enabled: !!accessToken,
+  });
+
   const { mutate: createUser, isPending } = useMutation({
     mutationFn: async (values: z.infer<typeof formSchema>) => {
       let url = '';
@@ -126,6 +154,7 @@ export default function UserForm() {
         address: values.address,
         sex: values.sex,
         role: values.role,
+        specialityId: values.speciality,
       };
 
       const response = await axios.post(
@@ -358,6 +387,29 @@ export default function UserForm() {
                 </FormItem>
               )}
             />
+
+            {form.watch('role') === 'doctor' && (
+              <FormField
+                name="speciality"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem className="col-span-2">
+                    <FormLabel required>Speciality</FormLabel>
+                    <FormControl>
+                      <Combobox
+                        value={field.value || ''}
+                        onChange={field.onChange}
+                        placeholder="Select doctor speciality..."
+                        inputPlaceholder="Search specialities..."
+                        options={specialities || []}
+                        disabled={isPending || isLoadingSpecialities}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
           </div>
 
           <div className="w-full space-y-2">

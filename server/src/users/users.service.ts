@@ -2,6 +2,7 @@ import {
   ConflictException,
   Injectable,
   NotFoundException,
+  UnprocessableEntityException,
 } from '@nestjs/common';
 import { hash } from 'bcrypt';
 import type { Role } from '@prisma/client';
@@ -178,6 +179,24 @@ export class UsersService {
     }
 
     const { weight, height, bloodType, ...userDto } = dto;
+
+    if (role === 'doctor' && !dto.specialityId) {
+      throw new UnprocessableEntityException(
+        'Speciality ID is required for doctor role',
+      );
+    }
+
+    if (dto.specialityId) {
+      const speciality = await this.prisma.speciality.findUnique({
+        where: {
+          id: dto.specialityId,
+        },
+      });
+
+      if (!speciality) {
+        throw new NotFoundException('Speciality not found');
+      }
+    }
 
     const newUser = await this.prisma.user.create({
       data: {

@@ -37,10 +37,14 @@ export class CreateUserDto {
   birthDate: Date;
 
   @IsString()
-  phoneNumber?: string;
+  phoneNumber: string;
 
   @IsString()
-  address?: string;
+  address: string;
+
+  @IsOptional()
+  @IsString()
+  specialityId?: string;
 
   @IsIn(['male', 'female'])
   sex: 'male' | 'female';

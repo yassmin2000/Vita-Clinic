@@ -112,10 +112,10 @@ export const columns: ColumnDef<Doctor>[] = [
     },
   },
   {
-    accessorKey: 'specialty',
+    accessorKey: 'speciality',
     header: 'Speciality',
     cell: ({ row }) => {
-      const speciality = row.original.specialty?.name;
+      const speciality = row.original.speciality?.name;
 
       return <Badge variant="outline">{speciality || 'NA'}</Badge>;
     },

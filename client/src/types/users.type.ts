@@ -19,7 +19,7 @@ export type Doctor = {
   email: string;
   birthDate: string;
   sex: 'male' | 'female';
-  specialty?: {
+  speciality?: {
     id: string;
     name: string;
   };
