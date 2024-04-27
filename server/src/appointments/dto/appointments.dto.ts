@@ -65,6 +65,8 @@ export class GetAllAppointmentsQuery {
     'patientName-desc',
     'doctorName-asc',
     'doctorName-desc',
+    'bookingDate-desc',
+    'bookingDate-asc',
   ])
   sort?:
     | 'date-desc'
@@ -72,5 +74,7 @@ export class GetAllAppointmentsQuery {
     | 'patientName-asc'
     | 'patientName-desc'
     | 'doctorName-asc'
-    | 'doctorName-desc';
+    | 'doctorName-desc'
+    | 'bookingDate-desc'
+    | 'bookingDate-asc';
 }

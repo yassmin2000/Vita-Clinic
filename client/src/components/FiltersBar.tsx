@@ -149,18 +149,22 @@ export default function FiltersBar({
                 value === 'all' ||
                 value === 'completed' ||
                 value === 'pending' ||
-                value === 'cancelled'
+                value === 'cancelled' ||
+                value === 'rejected' ||
+                value === 'approved'
               ) {
                 setCurrentPage(1);
                 setCurrentAppointmentStatus(value);
               }
             }}
-            className="w-[350px]"
+            className="w-[500px]"
           >
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className="grid w-full grid-cols-6">
               <TabsTrigger value="all">All</TabsTrigger>
+              <TabsTrigger value="approved">Approved</TabsTrigger>
               <TabsTrigger value="completed">Completed</TabsTrigger>
               <TabsTrigger value="pending">Pending</TabsTrigger>
+              <TabsTrigger value="rejected">Rejected</TabsTrigger>
               <TabsTrigger value="cancelled">Cancelled</TabsTrigger>
             </TabsList>
           </Tabs>
@@ -251,15 +255,23 @@ export default function FiltersBar({
               )}
 
               {sortByAppointmentDateEnabled && (
-                <SelectGroup>
-                  <SelectLabel>Appointment date</SelectLabel>
-                  <SelectItem value="appointmentDate-asc">
-                    Oldest first
-                  </SelectItem>
-                  <SelectItem value="appointmentDate-desc">
-                    Newest first
-                  </SelectItem>
-                </SelectGroup>
+                <>
+                  <SelectGroup>
+                    <SelectLabel>Appointment date</SelectLabel>
+                    <SelectItem value="date-asc">Oldest first</SelectItem>
+                    <SelectItem value="date-desc">Newest first</SelectItem>
+                  </SelectGroup>
+
+                  <SelectGroup>
+                    <SelectLabel>Booked at</SelectLabel>
+                    <SelectItem value="bookingDate-asc">
+                      Oldest first
+                    </SelectItem>
+                    <SelectItem value="bookingDate-desc">
+                      Newest first
+                    </SelectItem>
+                  </SelectGroup>
+                </>
               )}
             </SelectContent>
           </Select>

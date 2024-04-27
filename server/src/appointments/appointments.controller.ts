@@ -2,9 +2,11 @@ import { Request } from 'express';
 import {
   Body,
   Controller,
+  Get,
   Param,
   Patch,
   Post,
+  Query,
   Req,
   UnauthorizedException,
   UseGuards,
@@ -14,12 +16,62 @@ import {
 import { AppointmentsService } from './appointments.service';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
 
-import { CreateAppointmentDto } from './dto/appointments.dto';
+import {
+  CreateAppointmentDto,
+  GetAllAppointmentsQuery,
+} from './dto/appointments.dto';
 import type { Payload } from 'src/types/payload.type';
+import { ReportsService } from './reports/reports.service';
 
 @Controller('appointments')
 export class AppointmentsController {
-  constructor(private readonly appointmentsService: AppointmentsService) {}
+  constructor(
+    private readonly appointmentsService: AppointmentsService,
+    private readonly reportsService: ReportsService,
+  ) {}
+
+  @UseGuards(JwtGuard)
+  @Get()
+  async getAllAppointments(
+    @Query(new ValidationPipe({ transform: true }))
+    query: GetAllAppointmentsQuery,
+    @Req() request: Request,
+  ) {
+    const user: Payload = request['user'];
+
+    if (user.role === 'patient') {
+      throw new UnauthorizedException();
+    }
+
+    return this.appointmentsService.findAll(query);
+  }
+
+  @UseGuards(JwtGuard)
+  @Get(':id')
+  async getAppointmentById(@Param('id') id: string, @Req() request: Request) {
+    const user: Payload = request['user'];
+
+    if (user.role === 'patient') {
+      throw new UnauthorizedException();
+    }
+
+    return this.appointmentsService.findById(id);
+  }
+
+  @UseGuards(JwtGuard)
+  @Get(':id/reports')
+  async getAppointmentReportsById(
+    @Param('id') id: string,
+    @Req() request: Request,
+  ) {
+    const user: Payload = request['user'];
+
+    if (user.role === 'patient') {
+      throw new UnauthorizedException();
+    }
+
+    return this.reportsService.findAllByAppointmentId(id);
+  }
 
   @UseGuards(JwtGuard)
   @Post()

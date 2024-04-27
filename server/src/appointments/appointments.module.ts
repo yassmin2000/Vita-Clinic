@@ -10,13 +10,17 @@ import { LaboratoryTestsService } from 'src/settings/laboratory-tests/laboratory
 import { ModalitiesService } from 'src/settings/modalities/modalities.service';
 import { ServicesService } from 'src/settings/services/services.service';
 import { TherapiesService } from 'src/settings/therapies/therapies.service';
+import { ReportsModule } from './reports/reports.module';
+import { ReportsService } from './reports/reports.service';
 
 @Module({
+  imports: [ReportsModule],
   controllers: [AppointmentsController],
   providers: [
     AppointmentsService,
     JwtService,
     PrismaService,
+    ReportsService,
     BiomarkersService,
     LaboratoryTestsService,
     ModalitiesService,

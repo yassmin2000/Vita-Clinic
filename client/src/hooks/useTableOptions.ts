@@ -1,5 +1,7 @@
 import { create } from 'zustand';
 
+import type { AppointmentStatus } from '@/types/appointments.type';
+
 type UseTableOptions = {
   currentPage: number;
   setCurrentPage: (page: number) => void;
@@ -13,10 +15,8 @@ type UseTableOptions = {
   setCurrentGender: (gender: 'all' | 'male' | 'female') => void;
   currentStatus: string;
   setCurrentStatus: (status: 'all' | 'active' | 'inactive') => void;
-  currentAppointmentStatus: string;
-  setCurrentAppointmentStatus: (
-    status: 'all' | 'completed' | 'pending' | 'cancelled'
-  ) => void;
+  currentAppointmentStatus: 'all' | AppointmentStatus;
+  setCurrentAppointmentStatus: (status: 'all' | AppointmentStatus) => void;
   reset: () => void;
 };
 

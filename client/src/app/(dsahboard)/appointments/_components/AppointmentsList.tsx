@@ -1,18 +1,22 @@
 'use client';
 
 import { useEffect } from 'react';
+import axios from 'axios';
 import { useQuery } from '@tanstack/react-query';
-
-import { appointments as appointmentsData } from './appointmentData';
 
 import FiltersBar from '@/components/FiltersBar';
 import Pagination from '@/components/Pagination';
+import AppointmentsListItem from './AppointmentsListItem';
 import AppointmentItemSkeleton from './AppointmentItemSkeleton';
 
+import useAccessToken from '@/hooks/useAccessToken';
 import { useTableOptions } from '@/hooks/useTableOptions';
-import AppointmentsListItem from './AppointmentsListItem';
+
+import type { Appointment } from '@/types/appointments.type';
 
 export default function AppointmentsList() {
+  const accessToken = useAccessToken();
+
   const {
     sortBy,
     setSortBy,
@@ -29,46 +33,26 @@ export default function AppointmentsList() {
     isLoading,
   } = useQuery({
     queryKey: [
-      `appointments_page_${currentPage}_status_${currentAppointmentStatus}_count_${countPerPage}_sort_${sortBy}_search_${searchValue}`,
+      `appointments_page_${currentPage}_count_${countPerPage}_status_${currentAppointmentStatus}_sort_${sortBy}_search_${searchValue}`,
     ],
     queryFn: async () => {
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      const [sortWith, sortHow] = sortBy.split('-');
-      if (
-        sortWith !== 'patientName' &&
-        sortWith !== 'doctorName' &&
-        sortWith !== 'appointmentDate'
-      )
-        return null;
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/appointments?page=${currentPage}&limit=${countPerPage}&status=${currentAppointmentStatus}&value=${searchValue}&sort=${sortBy}`,
+        {
+          headers: {
+            authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
 
-      return appointmentsData
-        .filter(
-          (appointment) =>
-            (currentAppointmentStatus === 'all' ||
-              appointment.status.toLowerCase() === currentAppointmentStatus) &&
-            (appointment.patientName
-              .toLowerCase()
-              .includes(searchValue.toLowerCase()) ||
-              appointment.doctorName
-                .toLowerCase()
-                .includes(searchValue.toLowerCase()))
-        )
-        .sort((a, b) => {
-          if (a[sortWith] < b[sortWith]) {
-            return sortHow === 'desc' ? 1 : -1;
-          }
-          if (a[sortWith] > b[sortWith]) {
-            return sortHow === 'desc' ? -1 : 1;
-          }
-          return 0;
-        })
-        .slice((currentPage - 1) * countPerPage, currentPage * countPerPage);
+      return response.data as Appointment[];
     },
+    enabled: !!accessToken,
   });
 
   useEffect(() => {
     reset();
-    setSortBy('appointmentDate-desc');
+    setSortBy('date-desc');
   }, []);
 
   return (
@@ -102,11 +86,15 @@ export default function AppointmentsList() {
             <AppointmentsListItem
               key={appointment.id}
               id={appointment.id}
-              patientName={appointment.patientName}
-              doctorName={appointment.doctorName}
-              appointmentDate={appointment.appointmentDate}
-              bookedAt={appointment.bookedAt}
-              cancelledAt={appointment.cancelledAt}
+              patientName={`${appointment.patient.firstName} ${appointment.patient.lastName}`}
+              doctorName={
+                appointment.doctor
+                  ? `${appointment.doctor.firstName} ${appointment.doctor.lastName}`
+                  : ''
+              }
+              appointmentDate={appointment.date}
+              bookedAt={appointment.createdAt}
+              cancelledAt={appointment.updatedAt}
               status={appointment.status}
             />
           ))}

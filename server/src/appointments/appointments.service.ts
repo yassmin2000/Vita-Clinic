@@ -11,7 +11,10 @@ import { ModalitiesService } from 'src/settings/modalities/modalities.service';
 import { ServicesService } from 'src/settings/services/services.service';
 import { TherapiesService } from 'src/settings/therapies/therapies.service';
 
-import { CreateAppointmentDto } from './dto/appointments.dto';
+import {
+  CreateAppointmentDto,
+  GetAllAppointmentsQuery,
+} from './dto/appointments.dto';
 import type { AppointmentStatus } from '@prisma/client';
 
 @Injectable()
@@ -24,6 +27,94 @@ export class AppointmentsService {
     private therapiesService: TherapiesService,
   ) {}
 
+  async findAll({
+    page = 1,
+    limit = 10,
+    status = 'all',
+    value = '',
+    sort = 'date-desc',
+  }: GetAllAppointmentsQuery) {
+    const names = value.trim().split(' ');
+    const mode = 'insensitive' as 'insensitive';
+    const [sortField, sortOrder] = sort.split('-') as [string, 'desc' | 'asc'];
+
+    const nameConditions = names.flatMap((name) => [
+      {
+        doctor: {
+          OR: [
+            {
+              firstName: {
+                contains: name,
+                mode,
+              },
+            },
+            {
+              lastName: {
+                contains: name,
+                mode,
+              },
+            },
+          ],
+        },
+      },
+      {
+        patient: {
+          OR: [
+            {
+              firstName: {
+                contains: name,
+                mode,
+              },
+            },
+            {
+              lastName: {
+                contains: name,
+                mode,
+              },
+            },
+          ],
+        },
+      },
+    ]);
+
+    return this.prisma.appointment.findMany({
+      where: {
+        status: status === 'all' ? undefined : status,
+        OR: nameConditions,
+      },
+      include: {
+        patient: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+          },
+        },
+        doctor: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+          },
+        },
+      },
+      skip: (page - 1) * limit,
+      take: limit,
+      orderBy: [
+        ...(sortField === 'doctorName'
+          ? [{ doctor: { firstName: sortOrder } }]
+          : []),
+        ...(sortField === 'patientName'
+          ? [{ patient: { firstName: sortOrder } }]
+          : []),
+        {
+          date: sortField === 'date' ? sortOrder : undefined,
+          createdAt: sortField === 'bookingDate' ? sortOrder : undefined,
+        },
+      ],
+    });
+  }
+
   async findById(id: string) {
     const appointment = await this.prisma.appointment.findUnique({
       where: { id },
@@ -34,13 +125,20 @@ export class AppointmentsService {
         laboratoryTestResults: true,
         services: {
           include: {
-            services: true,
-            therapies: true,
+            service: true,
+            therapy: true,
             scans: true,
             labWorks: true,
           },
         },
         patient: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+          },
+        },
+        doctor: {
           select: {
             id: true,
             firstName: true,
@@ -142,8 +240,8 @@ export class AppointmentsService {
       include: {
         services: {
           include: {
-            services: true,
-            therapies: true,
+            service: true,
+            therapy: true,
             scans: true,
             labWorks: true,
           },
