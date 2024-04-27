@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-import { MessageType } from '@/app/(dsahboard)/reports/[reportId]/_components/Messages';
+import type { Message } from '@/types/appointments.type';
 
 type useChatProps = {
   addMessage: () => void;
@@ -8,9 +8,9 @@ type useChatProps = {
   setMessage: (message: string) => void;
   isLoading: boolean;
   setIsLoading: (isLoading: boolean) => void;
-  messages: MessageType[];
-  setMessages: (messages: MessageType[]) => void;
-  addNewMessage: (message: MessageType) => void;
+  messages: Message[];
+  setMessages: (messages: Message[]) => void;
+  addNewMessage: (message: Message) => void;
   deleteLastMessage: () => void;
   updateMessage: (id: string, text: string) => void;
 };
@@ -31,7 +31,7 @@ export const useChat = create<useChatProps>((set) => ({
     set((state) => {
       const messages = state.messages.map((message) => {
         if (message.id === id) {
-          return { ...message, text };
+          return { ...message, message: text };
         }
         return message;
       });

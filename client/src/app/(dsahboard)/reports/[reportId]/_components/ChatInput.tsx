@@ -7,8 +7,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
 import { useChat } from '@/hooks/useChat';
 
-import { messagesData } from './Messages';
-
 interface ChatInputProps {
   fileId: string;
   disabled?: boolean;
@@ -47,13 +45,6 @@ export default function ChatInput({
         throw new Error('Failed to send message');
       }
 
-      messagesData.push({
-        id: crypto.randomUUID(),
-        text: message,
-        createdAt: new Date().toISOString(),
-        isUserMessage: true,
-      });
-
       return response.body;
     },
     onMutate: async ({ message }) => {
@@ -62,12 +53,13 @@ export default function ChatInput({
       setIsLoading(true);
 
       await queryClient.cancelQueries({
-        queryKey: [`file_messages_${fileId}`],
+        queryKey: [`messages_${fileId}`],
       });
 
       addNewMessage({
         id: crypto.randomUUID(),
-        text: message,
+        reportId: fileId,
+        message,
         createdAt: new Date().toISOString(),
         isUserMessage: true,
       });
@@ -83,7 +75,7 @@ export default function ChatInput({
     },
     onSettled: async () => {
       setIsLoading(false);
-      queryClient.invalidateQueries({ queryKey: [`file_messages_${fileId}`] });
+      queryClient.invalidateQueries({ queryKey: [`messages_${fileId}`] });
     },
     onSuccess: async (stream) => {
       setIsLoading(false);
@@ -115,19 +107,13 @@ export default function ChatInput({
           isAIResponseCreated = true;
           addNewMessage({
             id: randomId,
-            text: accResponse,
+            reportId: fileId,
+            message: accResponse,
             createdAt: new Date().toISOString(),
             isUserMessage: false,
           });
         }
       }
-
-      messagesData.push({
-        id: crypto.randomUUID(),
-        text: accResponse,
-        createdAt: new Date().toISOString(),
-        isUserMessage: false,
-      });
     },
   });
 

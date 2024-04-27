@@ -5,19 +5,37 @@ import { OpenAIStream, StreamingTextResponse } from 'ai';
 
 import { pinecone } from '@/lib/pinecone';
 import { openai } from '@/lib/openai';
+import { getAccessToken, getUserRole } from '@/lib/auth';
+
+import type { Message } from '@/types/appointments.type';
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
 
-    // Make sure user is authenticated and has access to use the chat
+    const acceesToken = await getAccessToken();
+    const { role } = await getUserRole();
 
-    // Validate the body
+    if (!role || role !== 'doctor') {
+      return new NextResponse('Unauthorized', { status: 401 });
+    }
+
     const { fileId, message } = body;
 
-    // Get the file messages from the database
-
-    // Create the user message in the database
+    await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/reports/${fileId}/messages`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${acceesToken}`,
+        },
+        body: JSON.stringify({
+          message,
+          isUserMessage: true,
+        }),
+      }
+    );
 
     const pineconeIndex = pinecone.index('vita-clinic');
     const embeddings = new OpenAIEmbeddings({
@@ -31,11 +49,20 @@ export async function POST(req: NextRequest) {
 
     const results = await vectoreStore.similaritySearch(message, 4);
 
-    // Format the messages from the database
-    const formattedMessages: {
-      role: 'user' | 'assistant';
-      content: string;
-    }[] = [];
+    const prevMessages = (await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/reports/${fileId}/messages`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${acceesToken}`,
+        },
+      }
+    ).then((res) => res.json())) as Message[];
+
+    const formattedMessages = prevMessages.map((message) => ({
+      role: message.isUserMessage ? ('user' as const) : ('assistant' as const),
+      content: message.message,
+    }));
 
     const response = await openai.chat.completions.create({
       model: 'gpt-3.5-turbo',
@@ -67,7 +94,20 @@ export async function POST(req: NextRequest) {
 
     const stream = OpenAIStream(response, {
       async onCompletion(completion) {
-        // Save the message to the database
+        await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/reports/${fileId}/messages`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${acceesToken}`,
+            },
+            body: JSON.stringify({
+              message: completion,
+              isUserMessage: false,
+            }),
+          }
+        );
       },
     });
 
