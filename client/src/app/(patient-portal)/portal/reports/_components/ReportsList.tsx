@@ -119,7 +119,7 @@ export default function ReportsList() {
           reports.map((report) => (
             <ReportItem
               key={report.id}
-              id={report.id}
+              id={`report.id`}
               title={report.name}
               fileName={report.fileName}
               date={report.date}

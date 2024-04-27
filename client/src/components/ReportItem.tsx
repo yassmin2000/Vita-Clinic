@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { format } from 'date-fns';
-import { Info, Plus, Trash } from 'lucide-react';
+import { Info, Pencil, Plus, Trash } from 'lucide-react';
 
 import { Card } from './ui/card';
 import { Button } from './ui/button';
@@ -8,7 +8,7 @@ import { Button } from './ui/button';
 import useUserRole from '@/hooks/useUserRole';
 
 interface ReportItemProps {
-  id: number;
+  id: string;
   title: string;
   fileName: string;
   date: string;
@@ -49,6 +49,11 @@ export default function ReportItem({
         <span />
 
         <div className="flex gap-1">
+          {role && role === 'doctor' && (
+            <Button size="sm">
+              <Pencil className="mr-2 h-4 w-4" /> Edit
+            </Button>
+          )}
           {role && role !== 'patient' && (
             <Button size="sm" variant="destructive">
               <Trash className="mr-2 h-4 w-4" /> Delete

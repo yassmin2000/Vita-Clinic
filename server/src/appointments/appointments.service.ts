@@ -120,9 +120,7 @@ export class AppointmentsService {
       where: { id },
       include: {
         vitals: true,
-        reports: true,
-        scans: true,
-        laboratoryTestResults: true,
+        billing: true,
         services: {
           include: {
             service: true,

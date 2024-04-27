@@ -1,6 +1,15 @@
+'use client';
+
 import Link from 'next/link';
 import { format, formatDistanceToNow, parseISO } from 'date-fns';
-import { Check, MoreVertical, Timer, X } from 'lucide-react';
+import {
+  Check,
+  CheckCheck,
+  CircleOff,
+  MoreVertical,
+  Timer,
+  X,
+} from 'lucide-react';
 
 import {
   Card,
@@ -19,29 +28,39 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
-type Appointment = {
-  id: number;
+import type { AppointmentStatus } from '@/types/appointments.type';
+
+interface AppointmentDetailsCardProps {
+  id: string;
+  appointmentNumber: number;
+  status: AppointmentStatus;
+  doctorId?: string;
+  doctorName?: string;
+  patientId: string;
   patientName: string;
-  doctorName: string;
-  appointmentDate: string;
-  bookedAt: string;
-  cancelledAt: string;
-  status: 'completed' | 'pending' | 'cancelled';
-};
+  date: string;
+  cancelledDate: string;
+  serviceName?: string;
+  therapyName?: string;
+  serviceScans: string[];
+  serviceLabWorks: string[];
+}
 
-const appointment: Appointment = {
-  id: 1,
-  patientName: 'Douglas West',
-  doctorName: 'Ed Murphy',
-  appointmentDate: '2024-03-16T18:04:33.256Z',
-  bookedAt: '2023-02-09T16:28:55.721Z',
-  cancelledAt: '2021-12-15T13:47:50.681Z',
-  status: 'completed',
-};
-
-export default async function AppointmentDetailsCard() {
-  await new Promise((resolve) => setTimeout(resolve, 2000));
-
+export default function AppointmentDetailsCard({
+  id,
+  appointmentNumber,
+  status,
+  doctorId,
+  doctorName,
+  patientId,
+  patientName,
+  date,
+  cancelledDate,
+  serviceName,
+  therapyName,
+  serviceScans,
+  serviceLabWorks,
+}: AppointmentDetailsCardProps) {
   return (
     <Card>
       <CardHeader>
@@ -49,10 +68,10 @@ export default async function AppointmentDetailsCard() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <span className="text-xl font-semibold text-primary">
-                Appointment #{appointment.id}
+                Appointment #{appointmentNumber}
               </span>
-              <Badge variant={appointment.status} className="capitalize">
-                {appointment.status}
+              <Badge variant={status} className="capitalize">
+                {status}
               </Badge>
             </div>
 
@@ -63,14 +82,29 @@ export default async function AppointmentDetailsCard() {
                   <MoreVertical className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
+
               <DropdownMenuContent align="end">
                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                <DropdownMenuItem disabled={appointment.status === 'completed'}>
-                  <Check className="mr-2 h-4 w-4" /> Mark as completed
-                </DropdownMenuItem>
-                <DropdownMenuItem disabled={appointment.status === 'cancelled'}>
-                  <X className="mr-2 h-4 w-4" /> Cancel appointment
-                </DropdownMenuItem>
+                {status === 'pending' && (
+                  <>
+                    <DropdownMenuItem>
+                      <Check className="mr-2 h-4 w-4" /> Approve appointment
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      <X className="mr-2 h-4 w-4" /> Reject appointment
+                    </DropdownMenuItem>
+                  </>
+                )}
+                {status !== 'pending' && (
+                  <>
+                    <DropdownMenuItem disabled={status === 'completed'}>
+                      <Check className="mr-2 h-4 w-4" /> Mark as completed
+                    </DropdownMenuItem>
+                    <DropdownMenuItem disabled={status === 'cancelled'}>
+                      <X className="mr-2 h-4 w-4" /> Cancel appointment
+                    </DropdownMenuItem>
+                  </>
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -78,22 +112,22 @@ export default async function AppointmentDetailsCard() {
         <CardDescription>
           Appointment by{' '}
           <Link
-            href={`/users/${appointment.patientName}`}
+            href={`/users/${patientId}`}
             className="text-primary transition-all hover:text-primary/80"
           >
-            {appointment.patientName}
+            {patientName}
           </Link>{' '}
           with Dr.{' '}
           <Link
-            href={`/users/${appointment.doctorName}`}
+            href={`/users/${doctorId}`}
             className="text-primary transition-all hover:text-primary/80"
           >
-            {appointment.doctorName}
+            {doctorName}
           </Link>
         </CardDescription>
       </CardHeader>
       <CardContent>
-        {appointment.status === 'cancelled' && (
+        {status === 'cancelled' && (
           <div className="rounded-md bg-red-800/20 p-4">
             <div className="flex items-center gap-2">
               <X className="h-6 w-6 text-red-700" />
@@ -103,13 +137,13 @@ export default async function AppointmentDetailsCard() {
             </div>
             <p className="text-sm text-muted-foreground">
               The appointment was cancelled on{' '}
-              {format(parseISO(appointment.cancelledAt), 'EEE, do MMM, yyyy')}{' '}
-              at {format(parseISO(appointment.cancelledAt), 'h:mm a')} (
-              {formatDistanceToNow(parseISO(appointment.cancelledAt))} ago)
+              {format(parseISO(cancelledDate), 'EEE, do MMM, yyyy')} at{' '}
+              {format(parseISO(cancelledDate), 'h:mm a')} (
+              {formatDistanceToNow(parseISO(cancelledDate))} ago)
             </p>
           </div>
         )}
-        {appointment.status === 'pending' && (
+        {status === 'pending' && (
           <div className="rounded-md bg-orange-700/20 p-4">
             <div className="flex items-center gap-2">
               <Timer className="h-6 w-6 text-orange-700" />
@@ -119,31 +153,57 @@ export default async function AppointmentDetailsCard() {
             </div>
             <p className="text-sm text-muted-foreground">
               The appointment is scheduled for{' '}
-              {format(
-                parseISO(appointment.appointmentDate),
-                'EEE, do MMM, yyyy'
-              )}{' '}
-              at {format(parseISO(appointment.appointmentDate), 'h:mm a')} (In{' '}
-              {formatDistanceToNow(parseISO(appointment.appointmentDate))})
+              {format(parseISO(date), 'EEE, do MMM, yyyy')} at{' '}
+              {format(parseISO(date), 'h:mm a')} (In{' '}
+              {formatDistanceToNow(parseISO(date))})
             </p>
           </div>
         )}
-        {appointment.status === 'completed' && (
+        {status === 'completed' && (
           <div className="rounded-md bg-green-700/20 p-4">
             <div className="flex items-center gap-2">
-              <Check className="h-6 w-6 text-green-700" />
+              <CheckCheck className="h-6 w-6 text-green-700" />
               <span className="font-semibold text-green-700">
                 Appointment is completed
               </span>
             </div>
             <p className="text-sm text-muted-foreground">
               The appointment was completed on{' '}
-              {format(
-                parseISO(appointment.appointmentDate),
-                'EEE, do MMM, yyyy'
-              )}{' '}
-              at {format(parseISO(appointment.appointmentDate), 'h:mm a')} (
-              {formatDistanceToNow(parseISO(appointment.appointmentDate))} ago)
+              {format(parseISO(date), 'EEE, do MMM, yyyy')} at{' '}
+              {format(parseISO(date), 'h:mm a')} (
+              {formatDistanceToNow(parseISO(date))} ago)
+            </p>
+          </div>
+        )}
+        {status === 'approved' && (
+          <div className="rounded-md bg-blue-700/20 p-4">
+            <div className="flex items-center gap-2">
+              <Check className="h-6 w-6 text-blue-700" />
+              <span className="font-semibold text-blue-700">
+                Appointment is approved
+              </span>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              The appointment is approved and scheduled for{' '}
+              {format(parseISO(date), 'EEE, do MMM, yyyy')} at{' '}
+              {format(parseISO(date), 'h:mm a')} (In{' '}
+              {formatDistanceToNow(parseISO(date))})
+            </p>
+          </div>
+        )}
+        {status === 'rejected' && (
+          <div className="rounded-md bg-yellow-700/20 p-4">
+            <div className="flex items-center gap-2">
+              <CircleOff className="h-6 w-6 text-yellow-700" />
+              <span className="font-semibold text-yellow-700">
+                Appointment is rejected
+              </span>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              The appointment was rejected on{' '}
+              {format(parseISO(cancelledDate), 'EEE, do MMM, yyyy')} at{' '}
+              {format(parseISO(cancelledDate), 'h:mm a')} (
+              {formatDistanceToNow(parseISO(cancelledDate))} ago)
             </p>
           </div>
         )}
