@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import Dropzone from 'react-dropzone';
+import axios from 'axios';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -20,33 +22,98 @@ import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
+import { useToast } from '@/components/ui/use-toast';
 
 import { useUploadThing } from '@/lib/uploadthing';
+import useAccessToken from '@/hooks/useAccessToken';
+
 import { cn } from '@/lib/utils';
 
 const formSchema = z.object({
-  reportName: z.string().min(1, {
-    message: 'Report name is required.',
+  title: z.string().min(1, {
+    message: 'Report title is required.',
   }),
   notes: z.string().optional(),
 });
 
 interface CreateReportFormProps {
+  appointmentId: string;
   onClose: () => void;
 }
 
-export default function CreateReportForm({ onClose }: CreateReportFormProps) {
+export default function CreateReportForm({
+  appointmentId,
+  onClose,
+}: CreateReportFormProps) {
   const [file, setFile] = useState<File | null>(null);
   const [fileError, setFileError] = useState(false);
+
+  const [currentStep, setCurrentStep] = useState(1);
   const [isUploading, setIsUploading] = useState(false);
   const [progressValue, setProgressValue] = useState(0);
+
   const { startUpload } = useUploadThing('pdfUploader');
-  const [isSaving, setIsSaving] = useState(false);
+  const accessToken = useAccessToken();
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
   });
-  const isLoading = form.formState.isSubmitting;
+
+  const { mutate: createReport, isPending } = useMutation({
+    mutationFn: async () => {
+      if (!file) {
+        setFileError(true);
+        return;
+      }
+
+      const uploadedFile = await handleUpload(file);
+
+      const body = {
+        title: form.getValues('title'),
+        description: form.getValues('notes'),
+        reportURL: uploadedFile.url,
+        fileName: file.name,
+        appointmentId,
+      };
+
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/reports`,
+        body,
+        {
+          headers: {
+            authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      await axios.post('/api/embeddings', {
+        reportId: response.data.id,
+      });
+
+      onClose();
+      return response;
+    },
+    onError: () => {
+      return toast({
+        title: `Failed to create new report`,
+        description: 'Please try again later.',
+        variant: 'destructive',
+      });
+    },
+    onSuccess: () => {
+      return toast({
+        title: `Report created successfully`,
+        description: 'The report has been created successfully.',
+      });
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({
+        queryKey: [`reports_${appointmentId}`],
+      });
+    },
+  });
 
   const startSimulateProgress = () => {
     setProgressValue(0);
@@ -65,14 +132,13 @@ export default function CreateReportForm({ onClose }: CreateReportFormProps) {
   };
 
   const handleUpload = async (file: File) => {
-    console.log(file);
     setIsUploading(true);
     const progressInterval = startSimulateProgress();
 
     const res = await startUpload([file]);
 
     if (!res) {
-      return console.log('Failed to upload');
+      throw new Error('Failed to upload');
     }
 
     const [fileResponse] = res;
@@ -83,39 +149,13 @@ export default function CreateReportForm({ onClose }: CreateReportFormProps) {
     return fileResponse;
   };
 
-  const [currentStep, setCurrentStep] = useState(1);
-
   const onSubmit = () => {
     setCurrentStep((step) => step + 1);
   };
 
-  const createReport = async () => {
-    if (!file) {
-      setFileError(true);
-      return;
-    }
-
-    setIsSaving(true);
-    const uploadedFile = await handleUpload(file);
-
-    if (uploadedFile) {
-      const body = {
-        name: form.getValues('reportName'),
-        notes: form.getValues('notes'),
-        file: uploadedFile.url,
-      };
-      // Save the report to the database via an API call
-      setIsSaving(false);
-      onClose();
-    } else {
-      setIsSaving(false);
-      console.log('Something went wrong');
-    }
-  };
-
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 px-2">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 p-2">
         {currentStep === 1 && (
           <>
             <div className="w-full space-y-2">
@@ -129,14 +169,14 @@ export default function CreateReportForm({ onClose }: CreateReportFormProps) {
             </div>
             <div className="flex flex-col gap-4">
               <FormField
-                name="reportName"
+                name="title"
                 control={form.control}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel required>Report Name</FormLabel>
+                    <FormLabel required>Report Title</FormLabel>
                     <FormControl>
                       <Input
-                        disabled={isLoading}
+                        disabled={isPending}
                         placeholder="Report #1"
                         {...field}
                       />
@@ -153,8 +193,8 @@ export default function CreateReportForm({ onClose }: CreateReportFormProps) {
                     <FormLabel>Notes</FormLabel>
                     <FormControl>
                       <Textarea
-                        disabled={isLoading}
-                        placeholder="Add notes..."
+                        disabled={isPending}
+                        placeholder="Add extra notes..."
                         minRows={4}
                         maxRows={8}
                         {...field}
@@ -171,7 +211,7 @@ export default function CreateReportForm({ onClose }: CreateReportFormProps) {
         {currentStep === 2 && (
           <Dropzone
             multiple={false}
-            disabled={isUploading}
+            disabled={isPending}
             onDropAccepted={(files) => setFile(files[0])}
             accept={{ 'application/pdf': ['.pdf'] }}
           >
@@ -247,7 +287,7 @@ export default function CreateReportForm({ onClose }: CreateReportFormProps) {
           <Button
             type="button"
             size="sm"
-            disabled={currentStep === 1 || isSaving}
+            disabled={currentStep === 1 || isPending}
             onClick={() => setCurrentStep((step) => step - 1)}
             className="flex items-center gap-2"
           >
@@ -268,7 +308,7 @@ export default function CreateReportForm({ onClose }: CreateReportFormProps) {
             <Button
               type="button"
               size="sm"
-              disabled={isSaving}
+              disabled={isPending}
               onClick={() => {
                 if (!file) {
                   setFileError(true);

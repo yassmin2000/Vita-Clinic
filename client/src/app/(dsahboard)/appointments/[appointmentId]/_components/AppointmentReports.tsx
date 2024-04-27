@@ -1,88 +1,42 @@
 'use client';
 
+import axios from 'axios';
 import { useQuery } from '@tanstack/react-query';
 
 import ReportItem from '@/components/ReportItem';
 import NewReportButton from './NewReportButton';
 import ReportItemSkeleton from '@/components/ReportItemSkeleton';
 
-const reportsData = [
-  {
-    id: 1,
-    name: 'Report name',
-    fileName: 'report-file-name.pdf',
-    date: '2024-03-16T18:04:33.256Z',
-  },
-  {
-    id: 2,
-    name: 'Report name',
-    fileName: 'report-file-name.pdf',
-    date: '2024-03-16T18:04:33.256Z',
-  },
-  {
-    id: 3,
-    name: 'Report name',
-    fileName: 'report-file-name.pdf',
-    date: '2024-03-16T18:04:33.256Z',
-  },
-  {
-    id: 4,
-    name: 'Report name',
-    fileName: 'report-file-name.pdf',
-    date: '2024-03-16T18:04:33.256Z',
-  },
-  {
-    id: 5,
-    name: 'Report name',
-    fileName: 'report-file-name.pdf',
-    date: '2024-03-16T18:04:33.256Z',
-  },
-  {
-    id: 6,
-    name: 'Report name',
-    fileName: 'report-file-name.pdf',
-    date: '2024-03-16T18:04:33.256Z',
-  },
-  {
-    id: 7,
-    name: 'Report name',
-    fileName: 'report-file-name.pdf',
-    date: '2024-03-16T18:04:33.256Z',
-  },
-  {
-    id: 8,
-    name: 'Report name',
-    fileName: 'report-file-name.pdf',
+import useAccessToken from '@/hooks/useAccessToken';
+import useUserRole from '@/hooks/useUserRole';
 
-    date: '2024-03-16T18:04:33.256Z',
-  },
-  {
-    id: 9,
-    name: 'Report name',
-    fileName: 'report-file-name.pdf',
-
-    date: '2024-03-16T18:04:33.256Z',
-  },
-  {
-    id: 10,
-    name: 'Report name',
-    fileName: 'report-file-name.pdf',
-
-    date: '2024-03-16T18:04:33.256Z',
-  },
-];
+import type { Report } from '@/types/appointments.type';
 
 interface AppointmentReportsProps {
-  id: string;
+  appointmentId: string;
 }
 
-export default function AppointmentReports({ id }: AppointmentReportsProps) {
+export default function AppointmentReports({
+  appointmentId,
+}: AppointmentReportsProps) {
+  const accessToken = useAccessToken();
+  const { role } = useUserRole();
+
   const { data: reports, isLoading } = useQuery({
-    queryKey: [`reports_${id}`],
+    queryKey: [`reports_${appointmentId}`],
     queryFn: async () => {
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      return reportsData;
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/appointments/${appointmentId}/reports`,
+        {
+          headers: {
+            authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      return response.data as Report[];
     },
+    enabled: !!accessToken,
   });
 
   return (
@@ -92,7 +46,7 @@ export default function AppointmentReports({ id }: AppointmentReportsProps) {
           Appointment Reports
         </span>
 
-        <NewReportButton />
+        {role === 'doctor' && <NewReportButton appointmentId={appointmentId} />}
       </div>
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         {isLoading &&
@@ -105,9 +59,9 @@ export default function AppointmentReports({ id }: AppointmentReportsProps) {
             <ReportItem
               key={report.id}
               id={report.id}
-              title={report.name}
+              title={report.title}
               fileName={report.fileName}
-              date={report.date}
+              date={report.createdAt}
             />
           ))}
       </div>

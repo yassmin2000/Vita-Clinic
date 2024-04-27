@@ -7,7 +7,13 @@ import { Button } from '@/components/ui/button';
 import Modal from '@/components/Modal';
 import CreateReportForm from './CreateReportForm';
 
-export default function NewReportButton() {
+interface NewReportButtonProps {
+  appointmentId: string;
+}
+
+export default function NewReportButton({
+  appointmentId,
+}: NewReportButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -21,7 +27,10 @@ export default function NewReportButton() {
         onClose={() => setIsOpen(false)}
         className="h-fit px-6 py-8"
       >
-        <CreateReportForm onClose={() => setIsOpen(false)} />
+        <CreateReportForm
+          appointmentId={appointmentId}
+          onClose={() => setIsOpen(false)}
+        />
       </Modal>
     </>
   );
