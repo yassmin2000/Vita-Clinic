@@ -77,6 +77,19 @@ export class UsersService {
         avatarURL: true,
         birthDate: true,
         sex: true,
+        isSuperAdmin: true,
+        speciality: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        emr: {
+          select: {
+            id: true,
+            bloodType: true,
+          },
+        },
         address: true,
         createdAt: true,
         updatedAt: true,

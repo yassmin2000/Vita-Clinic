@@ -4,13 +4,15 @@ import axios from 'axios';
 import { useQuery } from '@tanstack/react-query';
 
 import { DataTable } from '@/components/DataTable';
-import { type Admin, columns } from './AdminColumn';
+import { columns } from './AdminColumn';
 import FiltersBar from '@/components/FiltersBar';
 import Pagination from '@/components/Pagination';
 
 import useAccessToken from '@/hooks/useAccessToken';
 import useUserRole from '@/hooks/useUserRole';
 import { useTableOptions } from '@/hooks/useTableOptions';
+
+import type { Admin } from '@/types/users.type';
 
 export default function AdminsTable() {
   const accessToken = useAccessToken();

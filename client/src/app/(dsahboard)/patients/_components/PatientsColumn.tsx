@@ -2,14 +2,14 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { ColumnDef } from '@tanstack/react-table';
+import type { ColumnDef, Row } from '@tanstack/react-table';
 import {
   differenceInYears,
   parseISO,
   format,
   formatDistanceToNow,
 } from 'date-fns';
-import { Eye, MoreHorizontal, Pencil, Trash } from 'lucide-react';
+import { Eye, MoreHorizontal, Pencil, ShieldMinus } from 'lucide-react';
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -23,16 +23,60 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-export type Patient = {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  birthDate: string;
-  sex: 'male' | 'female';
-  bloodType: string;
-  createdAt: string;
-  avatarURL: string;
+import useUserRole from '@/hooks/useUserRole';
+
+import type { Patient } from '@/types/users.type';
+import { bloodTypes } from '@/lib/constants';
+
+const ActionsCell = ({ row }: { row: Row<Patient> }) => {
+  const { role, isSuperAdmin } = useUserRole();
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" className="h-8 w-8 p-0">
+          <span className="sr-only">Open menu</span>
+          <MoreHorizontal className="h-4 w-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+        <Link href={`/users/${row.original.id}`}>
+          <DropdownMenuItem asChild>
+            <div className="flex items-center gap-2">
+              <Eye className="h-4 w-4" /> View Profile
+            </div>
+          </DropdownMenuItem>
+        </Link>
+        <Link href={`/patients/${row.original.id}/emr`}>
+          <DropdownMenuItem asChild>
+            <div className="flex items-center gap-2">
+              <Eye className="h-4 w-4" /> View EMR
+            </div>
+          </DropdownMenuItem>
+        </Link>
+        {role === 'doctor' && (
+          <Link href={`/patients/${row.original.id}/emr/edit`}>
+            <DropdownMenuItem asChild>
+              <div className="flex items-center gap-2">
+                <Pencil className="h-4 w-4" /> Edit EMR
+              </div>
+            </DropdownMenuItem>
+          </Link>
+        )}
+        {isSuperAdmin && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem>
+              <div className="flex items-center gap-2">
+                <ShieldMinus className="h-4 w-4" /> Deactivate
+              </div>
+            </DropdownMenuItem>
+          </>
+        )}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
 };
 
 export const columns: ColumnDef<Patient>[] = [
@@ -77,7 +121,10 @@ export const columns: ColumnDef<Patient>[] = [
     cell: ({ row }) => {
       const gender: string = row.original.sex;
       return (
-        <Badge variant={gender === 'male' ? 'default' : 'female'}>
+        <Badge
+          variant={gender === 'male' ? 'default' : 'female'}
+          className="capitalize"
+        >
           {gender}
         </Badge>
       );
@@ -87,8 +134,17 @@ export const columns: ColumnDef<Patient>[] = [
     accessorKey: 'bloodType',
     header: 'Blood type',
     cell: ({ row }) => {
-      const bloodType = row.original.bloodType;
-      return <Badge variant="outline">{bloodType}</Badge>;
+      const bloodType = row.original.emr?.bloodType;
+
+      if (!bloodType) {
+        return <Badge variant="outline">NA</Badge>;
+      }
+
+      return (
+        <Badge variant="outline">
+          {bloodTypes.find((type) => type.value === bloodType)?.label || 'NA'}
+        </Badge>
+      );
     },
   },
   {
@@ -133,37 +189,6 @@ export const columns: ColumnDef<Patient>[] = [
   },
   {
     id: 'actions',
-    cell: ({ row }) => {
-      const patient = row.original;
-
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem>
-              <Pencil className="mr-2 h-4 w-4" /> Edit
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Trash className="mr-2 h-4 w-4" /> Delete
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <Link href={`/users/${patient.id}`}>
-              <DropdownMenuItem asChild>
-                <div className="flex items-center gap-2">
-                  <Eye className="h-4 w-4" />
-                  View profile
-                </div>
-              </DropdownMenuItem>
-            </Link>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
-    },
+    cell: ActionsCell,
   },
 ];

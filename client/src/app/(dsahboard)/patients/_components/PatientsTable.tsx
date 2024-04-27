@@ -5,13 +5,15 @@ import axios from 'axios';
 import { useQuery } from '@tanstack/react-query';
 
 import { DataTable } from '@/components/DataTable';
-import { columns, type Patient } from './PatientsColumn';
+import { columns } from './PatientsColumn';
 import FiltersBar from '@/components/FiltersBar';
 import Pagination from '@/components/Pagination';
 
 import useAccessToken from '@/hooks/useAccessToken';
 import useUserRole from '@/hooks/useUserRole';
 import { useTableOptions } from '@/hooks/useTableOptions';
+
+import type { Patient } from '@/types/users.type';
 
 export default function PatientsTable() {
   const accessToken = useAccessToken();

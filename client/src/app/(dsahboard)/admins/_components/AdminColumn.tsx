@@ -2,14 +2,14 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { ColumnDef } from '@tanstack/react-table';
+import type { ColumnDef, Row } from '@tanstack/react-table';
 import {
   differenceInYears,
   parseISO,
   format,
   formatDistanceToNow,
 } from 'date-fns';
-import { Eye, MoreHorizontal, Pencil, Sparkles, Trash } from 'lucide-react';
+import { Eye, MoreHorizontal, ShieldMinus, Sparkles } from 'lucide-react';
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -29,16 +29,42 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 
-export type Admin = {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  birthDate: string;
-  sex: 'male' | 'female';
-  isSuperAdmin: boolean;
-  createdAt: string;
-  avatarURL: string;
+import type { Admin } from '@/types/users.type';
+import useUserRole from '@/hooks/useUserRole';
+
+const ActionsCell = ({ row }: { row: Row<Admin> }) => {
+  const { isSuperAdmin } = useUserRole();
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" className="h-8 w-8 p-0">
+          <span className="sr-only">Open menu</span>
+          <MoreHorizontal className="h-4 w-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+        <Link href={`/users/${row.original.id}`}>
+          <DropdownMenuItem asChild>
+            <div className="flex items-center gap-2">
+              <Eye className="h-4 w-4" /> View Profile
+            </div>
+          </DropdownMenuItem>
+        </Link>
+        {isSuperAdmin && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem>
+              <div className="flex items-center gap-2">
+                <ShieldMinus className="h-4 w-4" /> Deactivate
+              </div>
+            </DropdownMenuItem>
+          </>
+        )}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
 };
 
 export const columns: ColumnDef<Admin>[] = [
@@ -98,7 +124,12 @@ export const columns: ColumnDef<Admin>[] = [
     cell: ({ row }) => {
       const sex: string = row.original.sex;
       return (
-        <Badge variant={sex === 'male' ? 'default' : 'female'}>{sex}</Badge>
+        <Badge
+          variant={sex === 'male' ? 'default' : 'female'}
+          className="capitalize"
+        >
+          {sex}
+        </Badge>
       );
     },
   },
@@ -144,37 +175,6 @@ export const columns: ColumnDef<Admin>[] = [
   },
   {
     id: 'actions',
-    cell: ({ row }) => {
-      const admin = row.original;
-
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem>
-              <Pencil className="mr-2 h-4 w-4" /> Edit
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Trash className="mr-2 h-4 w-4" /> Delete
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <Link href={`/users/${admin.id}`}>
-              <DropdownMenuItem asChild>
-                <div className="flex items-center gap-2">
-                  <Eye className="h-4 w-4" />
-                  View profile
-                </div>
-              </DropdownMenuItem>
-            </Link>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
-    },
+    cell: ActionsCell,
   },
 ];

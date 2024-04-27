@@ -1,5 +1,7 @@
 'use client';
 
+import axios from 'axios';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -21,12 +23,15 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-
-import type { BloodType } from '@/types/emr.type';
-import useAccessToken from '@/hooks/useAccessToken';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/components/ui/use-toast';
-import axios from 'axios';
+
+import useAccessToken from '@/hooks/useAccessToken';
+import {
+  alcoholStatus,
+  bloodTypes,
+  drugStatus,
+  smokingStatus,
+} from '@/lib/constants';
 
 const formSchema = z.object({
   weight: z
@@ -57,86 +62,6 @@ const formSchema = z.object({
   alcoholStatus: z.enum(['never', 'former', 'current']).optional(),
   drugsUsage: z.enum(['never', 'former', 'current']).optional(),
 });
-
-const bloodTypes = [
-  {
-    label: 'A+',
-    value: 'a_positive',
-  },
-  {
-    label: 'A-',
-    value: 'a_negative',
-  },
-  {
-    label: 'B+',
-    value: 'b_positive',
-  },
-  {
-    label: 'B-',
-    value: 'b_negative',
-  },
-  {
-    label: 'AB+',
-    value: 'ab_positive',
-  },
-  {
-    label: 'AB-',
-    value: 'ab_negative',
-  },
-  {
-    label: 'O+',
-    value: 'o_positive',
-  },
-  {
-    label: 'O-',
-    value: 'o_negative',
-  },
-];
-
-const smokingStatus = [
-  {
-    label: 'Never Smoked',
-    value: 'never',
-  },
-  {
-    label: 'Former Smoker',
-    value: 'former',
-  },
-  {
-    label: 'Current Smoker',
-    value: 'current',
-  },
-];
-
-const alcoholStatus = [
-  {
-    label: 'Never Drank',
-    value: 'never',
-  },
-  {
-    label: 'Former Drinker',
-    value: 'former',
-  },
-  {
-    label: 'Current Drinker',
-    value: 'current',
-  },
-];
-
-const drugStatus = [
-  {
-    label: 'Never Used',
-    value: 'never',
-  },
-  {
-    label: 'Former User',
-    value: 'former',
-  },
-  {
-    label: 'Current User',
-    value: 'current',
-  },
-];
 
 interface GeneralInformationFormProps {
   patientId: string;
