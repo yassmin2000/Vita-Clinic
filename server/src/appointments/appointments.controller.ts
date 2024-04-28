@@ -22,12 +22,14 @@ import {
 } from './dto/appointments.dto';
 import type { Payload } from 'src/types/payload.type';
 import { ReportsService } from './reports/reports.service';
+import { ScansService } from './scans/scans.service';
 
 @Controller('appointments')
 export class AppointmentsController {
   constructor(
     private readonly appointmentsService: AppointmentsService,
     private readonly reportsService: ReportsService,
+    private readonly scansService: ScansService
   ) {}
 
   @UseGuards(JwtGuard)
@@ -71,6 +73,21 @@ export class AppointmentsController {
     }
 
     return this.reportsService.findAllByAppointmentId(id);
+  }
+
+  @UseGuards(JwtGuard)
+  @Get(':id/scans')
+  async getAppointmentScansById(
+    @Param('id') id: string,
+    @Req() request: Request,
+  ) {
+    const user: Payload = request['user'];
+
+    if (user.role === 'patient') {
+      throw new UnauthorizedException();
+    }
+
+    return this.scansService.findAllByAppointmentId(id);
   }
 
   @UseGuards(JwtGuard)

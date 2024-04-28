@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 
 import { UsersService } from '../users.service';
+import { ScansService } from 'src/appointments/scans/scans.service';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
 
 import { GetAllUsersQuery } from '../dto/users.dto';
@@ -17,7 +18,10 @@ import type { Payload } from 'src/types/payload.type';
 
 @Controller('/users/patients')
 export class PatientsController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly scansService: ScansService,
+  ) {}
 
   @UseGuards(JwtGuard)
   @Get()
@@ -35,5 +39,17 @@ export class PatientsController {
     return this.usersService.findAll('patient', {
       ...query,
     });
+  }
+
+  @UseGuards(JwtGuard)
+  @Get('/scans')
+  async getPatientScans(@Req() request: Request) {
+    const user: Payload = request['user'];
+
+    if (user.role !== 'patient') {
+      throw new UnauthorizedException();
+    }
+
+    return this.scansService.findAllByPatientId(user.id);
   }
 }
