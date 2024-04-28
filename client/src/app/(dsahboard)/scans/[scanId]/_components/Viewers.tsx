@@ -8,7 +8,11 @@ const DICOMViewer = dynamic(() => import('./DICOMViewer'), {
 import useViewerStore from '@/hooks/useViewerStore';
 import { cn } from '@/lib/utils';
 
-export default function Viewers() {
+interface ViewersProps {
+  dicomURLs: string[];
+}
+
+export default function Viewers({ dicomURLs }: ViewersProps) {
   const { firstViewportsCount, secondViewportsCount, splitViewportsBy } =
     useViewerStore();
 
@@ -41,6 +45,7 @@ export default function Viewers() {
           <DICOMViewer
             key={`${firstViewportsCount}_${secondViewportsCount}_${splitViewportsBy}_${i}`}
             index={i}
+            dicomURLs={dicomURLs}
           />
         ))}
       </div>
@@ -61,6 +66,7 @@ export default function Viewers() {
             <DICOMViewer
               key={`${firstViewportsCount}_${secondViewportsCount}_${splitViewportsBy}_${i * 10}`}
               index={(i + 1) * 10}
+              dicomURLs={dicomURLs}
             />
           ))}
         </div>

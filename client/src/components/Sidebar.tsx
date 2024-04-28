@@ -10,7 +10,6 @@ import {
   ShieldPlus,
   UserIcon,
   Cable,
-  View,
   Trash2,
   Pill,
   FileScan,
@@ -64,12 +63,6 @@ const routes = [
     icon: Cable,
     href: '/devices',
     label: 'Devices',
-    isStaff: true,
-  },
-  {
-    icon: View,
-    href: '/dicom-viewer',
-    label: 'DICOM Viewer',
     isStaff: true,
   },
   {
