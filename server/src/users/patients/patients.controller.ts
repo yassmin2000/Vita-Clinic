@@ -15,6 +15,8 @@ import { ScansService } from 'src/appointments/scans/scans.service';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
 
 import { GetAllUsersQuery } from '../dto/users.dto';
+import { GetPatientReportsQuery } from 'src/appointments/reports/dto/reports.dto';
+import { GetPatientScansQuery } from 'src/appointments/scans/dto/scans.dto';
 import type { Payload } from 'src/types/payload.type';
 
 @Controller('/users/patients')
@@ -44,25 +46,34 @@ export class PatientsController {
   }
 
   @UseGuards(JwtGuard)
-  @Get('/scans')
-  async getPatientScans(@Req() request: Request) {
+  @Get('/reports')
+  async getPatientReports(
+    @Req() request: Request,
+    @Query(new ValidationPipe({ transform: true }))
+    query: GetPatientReportsQuery,
+  ) {
     const user: Payload = request['user'];
 
     if (user.role !== 'patient') {
       throw new UnauthorizedException();
     }
 
-    return this.reportsService.findAllByPatientId(user.id);
+    return this.reportsService.findAllByPatientId(user.id, query);
   }
 
-  @Get('/reports')
-  async getPatientReports(@Req() request: Request) {
+  @UseGuards(JwtGuard)
+  @Get('/scans')
+  async getPatientScans(
+    @Req() request: Request,
+    @Query(new ValidationPipe({ transform: true }))
+    query: GetPatientScansQuery,
+  ) {
     const user: Payload = request['user'];
 
     if (user.role !== 'patient') {
       throw new UnauthorizedException();
     }
 
-    return this.scansService.findAllByPatientId(user.id);
+    return this.scansService.findAllByPatientId(user.id, query);
   }
 }

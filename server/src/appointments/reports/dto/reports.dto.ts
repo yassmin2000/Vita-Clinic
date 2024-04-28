@@ -2,11 +2,13 @@ import { PartialType } from '@nestjs/mapped-types';
 import {
   IsBoolean,
   IsIn,
+  IsInt,
   IsNotEmpty,
   IsOptional,
   IsString,
   IsUrl,
 } from 'class-validator';
+import { Transform } from 'class-transformer';
 
 export class CreateReportDto {
   @IsNotEmpty()
@@ -39,4 +41,24 @@ export class CreateMessageDto {
 
   @IsBoolean()
   isUserMessage: boolean;
+}
+
+export class GetPatientReportsQuery {
+  @IsOptional()
+  @IsInt()
+  @Transform(({ value }) => parseInt(value), { toClassOnly: true })
+  page?: number;
+
+  @IsOptional()
+  @IsInt()
+  @Transform(({ value }) => parseInt(value), { toClassOnly: true })
+  limit?: number;
+
+  @IsOptional()
+  @IsString()
+  value?: string;
+
+  @IsOptional()
+  @IsIn(['name-desc', 'name-asc', 'createdAt-desc', 'createdAt-asc'])
+  sort?: 'name-desc' | 'name-asc' | 'createdAt-desc' | 'createdAt-asc';
 }

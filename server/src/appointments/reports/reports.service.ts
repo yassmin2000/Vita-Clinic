@@ -8,6 +8,7 @@ import { PrismaService } from 'src/prisma.service';
 import {
   CreateMessageDto,
   CreateReportDto,
+  GetPatientReportsQuery,
   UpdateReportDto,
 } from './dto/reports.dto';
 
@@ -24,12 +25,32 @@ export class ReportsService {
     });
   }
 
-  async findAllByPatientId(patientId: string) {
+  async findAllByPatientId(
+    patientId: string,
+    {
+      page = 1,
+      limit = 10,
+      value = '',
+      sort = 'createdAt-desc',
+    }: GetPatientReportsQuery,
+  ) {
+    const [sortField, sortOrder] = sort.split('-') as [string, 'desc' | 'asc'];
+
     return this.prisma.report.findMany({
-      where: { appointment: { patientId } },
-      include: {
-        appointment: true,
+      where: {
+        appointment: { patientId },
+        title: { contains: value, mode: 'insensitive' },
       },
+      skip: (page - 1) * limit,
+      take: limit,
+      orderBy: [
+        {
+          title: sortField === 'name' ? sortOrder : undefined,
+        },
+        {
+          createdAt: sortField === 'createdAt' ? sortOrder : undefined,
+        },
+      ],
     });
   }
 

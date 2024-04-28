@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import axios from 'axios';
 import { useQuery } from '@tanstack/react-query';
 
 import FiltersBar from '@/components/FiltersBar';
@@ -8,7 +9,10 @@ import ScanItem from '@/components/ScanItem';
 import Pagination from '@/components/Pagination';
 import ScanItemSkeleton from '@/components/ScanItemSkeleton';
 
+import useAccessToken from '@/hooks/useAccessToken';
 import { useTableOptions } from '@/hooks/useTableOptions';
+
+import type { Scan } from '@/types/appointments.type';
 
 const scansData = [
   {
@@ -62,19 +66,31 @@ const scansData = [
 ];
 
 export default function ScansList() {
-  const { currentPage, countPerPage, reset, setSortBy } = useTableOptions();
+  const { currentPage, countPerPage, reset, setSortBy, searchValue, sortBy } =
+    useTableOptions();
+  const accessToken = useAccessToken();
 
   const {
     data: scans,
     refetch,
     isLoading,
   } = useQuery({
-    // Handle real data fetching later
-    queryKey: [`scans`],
+    queryKey: [
+      `scans_page_${currentPage}_count_${countPerPage}_sort_${sortBy}_search_${searchValue}`,
+    ],
     queryFn: async () => {
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      return scansData;
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/users/patients/scans?page=${currentPage}&limit=${countPerPage}&value=${searchValue}&sort=${sortBy}`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      return response.data as Scan[];
     },
+    enabled: !!accessToken,
   });
 
   useEffect(() => {
@@ -104,10 +120,10 @@ export default function ScansList() {
           scans.map((scan) => (
             <ScanItem
               key={scan.id}
-              id={`${scan.id}`}
-              title={scan.name}
-              modality={scan.modality}
-              date={scan.date}
+              id={scan.id}
+              title={scan.title}
+              modality={scan.modality.name}
+              date={scan.createdAt}
             />
           ))}
       </div>

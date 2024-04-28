@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import axios from 'axios';
 import { useQuery } from '@tanstack/react-query';
 
 import FiltersBar from '@/components/FiltersBar';
@@ -8,88 +9,37 @@ import ReportItem from '@/components/ReportItem';
 import Pagination from '@/components/Pagination';
 import ReportItemSkeleton from '@/components/ReportItemSkeleton';
 
+import useAccessToken from '@/hooks/useAccessToken';
 import { useTableOptions } from '@/hooks/useTableOptions';
 
-const reportsData = [
-  {
-    id: 1,
-    name: 'Report name',
-    fileName: 'report-file-name.pdf',
-    date: '2024-03-16T18:04:33.256Z',
-  },
-  {
-    id: 2,
-    name: 'Report name',
-    fileName: 'report-file-name.pdf',
-    date: '2024-03-16T18:04:33.256Z',
-  },
-  {
-    id: 3,
-    name: 'Report name',
-    fileName: 'report-file-name.pdf',
-    date: '2024-03-16T18:04:33.256Z',
-  },
-  {
-    id: 4,
-    name: 'Report name',
-    fileName: 'report-file-name.pdf',
-    date: '2024-03-16T18:04:33.256Z',
-  },
-  {
-    id: 5,
-    name: 'Report name',
-    fileName: 'report-file-name.pdf',
-    date: '2024-03-16T18:04:33.256Z',
-  },
-  {
-    id: 6,
-    name: 'Report name',
-    fileName: 'report-file-name.pdf',
-    date: '2024-03-16T18:04:33.256Z',
-  },
-  {
-    id: 7,
-    name: 'Report name',
-    fileName: 'report-file-name.pdf',
-    date: '2024-03-16T18:04:33.256Z',
-  },
-  {
-    id: 8,
-    name: 'Report name',
-    fileName: 'report-file-name.pdf',
-
-    date: '2024-03-16T18:04:33.256Z',
-  },
-  {
-    id: 9,
-    name: 'Report name',
-    fileName: 'report-file-name.pdf',
-
-    date: '2024-03-16T18:04:33.256Z',
-  },
-  {
-    id: 10,
-    name: 'Report name',
-    fileName: 'report-file-name.pdf',
-
-    date: '2024-03-16T18:04:33.256Z',
-  },
-];
+import type { Report } from '@/types/appointments.type';
 
 export default function ReportsList() {
-  const { currentPage, countPerPage, reset, setSortBy } = useTableOptions();
+  const { currentPage, countPerPage, reset, setSortBy, searchValue, sortBy } =
+    useTableOptions();
+  const accessToken = useAccessToken();
 
   const {
     data: reports,
     refetch,
     isLoading,
   } = useQuery({
-    // Handle real data fetching later
-    queryKey: [`reports`],
+    queryKey: [
+      `reports_page_${currentPage}_count_${countPerPage}_sort_${sortBy}_search_${searchValue}`,
+    ],
     queryFn: async () => {
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      return reportsData;
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/users/patients/reports?page=${currentPage}&limit=${countPerPage}&value=${searchValue}&sort=${sortBy}`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      return response.data as Report[];
     },
+    enabled: !!accessToken,
   });
 
   useEffect(() => {
@@ -119,10 +69,10 @@ export default function ReportsList() {
           reports.map((report) => (
             <ReportItem
               key={report.id}
-              id={`report.id`}
-              title={report.name}
+              id={report.id}
+              title={report.title}
               fileName={report.fileName}
-              date={report.date}
+              date={report.createdAt}
             />
           ))}
       </div>

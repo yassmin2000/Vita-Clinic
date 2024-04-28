@@ -1,15 +1,32 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 
-import { CreateScanDto, UpdateScanDto } from './dto/scans.dto';
+import {
+  CreateScanDto,
+  GetPatientScansQuery,
+  UpdateScanDto,
+} from './dto/scans.dto';
 
 @Injectable()
 export class ScansService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findAllByPatientId(patientId: string) {
+  async findAllByPatientId(
+    patientId: string,
+    {
+      page = 1,
+      limit = 10,
+      value = '',
+      sort = 'createdAt-desc',
+    }: GetPatientScansQuery,
+  ) {
+    const [sortField, sortOrder] = sort.split('-') as [string, 'desc' | 'asc'];
+
     return this.prisma.scan.findMany({
-      where: { appointment: { patientId } },
+      where: {
+        appointment: { patientId },
+        title: { contains: value, mode: 'insensitive' },
+      },
       select: {
         title: true,
         description: true,
@@ -18,6 +35,16 @@ export class ScansService {
         modality: true,
         appointment: true,
       },
+      skip: (page - 1) * limit,
+      take: limit,
+      orderBy: [
+        {
+          title: sortField === 'name' ? sortOrder : undefined,
+        },
+        {
+          createdAt: sortField === 'createdAt' ? sortOrder : undefined,
+        },
+      ],
     });
   }
 
