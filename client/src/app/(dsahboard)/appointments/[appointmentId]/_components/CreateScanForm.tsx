@@ -24,9 +24,14 @@ import { Progress } from '@/components/ui/progress';
 import { useUploadThing } from '@/lib/uploadthing';
 import { cn } from '@/lib/utils';
 import { Combobox } from '@/components/ui/combobox';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import axios from 'axios';
+import useAccessToken from '@/hooks/useAccessToken';
+import { useToast } from '@/components/ui/use-toast';
+import { PriceLookup } from '@/types/settings.type';
 
 const formSchema = z.object({
-  scanName: z
+  title: z
     .string({
       required_error: 'Scan name is required.',
     })
@@ -40,50 +45,143 @@ const formSchema = z.object({
 });
 
 interface CreateScanFormProps {
+  appointmentId: string;
   onClose: () => void;
 }
 
-export default function CreateScanForm({ onClose }: CreateScanFormProps) {
+export default function CreateScanForm({
+  appointmentId,
+  onClose,
+}: CreateScanFormProps) {
   const [files, setFiles] = useState<File[]>([]);
   const [fileError, setFileError] = useState(false);
+
+  const [currentStep, setCurrentStep] = useState(1);
   const [isUploading, setIsUploading] = useState(false);
   const [progressValue, setProgressValue] = useState(0);
-  const [isSaving, setIsSaving] = useState(false);
+
+  const { startUpload } = useUploadThing('dicomUploader');
+  const accessToken = useAccessToken();
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
   });
-  const isLoading = form.formState.isSubmitting;
+
+  const { data: modalities, isLoading: isLoadingModalities } = useQuery({
+    queryKey: ['modalities_form'],
+    queryFn: async () => {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/settings/modalities`,
+        {
+          headers: {
+            authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      const data = response.data as PriceLookup[];
+
+      return data.map((modality) => ({
+        label: `${modality.name} (${modality.price}$)`,
+        value: modality.id,
+      }));
+    },
+    enabled: !!accessToken,
+  });
+
+  const { mutate: createScan, isPending } = useMutation({
+    mutationFn: async () => {
+      if (files.length === 0) {
+        setFileError(true);
+        return;
+      }
+
+      const scanURLs = await handleUpload(files);
+
+      const body = {
+        title: form.getValues('title'),
+        description: form.getValues('notes'),
+        scanURLs: scanURLs.map((url) => url.replace('https://', 'dicomweb://')),
+        appointmentId,
+        modalityId: form.getValues('modality'),
+      };
+
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/scans`,
+        body,
+        {
+          headers: {
+            authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      onClose();
+      return response;
+    },
+    onError: () => {
+      return toast({
+        title: `Failed to create new scan`,
+        description: 'Please try again later.',
+        variant: 'destructive',
+      });
+    },
+    onSuccess: () => {
+      return toast({
+        title: `Scan created successfully`,
+        description: 'The scan has been created successfully.',
+      });
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({
+        queryKey: [`scans_${appointmentId}`],
+      });
+    },
+  });
+
+  const startSimulateProgress = () => {
+    setProgressValue(0);
+
+    const interval = setInterval(() => {
+      setProgressValue((value) => {
+        if (value >= 95) {
+          clearInterval(interval);
+          return value;
+        }
+        return value + 5;
+      });
+    }, 500);
+
+    return interval;
+  };
 
   const handleUpload = async (files: File[]) => {
     setIsUploading(true);
-    // Handle uploading DICOM images to the server
-  };
+    const progressInterval = startSimulateProgress();
 
-  const [currentStep, setCurrentStep] = useState(1);
+    const res = await startUpload(files);
+
+    if (!res) {
+      throw new Error('Failed to upload');
+    }
+
+    clearInterval(progressInterval);
+    setProgressValue(100);
+
+    return res.map((file) => file.url);
+  };
 
   const onSubmit = () => {
     setCurrentStep((step) => step + 1);
   };
 
-  const createScan = async () => {
-    if (files.length === 0) {
-      setFileError(true);
-      return;
-    }
-
-    setIsSaving(true);
-    handleUpload(files);
-
-    // Save new scan to database
-
-    setIsSaving(false);
-    onClose();
-  };
+  const isLoading = isLoadingModalities || isPending;
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 px-2">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 p-2">
         {currentStep === 1 && (
           <>
             <div className="w-full space-y-2">
@@ -97,11 +195,11 @@ export default function CreateScanForm({ onClose }: CreateScanFormProps) {
             </div>
             <div className="flex flex-col gap-4">
               <FormField
-                name="scanName"
+                name="title"
                 control={form.control}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel required>Scan Name</FormLabel>
+                    <FormLabel required>Scan Title</FormLabel>
                     <FormControl>
                       <Input
                         disabled={isLoading}
@@ -125,28 +223,7 @@ export default function CreateScanForm({ onClose }: CreateScanFormProps) {
                         onChange={field.onChange}
                         placeholder="Select modality..."
                         inputPlaceholder="Search modality..."
-                        options={[
-                          {
-                            value: 'CT',
-                            label: 'CT',
-                          },
-                          {
-                            value: 'MRI',
-                            label: 'MRI',
-                          },
-                          {
-                            value: 'X-Ray',
-                            label: 'X-Ray',
-                          },
-                          {
-                            value: 'Ultrasound',
-                            label: 'Ultrasound',
-                          },
-                          {
-                            value: 'PET',
-                            label: 'PET',
-                          },
-                        ]}
+                        options={modalities || []}
                       />
                     </FormControl>
                     <FormMessage />
@@ -180,7 +257,24 @@ export default function CreateScanForm({ onClose }: CreateScanFormProps) {
           <Dropzone
             multiple={true}
             disabled={isUploading}
-            onDropAccepted={(files) => setFiles(files)}
+            onDropAccepted={(files) =>
+              setFiles(
+                files.sort((a, b) => {
+                  const regex = /(\d+)/g;
+                  const matchA = a.name.match(regex);
+                  const matchB = b.name.match(regex);
+                  const numA = matchA ? parseInt(matchA[0]) : 0;
+                  const numB = matchB ? parseInt(matchB[0]) : 0;
+                  if (numA < numB) {
+                    return -1;
+                  } else if (numA > numB) {
+                    return 1;
+                  } else {
+                    return a.name.localeCompare(b.name);
+                  }
+                })
+              )
+            }
           >
             {({ getRootProps, acceptedFiles }) => (
               <div className="flex flex-col gap-2">
@@ -215,21 +309,19 @@ export default function CreateScanForm({ onClose }: CreateScanFormProps) {
 
                       {acceptedFiles && acceptedFiles.length > 0 && (
                         <div className="mb-2 space-y-2 overflow-y-auto">
-                          {acceptedFiles
-                            .sort((a, b) => a.name.localeCompare(b.name))
-                            .map((file) => (
-                              <div
-                                key={file.name}
-                                className="flex max-w-xs items-center divide-x divide-zinc-200 overflow-hidden rounded-md bg-white outline outline-[1px] outline-zinc-200"
-                              >
-                                <div className="grid h-full place-items-center px-3 py-2">
-                                  <File className="h-4 w-4 text-blue-500" />
-                                </div>
-                                <div className="h-full truncate px-3 py-2 text-sm">
-                                  {file.name}
-                                </div>
+                          {files.map((file) => (
+                            <div
+                              key={file.name}
+                              className="flex max-w-xs items-center divide-x divide-zinc-200 overflow-hidden rounded-md bg-white outline outline-[1px] outline-zinc-200"
+                            >
+                              <div className="grid h-full place-items-center px-3 py-2">
+                                <File className="h-4 w-4 text-blue-500" />
                               </div>
-                            ))}
+                              <div className="h-full truncate px-3 py-2 text-sm">
+                                {file.name}
+                              </div>
+                            </div>
+                          ))}
                         </div>
                       )}
 
@@ -261,7 +353,7 @@ export default function CreateScanForm({ onClose }: CreateScanFormProps) {
           <Button
             type="button"
             size="sm"
-            disabled={currentStep === 1 || isSaving}
+            disabled={currentStep === 1 || isLoading}
             onClick={() => setCurrentStep((step) => step - 1)}
             className="flex items-center gap-2"
           >
@@ -282,7 +374,7 @@ export default function CreateScanForm({ onClose }: CreateScanFormProps) {
             <Button
               type="button"
               size="sm"
-              disabled={isSaving}
+              disabled={isLoading}
               onClick={() => {
                 if (files.length === 0) {
                   setFileError(true);
@@ -292,7 +384,7 @@ export default function CreateScanForm({ onClose }: CreateScanFormProps) {
                 }
               }}
             >
-              Create Report
+              Create Scan
             </Button>
           )}
         </div>
