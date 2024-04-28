@@ -14,57 +14,6 @@ import { useTableOptions } from '@/hooks/useTableOptions';
 
 import type { Scan } from '@/types/appointments.type';
 
-const scansData = [
-  {
-    id: 1,
-    name: 'Scan name',
-    date: '2024-03-16T18:04:33.256Z',
-    modality: 'CT',
-  },
-  {
-    id: 2,
-    name: 'Scan name',
-    date: '2024-03-16T18:04:33.256Z',
-    modality: 'MRI',
-  },
-  {
-    id: 3,
-    name: 'Scan name',
-    date: '2024-03-16T18:04:33.256Z',
-    modality: 'MRI',
-  },
-  {
-    id: 4,
-    name: 'Scan name',
-    date: '2024-03-16T18:04:33.256Z',
-    modality: 'X-Ray',
-  },
-  {
-    id: 5,
-    name: 'Scan name',
-    date: '2024-03-16T18:04:33.256Z',
-    modality: 'PET',
-  },
-  {
-    id: 6,
-    name: 'Scan name',
-    date: '2024-03-16T18:04:33.256Z',
-    modality: 'PET',
-  },
-  {
-    id: 7,
-    name: 'Scan name',
-    date: '2024-03-16T18:04:33.256Z',
-    modality: 'MRI',
-  },
-  {
-    id: 8,
-    name: 'Scan name',
-    date: '2024-03-16T18:04:33.256Z',
-    modality: 'MRI',
-  },
-];
-
 export default function ScansList() {
   const { currentPage, countPerPage, reset, setSortBy, searchValue, sortBy } =
     useTableOptions();
