@@ -7,7 +7,11 @@ import { Button } from '@/components/ui/button';
 import Modal from '@/components/Modal';
 import CreateScanForm from './CreateScanForm';
 
-export default function NewScanButton() {
+interface NewScanButtonProps {
+  appointmentId: string;
+}
+
+export default function NewScanButton({ appointmentId }: NewScanButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -21,7 +25,10 @@ export default function NewScanButton() {
         onClose={() => setIsOpen(false)}
         className="h-fit px-4 py-8"
       >
-        <CreateScanForm onClose={() => setIsOpen(false)} />
+        <CreateScanForm
+          appointmentId={appointmentId}
+          onClose={() => setIsOpen(false)}
+        />
       </Modal>
     </>
   );

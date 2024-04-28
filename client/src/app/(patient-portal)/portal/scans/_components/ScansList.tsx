@@ -104,7 +104,7 @@ export default function ScansList() {
           scans.map((scan) => (
             <ScanItem
               key={scan.id}
-              id={scan.id}
+              id={`${scan.id}`}
               title={scan.name}
               modality={scan.modality}
               date={scan.date}

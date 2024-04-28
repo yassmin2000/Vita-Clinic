@@ -8,7 +8,7 @@ import { Button } from './ui/button';
 import useUserRole from '@/hooks/useUserRole';
 
 interface ScanItemProps {
-  id: number;
+  id: string;
   title: string;
   date: string;
   modality: string;

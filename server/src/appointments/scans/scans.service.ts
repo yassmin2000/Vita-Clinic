@@ -10,9 +10,13 @@ export class ScansService {
   async findAllByPatientId(patientId: string) {
     return this.prisma.scan.findMany({
       where: { appointment: { patientId } },
-      include: {
-        appointment: true,
+      select: {
+        title: true,
+        description: true,
+        createdAt: true,
+        updatedAt: true,
         modality: true,
+        appointment: true,
       },
     });
   }
@@ -20,9 +24,14 @@ export class ScansService {
   async findAllByAppointmentId(appointmentId: string) {
     return this.prisma.scan.findMany({
       where: { appointmentId },
-      include: {
-        appointment: true,
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        createdAt: true,
+        updatedAt: true,
         modality: true,
+        appointment: true,
       },
     });
   }

@@ -1,73 +1,40 @@
 'use client';
 
+import axios from 'axios';
 import { useQuery } from '@tanstack/react-query';
 
 import ScanItem from '@/components/ScanItem';
 import NewScanButton from './NewScanButton';
 import ScanItemSkeleton from '@/components/ScanItemSkeleton';
 
-const scansData = [
-  {
-    id: 1,
-    name: 'Scan name',
-    date: '2024-03-16T18:04:33.256Z',
-    modality: 'CT',
-  },
-  {
-    id: 2,
-    name: 'Scan name',
-    date: '2024-03-16T18:04:33.256Z',
-    modality: 'MRI',
-  },
-  {
-    id: 3,
-    name: 'Scan name',
-    date: '2024-03-16T18:04:33.256Z',
-    modality: 'MRI',
-  },
-  {
-    id: 4,
-    name: 'Scan name',
-    date: '2024-03-16T18:04:33.256Z',
-    modality: 'X-Ray',
-  },
-  {
-    id: 5,
-    name: 'Scan name',
-    date: '2024-03-16T18:04:33.256Z',
-    modality: 'PET',
-  },
-  {
-    id: 6,
-    name: 'Scan name',
-    date: '2024-03-16T18:04:33.256Z',
-    modality: 'PET',
-  },
-  {
-    id: 7,
-    name: 'Scan name',
-    date: '2024-03-16T18:04:33.256Z',
-    modality: 'MRI',
-  },
-  {
-    id: 8,
-    name: 'Scan name',
-    date: '2024-03-16T18:04:33.256Z',
-    modality: 'MRI',
-  },
-];
+import useAccessToken from '@/hooks/useAccessToken';
+import useUserRole from '@/hooks/useUserRole';
+
+import type { Scan } from '@/types/appointments.type';
 
 interface AppointmentScansProps {
   id: string;
 }
 
 export default function AppointmentScans({ id }: AppointmentScansProps) {
+  const accessToken = useAccessToken();
+  const { role } = useUserRole();
+
   const { data: scans, isLoading } = useQuery({
     queryKey: [`scans_${id}`],
     queryFn: async () => {
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      return scansData;
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/appointments/${id}/scans`,
+        {
+          headers: {
+            authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      return response.data as Scan[];
     },
+    enabled: !!accessToken,
   });
 
   return (
@@ -77,7 +44,7 @@ export default function AppointmentScans({ id }: AppointmentScansProps) {
           Appointment Scans
         </span>
 
-        <NewScanButton />
+        {role === 'doctor' && <NewScanButton appointmentId={id} />}
       </div>
       <div className="grid grid-cols-1 gap-6 divide-y divide-accent md:grid-cols-2 lg:grid-cols-3">
         {isLoading &&
@@ -90,9 +57,9 @@ export default function AppointmentScans({ id }: AppointmentScansProps) {
             <ScanItem
               key={scan.id}
               id={scan.id}
-              title={scan.name}
-              modality={scan.modality}
-              date={scan.date}
+              title={scan.title}
+              modality={scan.modality.name}
+              date={scan.createdAt}
             />
           ))}
       </div>

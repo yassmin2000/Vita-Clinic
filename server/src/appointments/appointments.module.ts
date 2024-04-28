@@ -13,6 +13,7 @@ import { TherapiesService } from 'src/settings/therapies/therapies.service';
 import { ReportsModule } from './reports/reports.module';
 import { ReportsService } from './reports/reports.service';
 import { ScansModule } from './scans/scans.module';
+import { ScansService } from './scans/scans.service';
 
 @Module({
   imports: [ReportsModule, ScansModule],
@@ -22,6 +23,7 @@ import { ScansModule } from './scans/scans.module';
     JwtService,
     PrismaService,
     ReportsService,
+    ScansService,
     BiomarkersService,
     LaboratoryTestsService,
     ModalitiesService,
