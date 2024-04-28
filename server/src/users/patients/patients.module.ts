@@ -3,21 +3,31 @@ import { JwtService } from '@nestjs/jwt';
 
 import { PatientsController } from './patients.controller';
 
-import { PatientsService } from './patients.service';
 import { UsersService } from '../users.service';
 import { PrismaService } from 'src/prisma.service';
-import { OtpService } from 'src/otp/otp.service';
+import { AppointmentsService } from 'src/appointments/appointments.service';
 import { ReportsService } from 'src/appointments/reports/reports.service';
 import { ScansService } from 'src/appointments/scans/scans.service';
+import { OtpService } from 'src/otp/otp.service';
+import { BiomarkersService } from 'src/settings/biomarkers/biomarkers.service';
+import { ModalitiesService } from 'src/settings/modalities/modalities.service';
+import { LaboratoryTestsService } from 'src/settings/laboratory-tests/laboratory-tests.service';
+import { ServicesService } from 'src/settings/services/services.service';
+import { TherapiesService } from 'src/settings/therapies/therapies.service';
 
 @Module({
   controllers: [PatientsController],
   providers: [
-    PatientsService,
     JwtService,
     UsersService,
+    AppointmentsService,
     ReportsService,
     ScansService,
+    BiomarkersService,
+    LaboratoryTestsService,
+    ModalitiesService,
+    ServicesService,
+    TherapiesService,
     PrismaService,
     OtpService,
   ],

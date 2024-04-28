@@ -27,13 +27,16 @@ export class AppointmentsService {
     private therapiesService: TherapiesService,
   ) {}
 
-  async findAll({
-    page = 1,
-    limit = 10,
-    status = 'all',
-    value = '',
-    sort = 'date-desc',
-  }: GetAllAppointmentsQuery) {
+  async findAll(
+    {
+      page = 1,
+      limit = 10,
+      status = 'all',
+      value = '',
+      sort = 'date-desc',
+    }: GetAllAppointmentsQuery,
+    patientId?: string,
+  ) {
     const names = value.trim().split(' ');
     const mode = 'insensitive' as 'insensitive';
     const [sortField, sortOrder] = sort.split('-') as [string, 'desc' | 'asc'];
@@ -80,6 +83,7 @@ export class AppointmentsService {
     return this.prisma.appointment.findMany({
       where: {
         status: status === 'all' ? undefined : status,
+        patientId: patientId || undefined,
         OR: nameConditions,
       },
       include: {

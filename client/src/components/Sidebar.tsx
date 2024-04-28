@@ -78,6 +78,12 @@ const routes = [
     isPatient: true,
   },
   {
+    icon: CalendarCheck,
+    href: '/portal/appointments',
+    label: 'Appointments',
+    isPatient: true,
+  },
+  {
     icon: Pill,
     href: '/portal/medications',
     label: 'Medications',
@@ -113,45 +119,47 @@ export default function Sidebar() {
     <div className="flex h-full flex-col space-y-4 overflow-y-auto border-r border-primary/10 bg-secondary text-primary">
       <div className="flex flex-1 justify-center p-3">
         <div className="flex flex-col justify-between">
-          <div className="flex flex-col gap-2">
-            {routes
-              .filter((route) => !route.super)
-              .filter((route) => {
-                if (role === 'patient') return route.isPatient;
-                return route.isStaff;
-              })
-              .map((route) => (
-                <TooltipProvider key={route.href}>
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <div
-                        className={cn(
-                          'group flex w-full cursor-pointer justify-start rounded-lg p-3 text-xs font-medium text-muted-foreground transition hover:bg-primary/10 hover:text-primary',
-                          pathname === route.href &&
-                            'bg-primary/10 text-primary'
-                        )}
-                      >
-                        <Link
-                          href={route.href}
-                          className="flex items-center gap-8"
+          {role && (
+            <div className="flex flex-col gap-2">
+              {routes
+                .filter((route) => !route.super)
+                .filter((route) => {
+                  if (role === 'patient') return route.isPatient;
+                  return route.isStaff;
+                })
+                .map((route) => (
+                  <TooltipProvider key={route.href}>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <div
+                          className={cn(
+                            'group flex w-full cursor-pointer justify-start rounded-lg p-3 text-xs font-medium text-muted-foreground transition hover:bg-primary/10 hover:text-primary',
+                            pathname === route.href &&
+                              'bg-primary/10 text-primary'
+                          )}
                         >
-                          <route.icon className="h-5 w-5" />
+                          <Link
+                            href={route.href}
+                            className="flex items-center gap-8"
+                          >
+                            <route.icon className="h-5 w-5" />
 
-                          <p className="md:hidden">{route.label}</p>
-                        </Link>
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent
-                      side="right"
-                      align="start"
-                      className="hidden md:block"
-                    >
-                      <p>{route.label}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              ))}
-          </div>
+                            <p className="md:hidden">{route.label}</p>
+                          </Link>
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent
+                        side="right"
+                        align="start"
+                        className="hidden md:block"
+                      >
+                        <p>{route.label}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                ))}
+            </div>
+          )}
 
           {role !== 'patient' && (
             <div className="flex flex-col gap-2">

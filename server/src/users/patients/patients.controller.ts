@@ -10,11 +10,13 @@ import {
 } from '@nestjs/common';
 
 import { UsersService } from '../users.service';
+import { AppointmentsService } from 'src/appointments/appointments.service';
 import { ReportsService } from 'src/appointments/reports/reports.service';
 import { ScansService } from 'src/appointments/scans/scans.service';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
 
 import { GetAllUsersQuery } from '../dto/users.dto';
+import { GetAllAppointmentsQuery } from 'src/appointments/dto/appointments.dto';
 import { GetPatientReportsQuery } from 'src/appointments/reports/dto/reports.dto';
 import { GetPatientScansQuery } from 'src/appointments/scans/dto/scans.dto';
 import type { Payload } from 'src/types/payload.type';
@@ -23,6 +25,7 @@ import type { Payload } from 'src/types/payload.type';
 export class PatientsController {
   constructor(
     private readonly usersService: UsersService,
+    private readonly appointmentsService: AppointmentsService,
     private readonly reportsService: ReportsService,
     private readonly scansService: ScansService,
   ) {}
@@ -43,6 +46,22 @@ export class PatientsController {
     return this.usersService.findAll('patient', {
       ...query,
     });
+  }
+
+  @UseGuards(JwtGuard)
+  @Get('/appointments')
+  async getPatientsAppointments(
+    @Query(new ValidationPipe({ transform: true }))
+    query: GetAllAppointmentsQuery,
+    @Req() request: Request,
+  ) {
+    const user: Payload = request['user'];
+
+    if (user.role !== 'patient') {
+      throw new UnauthorizedException();
+    }
+
+    return this.appointmentsService.findAll(query, user.id);
   }
 
   @UseGuards(JwtGuard)

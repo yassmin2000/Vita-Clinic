@@ -37,7 +37,7 @@ export default function AppointmentsList() {
     ],
     queryFn: async () => {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/appointments?page=${currentPage}&limit=${countPerPage}&status=${currentAppointmentStatus}&value=${searchValue}&sort=${sortBy}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/users/patients/appointments?page=${currentPage}&limit=${countPerPage}&status=${currentAppointmentStatus}&value=${searchValue}&sort=${sortBy}`,
         {
           headers: {
             authorization: `Bearer ${accessToken}`,
@@ -63,7 +63,6 @@ export default function AppointmentsList() {
         searchFilter
         searchPlaceholder="Search by patient name or doctor name"
         sortingEnabled
-        sortByPatientNameEnabled
         sortByDoctorNameEnabled
         sortByAppointmentDateEnabled
         addNewButton={false}

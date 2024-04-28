@@ -1,3 +1,5 @@
+'use client';
+
 import Link from 'next/link';
 import { format, parseISO } from 'date-fns';
 import {
@@ -22,7 +24,9 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Button, buttonVariants } from '@/components/ui/button';
 
+import useUserRole from '@/hooks/useUserRole';
 import { cn } from '@/lib/utils';
+
 import type { AppointmentStatus } from '@/types/appointments.type';
 
 interface AppointmentsListItemProps {
@@ -72,6 +76,7 @@ export default function AppointmentsListItem({
   appointmentDate,
   cancelledAt,
 }: AppointmentsListItemProps) {
+  const { role } = useUserRole();
   const currentStatus = appointmentStatus[status];
 
   return (
@@ -133,41 +138,43 @@ export default function AppointmentsListItem({
         </div>
       </div>
       <div className="flex items-center gap-2">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreVertical className="h-5 w-5" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem>
-              <Eye className="mr-2 h-4 w-4" /> View appointment
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            {status === 'pending' && (
-              <>
-                <DropdownMenuItem>
-                  <Check className="mr-2 h-4 w-4" /> Approve appointment
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <X className="mr-2 h-4 w-4" /> Reject appointment
-                </DropdownMenuItem>
-              </>
-            )}
-            {status !== 'pending' && (
-              <>
-                <DropdownMenuItem disabled={status === 'completed'}>
-                  <Check className="mr-2 h-4 w-4" /> Mark as completed
-                </DropdownMenuItem>
-                <DropdownMenuItem disabled={status === 'cancelled'}>
-                  <X className="mr-2 h-4 w-4" /> Cancel appointment
-                </DropdownMenuItem>
-              </>
-            )}
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {role === 'admin' && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <MoreVertical className="h-5 w-5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <DropdownMenuItem>
+                <Eye className="mr-2 h-4 w-4" /> View appointment
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              {status === 'pending' && (
+                <>
+                  <DropdownMenuItem>
+                    <Check className="mr-2 h-4 w-4" /> Approve appointment
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <X className="mr-2 h-4 w-4" /> Reject appointment
+                  </DropdownMenuItem>
+                </>
+              )}
+              {status !== 'pending' && (
+                <>
+                  <DropdownMenuItem disabled={status === 'completed'}>
+                    <Check className="mr-2 h-4 w-4" /> Mark as completed
+                  </DropdownMenuItem>
+                  <DropdownMenuItem disabled={status === 'cancelled'}>
+                    <X className="mr-2 h-4 w-4" /> Cancel appointment
+                  </DropdownMenuItem>
+                </>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
 
         <Link
           href={`/appointments/${id}`}
