@@ -15,7 +15,11 @@ const poppins = Poppins({
   subsets: ['latin'],
 });
 
-export default function Navbar() {
+interface NavbarProps {
+  role: string;
+}
+
+export default function Navbar({ role }: NavbarProps) {
   const { data: session } = useSession();
 
   useEffect(() => {
@@ -33,7 +37,7 @@ export default function Navbar() {
   return (
     <div className="fixed z-50 flex h-16 w-full items-center justify-between border-b border-primary/10 bg-secondary px-4 py-2">
       <div className="flex items-center">
-        <MobileSidebar />
+        {session && <MobileSidebar role={role} />}
         <Link href="/">
           <p
             className={cn(

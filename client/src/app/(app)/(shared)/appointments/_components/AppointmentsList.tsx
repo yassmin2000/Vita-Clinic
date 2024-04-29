@@ -6,16 +6,18 @@ import { useQuery } from '@tanstack/react-query';
 
 import FiltersBar from '@/components/FiltersBar';
 import Pagination from '@/components/Pagination';
-import AppointmentsListItem from '@/components/AppointmentsListItem';
-import AppointmentItemSkeleton from '@/components/AppointmentItemSkeleton';
+import AppointmentsListItem from './AppointmentsListItem';
+import AppointmentItemSkeleton from './AppointmentItemSkeleton';
 
 import useAccessToken from '@/hooks/useAccessToken';
+import useUserRole from '@/hooks/useUserRole';
 import { useTableOptions } from '@/hooks/useTableOptions';
 
 import type { Appointment } from '@/types/appointments.type';
 
 export default function AppointmentsList() {
   const accessToken = useAccessToken();
+  const { role } = useUserRole();
 
   const {
     sortBy,
@@ -36,14 +38,18 @@ export default function AppointmentsList() {
       `appointments_page_${currentPage}_count_${countPerPage}_status_${currentAppointmentStatus}_sort_${sortBy}_search_${searchValue}`,
     ],
     queryFn: async () => {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/users/patients/appointments?page=${currentPage}&limit=${countPerPage}&status=${currentAppointmentStatus}&value=${searchValue}&sort=${sortBy}`,
-        {
-          headers: {
-            authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
+      let url = '';
+      if (role === 'patient') {
+        url = `${process.env.NEXT_PUBLIC_API_URL}/users/patients/appointments?page=${currentPage}&limit=${countPerPage}&status=${currentAppointmentStatus}&value=${searchValue}&sort=${sortBy}`;
+      } else {
+        url = `${process.env.NEXT_PUBLIC_API_URL}/appointments?page=${currentPage}&limit=${countPerPage}&status=${currentAppointmentStatus}&value=${searchValue}&sort=${sortBy}`;
+      }
+
+      const response = await axios.get(url, {
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+      });
 
       return response.data as Appointment[];
     },
@@ -61,8 +67,13 @@ export default function AppointmentsList() {
         refetch={refetch}
         appointmentStatusFilter
         searchFilter
-        searchPlaceholder="Search by patient name or doctor name"
+        searchPlaceholder={
+          role === 'patient'
+            ? 'Search by doctor name'
+            : 'Search by patient name or doctor name'
+        }
         sortingEnabled
+        sortByPatientNameEnabled={role !== 'patient'}
         sortByDoctorNameEnabled
         sortByAppointmentDateEnabled
         addNewButton={false}

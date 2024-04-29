@@ -5,9 +5,14 @@ import { usePathname } from 'next/navigation';
 import { Menu } from 'lucide-react';
 
 import { Sheet, SheetContent, SheetTrigger } from './ui/sheet';
-import Sidebar from './Sidebar';
+import StaffSidebar from './StaffSidebar';
+import PatientsSidebar from './PatientsSidebar';
 
-export default function MobileSidebar() {
+interface MobileSidebarProps {
+  role: string;
+}
+
+export default function MobileSidebar({ role }: MobileSidebarProps) {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -21,7 +26,7 @@ export default function MobileSidebar() {
         <Menu />
       </SheetTrigger>
       <SheetContent side="left" className="w-fit bg-secondary p-0 pt-10">
-        <Sidebar />
+        {role === 'patient' ? <PatientsSidebar /> : <StaffSidebar />}
       </SheetContent>
     </Sheet>
   );

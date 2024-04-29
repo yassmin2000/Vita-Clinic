@@ -24,10 +24,7 @@ export default function ReportItem({
 
   return (
     <Card className="col-span-1 divide-y divide-accent rounded-lg transition-all hover:shadow-lg dark:shadow-white/10">
-      <Link
-        href={role === 'patient' ? `/portal/reports/${id}` : `/reports/${id}`}
-        className="flex flex-col gap-2"
-      >
+      <Link href={`/reports/${id}`} className="flex flex-col gap-2">
         <div className="flex w-full items-center justify-between space-x-6 px-6 pt-6">
           <div className="h-10 w-10 flex-shrink-0 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500" />
           <div className="flex-1 truncate">

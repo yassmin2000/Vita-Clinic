@@ -16,7 +16,7 @@ export default async function AuthLayout({
 
   return (
     <div className="h-full">
-      <Navbar />
+      <Navbar role={''} />
       <main className="h-full pt-16">
         <div className="h-full space-y-2 px-4">{children}</div>
       </main>
