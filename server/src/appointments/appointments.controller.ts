@@ -14,6 +14,8 @@ import {
 } from '@nestjs/common';
 
 import { AppointmentsService } from './appointments.service';
+import { ReportsService } from './reports/reports.service';
+import { ScansService } from './scans/scans.service';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
 
 import {
@@ -21,15 +23,13 @@ import {
   GetAllAppointmentsQuery,
 } from './dto/appointments.dto';
 import type { Payload } from 'src/types/payload.type';
-import { ReportsService } from './reports/reports.service';
-import { ScansService } from './scans/scans.service';
 
 @Controller('appointments')
 export class AppointmentsController {
   constructor(
     private readonly appointmentsService: AppointmentsService,
     private readonly reportsService: ReportsService,
-    private readonly scansService: ScansService
+    private readonly scansService: ScansService,
   ) {}
 
   @UseGuards(JwtGuard)
@@ -53,11 +53,13 @@ export class AppointmentsController {
   async getAppointmentById(@Param('id') id: string, @Req() request: Request) {
     const user: Payload = request['user'];
 
-    if (user.role === 'patient') {
+    const appointment = await this.appointmentsService.findById(id);
+
+    if (user.role === 'patient' && appointment.patientId !== user.id) {
       throw new UnauthorizedException();
     }
 
-    return this.appointmentsService.findById(id);
+    return appointment;
   }
 
   @UseGuards(JwtGuard)
@@ -68,11 +70,15 @@ export class AppointmentsController {
   ) {
     const user: Payload = request['user'];
 
+    const reports = await this.reportsService.findAllByAppointmentId(id);
+
     if (user.role === 'patient') {
-      throw new UnauthorizedException();
+      return reports.filter(
+        (report) => report.appointment.patientId === user.id,
+      );
     }
 
-    return this.reportsService.findAllByAppointmentId(id);
+    return reports;
   }
 
   @UseGuards(JwtGuard)
@@ -83,11 +89,13 @@ export class AppointmentsController {
   ) {
     const user: Payload = request['user'];
 
+    const scans = await this.scansService.findAllByAppointmentId(id);
+
     if (user.role === 'patient') {
-      throw new UnauthorizedException();
+      return scans.filter((scan) => scan.appointment.patientId === user.id);
     }
 
-    return this.scansService.findAllByAppointmentId(id);
+    return scans;
   }
 
   @UseGuards(JwtGuard)
