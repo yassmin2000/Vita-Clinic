@@ -175,7 +175,7 @@ export default function LaboratoryTestForm({
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit((e) => mutateLaboratoryTest(e))}
-        className="space-y-6 px-4 text-foreground"
+        className="space-y-6 px-4 py-2 text-foreground"
       >
         <div className="w-full space-y-2">
           {currentId ? (
