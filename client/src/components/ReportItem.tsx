@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { format } from 'date-fns';
-import { Info, Pencil, Plus, Trash } from 'lucide-react';
+import { Info, Pencil, Plus } from 'lucide-react';
 
 import { Card } from './ui/card';
 import { Button } from './ui/button';
@@ -48,18 +48,14 @@ export default function ReportItem({
         <div className="flex gap-1">
           {role && role === 'doctor' && (
             <Button size="sm">
-              <Pencil className="mr-2 h-4 w-4" /> Edit
+              <Pencil className="h-4 w-4 sm:mr-2" />
+              <span className="sr-only sm:not-sr-only">Edit</span>
             </Button>
           )}
-          {role && role !== 'patient' && (
-            <Button size="sm" variant="destructive">
-              <Trash className="mr-2 h-4 w-4" /> Delete
-            </Button>
-          )}
-
           {role && role === 'patient' && (
             <Button size="sm">
-              <Info className="mr-2 h-4 w-4" /> Details
+              <Info className="h-4 w-4 sm:mr-2" />
+              <span className="sr-only sm:not-sr-only">Details</span>
             </Button>
           )}
         </div>
