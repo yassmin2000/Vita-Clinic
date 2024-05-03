@@ -433,7 +433,7 @@ model Modality {
 }
 
 model Scan {
-  id          String @id @default(uuid())
+  id          String  @id @default(uuid())
   title       String
   description String?
 
@@ -451,6 +451,7 @@ model Scan {
 
 model Billing {
   id     String        @id @default(uuid())
+  number Int           @unique @default(autoincrement())
   date   DateTime
   amount Float
   status BillingStatus @default(initial)

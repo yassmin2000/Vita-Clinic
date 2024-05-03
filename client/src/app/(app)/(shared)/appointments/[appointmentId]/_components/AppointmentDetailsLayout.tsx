@@ -62,6 +62,9 @@ export default function AppointmentDetailsLayout({
           serviceLabWorks={appointment.services.labWorks.map(
             (laboratoryTest) => laboratoryTest.name
           )}
+          billingNumber={appointment.billing.number}
+          billingStatus={appointment.billing.status}
+          billingAmount={appointment.billing.amount}
         />
       )}
 

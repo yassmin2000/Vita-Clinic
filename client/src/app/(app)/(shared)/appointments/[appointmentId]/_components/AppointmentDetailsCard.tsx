@@ -6,6 +6,7 @@ import {
   Check,
   CheckCheck,
   CircleOff,
+  Download,
   MoreVertical,
   Timer,
   X,
@@ -15,6 +16,7 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
@@ -27,6 +29,9 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+
+import useUserRole from '@/hooks/useUserRole';
 
 import type { AppointmentStatus } from '@/types/appointments.type';
 
@@ -44,6 +49,9 @@ interface AppointmentDetailsCardProps {
   therapyName?: string;
   serviceScans: string[];
   serviceLabWorks: string[];
+  billingNumber: number;
+  billingStatus: string;
+  billingAmount: number;
 }
 
 export default function AppointmentDetailsCard({
@@ -60,7 +68,12 @@ export default function AppointmentDetailsCard({
   therapyName,
   serviceScans,
   serviceLabWorks,
+  billingNumber,
+  billingStatus,
+  billingAmount,
 }: AppointmentDetailsCardProps) {
+  const { role } = useUserRole();
+
   return (
     <Card>
       <CardHeader>
@@ -75,38 +88,40 @@ export default function AppointmentDetailsCard({
               </Badge>
             </div>
 
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="h-8 w-8 p-0">
-                  <span className="sr-only">Open menu</span>
-                  <MoreVertical className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
+            {role === 'admin' && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="h-8 w-8 p-0">
+                    <span className="sr-only">Open menu</span>
+                    <MoreVertical className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
 
-              <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                {status === 'pending' && (
-                  <>
-                    <DropdownMenuItem>
-                      <Check className="mr-2 h-4 w-4" /> Approve appointment
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <X className="mr-2 h-4 w-4" /> Reject appointment
-                    </DropdownMenuItem>
-                  </>
-                )}
-                {status !== 'pending' && (
-                  <>
-                    <DropdownMenuItem disabled={status === 'completed'}>
-                      <Check className="mr-2 h-4 w-4" /> Mark as completed
-                    </DropdownMenuItem>
-                    <DropdownMenuItem disabled={status === 'cancelled'}>
-                      <X className="mr-2 h-4 w-4" /> Cancel appointment
-                    </DropdownMenuItem>
-                  </>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                  {status === 'pending' && (
+                    <>
+                      <DropdownMenuItem>
+                        <Check className="mr-2 h-4 w-4" /> Approve appointment
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <X className="mr-2 h-4 w-4" /> Reject appointment
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                  {status !== 'pending' && (
+                    <>
+                      <DropdownMenuItem disabled={status === 'completed'}>
+                        <Check className="mr-2 h-4 w-4" /> Mark as completed
+                      </DropdownMenuItem>
+                      <DropdownMenuItem disabled={status === 'cancelled'}>
+                        <X className="mr-2 h-4 w-4" /> Cancel appointment
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </div>
         </CardTitle>
         <CardDescription>
@@ -208,6 +223,80 @@ export default function AppointmentDetailsCard({
           </div>
         )}
       </CardContent>
+
+      <Separator />
+
+      <CardFooter className="grid grid-cols-1 gap-4 px-6 py-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        <div className="flex flex-col">
+          <span className="font-medium text-primary">Date</span>
+          <span className="text-foreground">
+            {format(parseISO(date), 'do MMM, yyyy')}
+          </span>
+        </div>
+        <div className="flex flex-col">
+          <span className="font-medium text-primary">Time</span>
+          <span className="text-foreground">
+            {format(parseISO(date), 'h:mm a')}
+          </span>
+        </div>
+        <div className="flex flex-col">
+          <span className="font-medium text-primary">Patient</span>
+          <span className="text-foreground">{patientName}</span>
+        </div>
+        <div className="flex flex-col">
+          <span className="font-medium text-primary">Doctor</span>
+          <span className="text-foreground">{doctorName || 'NA'}</span>
+        </div>
+        <div className="flex flex-col">
+          <span className="font-medium text-primary">Service</span>
+          <span className="text-foreground">{serviceName || 'NA'}</span>
+        </div>
+        <div className="flex flex-col">
+          <span className="font-medium text-primary">Therapy</span>
+          <span className="text-foreground">{therapyName || 'NA'}</span>
+        </div>
+        <div className="flex flex-col">
+          <span className="font-medium text-primary">Scans</span>
+          <span className="text-foreground">
+            {serviceScans.length > 0 ? serviceScans.join(', ') : 'NA'}
+          </span>
+        </div>
+        <div className="flex flex-col">
+          <span className="font-medium text-primary">Lab Works</span>
+          <span className="text-foreground">
+            {serviceLabWorks.length > 0 ? serviceLabWorks.join(', ') : 'NA'}
+          </span>
+        </div>
+      </CardFooter>
+
+      <Separator />
+
+      <div className="px-6 py-4">
+        <div className="flex items-center justify-between">
+          <div className="flex flex-col">
+            <span className="font-medium text-primary">Billing</span>
+            <span className="flex items-center text-foreground">
+              Invoice #{billingNumber} -{' '}
+              {billingAmount.toLocaleString('en-US', {
+                style: 'currency',
+                currency: 'USD',
+              })}{' '}
+              <Badge
+                variant={
+                  billingStatus === 'initial' ? 'cancelled' : 'completed'
+                }
+                className="ml-2 capitalize"
+              >
+                {billingStatus === 'initial' ? 'Not Paid' : 'Paid'}
+              </Badge>
+            </span>
+          </div>
+          <Button size="sm" variant="outline">
+            <Download className="mr-2 h-4 w-4" />
+            Export Invoice
+          </Button>
+        </div>
+      </div>
     </Card>
   );
 }

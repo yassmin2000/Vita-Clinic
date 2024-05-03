@@ -63,6 +63,7 @@ export type Scan = {
 
 export type Billing = {
   id: string;
+  number: number;
   date: string;
   amount: number;
   status: string;
