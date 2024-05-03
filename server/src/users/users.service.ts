@@ -114,6 +114,19 @@ export class UsersService {
     });
   }
 
+  async findAllList(role: Role) {
+    return this.prisma.user.findMany({
+      where: {
+        role,
+      },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+      },
+    });
+  }
+
   async findById(id: string) {
     const user = await this.prisma.user.findUnique({
       where: { id },

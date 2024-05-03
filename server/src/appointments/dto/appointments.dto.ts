@@ -9,7 +9,7 @@ import {
 } from 'class-validator';
 import { Transform } from 'class-transformer';
 
-import type { AppointmentStatus } from '@prisma/client';
+import type { AppointmentStatus, BillingStatus } from '@prisma/client';
 
 export class CreateAppointmentDto {
   @IsNotEmpty()
@@ -77,4 +77,14 @@ export class GetAllAppointmentsQuery {
     | 'doctorName-desc'
     | 'bookingDate-desc'
     | 'bookingDate-asc';
+}
+
+export class ApproveAppointmentDto {
+  @IsString()
+  doctorId: string;
+}
+
+export class CompleteAppointmentDto {
+  @IsIn(['paid', 'insurance'])
+  billingStatus: BillingStatus;
 }

@@ -7,22 +7,13 @@ import {
   Check,
   CheckCheck,
   CircleOff,
-  Eye,
-  MoreVertical,
   Timer,
   X,
 } from 'lucide-react';
 
 import { Card } from '@/components/ui/card';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Button, buttonVariants } from '@/components/ui/button';
+import AppointmentDropdownMenu from './AppointmentDropdownMenu';
+import { buttonVariants } from '@/components/ui/button';
 
 import useUserRole from '@/hooks/useUserRole';
 import { cn } from '@/lib/utils';
@@ -31,12 +22,14 @@ import type { AppointmentStatus } from '@/types/appointments.type';
 
 interface AppointmentsListItemProps {
   id: string;
+  appointmentNumber: number;
   patientName: string;
   doctorName: string;
   status: AppointmentStatus;
   bookedAt: string;
   appointmentDate: string;
   cancelledAt: string;
+  queryKey?: string;
 }
 
 const appointmentStatus = {
@@ -69,12 +62,14 @@ const appointmentStatus = {
 
 export default function AppointmentsListItem({
   id,
+  appointmentNumber,
   patientName,
   doctorName,
   status,
   bookedAt,
   appointmentDate,
   cancelledAt,
+  queryKey,
 }: AppointmentsListItemProps) {
   const { role } = useUserRole();
   const currentStatus = appointmentStatus[status];
@@ -139,41 +134,12 @@ export default function AppointmentsListItem({
       </div>
       <div className="flex items-center gap-2">
         {role === 'admin' && (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <MoreVertical className="h-5 w-5" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem>
-                <Eye className="mr-2 h-4 w-4" /> View appointment
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              {status === 'pending' && (
-                <>
-                  <DropdownMenuItem>
-                    <Check className="mr-2 h-4 w-4" /> Approve appointment
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <X className="mr-2 h-4 w-4" /> Reject appointment
-                  </DropdownMenuItem>
-                </>
-              )}
-              {status !== 'pending' && (
-                <>
-                  <DropdownMenuItem disabled={status === 'completed'}>
-                    <Check className="mr-2 h-4 w-4" /> Mark as completed
-                  </DropdownMenuItem>
-                  <DropdownMenuItem disabled={status === 'cancelled'}>
-                    <X className="mr-2 h-4 w-4" /> Cancel appointment
-                  </DropdownMenuItem>
-                </>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <AppointmentDropdownMenu
+            id={id}
+            appointmentNumber={appointmentNumber}
+            status={status}
+            queryKey={queryKey}
+          />
         )}
 
         <Link

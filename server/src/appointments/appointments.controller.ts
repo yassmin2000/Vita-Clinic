@@ -19,6 +19,8 @@ import { ScansService } from './scans/scans.service';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
 
 import {
+  ApproveAppointmentDto,
+  CompleteAppointmentDto,
   CreateAppointmentDto,
   GetAllAppointmentsQuery,
 } from './dto/appointments.dto';
@@ -115,14 +117,18 @@ export class AppointmentsController {
 
   @UseGuards(JwtGuard)
   @Patch(':id/approve')
-  async approveAppointment(@Param('id') id: string, @Req() request: Request) {
+  async approveAppointment(
+    @Param('id') id: string,
+    @Body(new ValidationPipe()) dto: ApproveAppointmentDto,
+    @Req() request: Request,
+  ) {
     const user: Payload = request['user'];
 
     if (user.role !== 'admin') {
       throw new UnauthorizedException();
     }
 
-    return this.appointmentsService.changeStatus(id, 'approved');
+    return this.appointmentsService.approve(id, dto.doctorId);
   }
 
   @UseGuards(JwtGuard)
@@ -134,19 +140,23 @@ export class AppointmentsController {
       throw new UnauthorizedException();
     }
 
-    return this.appointmentsService.changeStatus(id, 'rejected');
+    return this.appointmentsService.reject(id);
   }
 
   @UseGuards(JwtGuard)
   @Patch(':id/complete')
-  async completeAppointment(@Param('id') id: string, @Req() request: Request) {
+  async completeAppointment(
+    @Param('id') id: string,
+    @Body(new ValidationPipe()) dto: CompleteAppointmentDto,
+    @Req() request: Request,
+  ) {
     const user: Payload = request['user'];
 
     if (user.role === 'patient') {
       throw new UnauthorizedException();
     }
 
-    return this.appointmentsService.changeStatus(id, 'completed');
+    return this.appointmentsService.complete(id, dto.billingStatus);
   }
 
   @UseGuards(JwtGuard)
@@ -163,6 +173,6 @@ export class AppointmentsController {
       throw new UnauthorizedException();
     }
 
-    return this.appointmentsService.changeStatus(id, 'cancelled');
+    return this.appointmentsService.cancel(id);
   }
 }

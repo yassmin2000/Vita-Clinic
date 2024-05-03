@@ -36,4 +36,16 @@ export class DoctorsController {
       ...query,
     });
   }
+
+  @UseGuards(JwtGuard)
+  @Get('list')
+  async getDoctorsList(@Req() request: Request) {
+    const user: Payload = request['user'];
+
+    if (user.role === 'patient') {
+      throw new UnauthorizedException();
+    }
+
+    return this.usersService.findAllList('doctor');
+  }
 }

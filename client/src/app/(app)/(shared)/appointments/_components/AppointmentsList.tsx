@@ -96,6 +96,7 @@ export default function AppointmentsList() {
             <AppointmentsListItem
               key={appointment.id}
               id={appointment.id}
+              appointmentNumber={appointment.number}
               patientName={`${appointment.patient.firstName} ${appointment.patient.lastName}`}
               doctorName={
                 appointment.doctor
@@ -106,6 +107,7 @@ export default function AppointmentsList() {
               bookedAt={appointment.createdAt}
               cancelledAt={appointment.updatedAt}
               status={appointment.status}
+              queryKey={`appointments_page_${currentPage}_count_${countPerPage}_status_${currentAppointmentStatus}_sort_${sortBy}_search_${searchValue}`}
             />
           ))}
       </div>

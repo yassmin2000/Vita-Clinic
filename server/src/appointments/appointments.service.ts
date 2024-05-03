@@ -15,7 +15,7 @@ import {
   CreateAppointmentDto,
   GetAllAppointmentsQuery,
 } from './dto/appointments.dto';
-import type { AppointmentStatus } from '@prisma/client';
+import type { BillingStatus } from '@prisma/client';
 
 @Injectable()
 export class AppointmentsService {
@@ -252,11 +252,7 @@ export class AppointmentsService {
     });
   }
 
-  async changeStatus(appointmentId: string, status: AppointmentStatus) {
-    if (status === 'pending') {
-      throw new ConflictException('Status cannot be changed');
-    }
-
+  async approve(appointmentId: string, doctorId: string) {
     const appointment = await this.prisma.appointment.findUnique({
       where: { id: appointmentId },
     });
@@ -265,20 +261,109 @@ export class AppointmentsService {
       throw new NotFoundException('Appointment not found');
     }
 
-    const unchangeableStatuses = ['completed', 'rejected', 'cancelled'];
+    const doctor = await this.prisma.user.findUnique({
+      where: { id: doctorId, role: 'doctor' },
+    });
 
-    if (
-      unchangeableStatuses.includes(appointment.status) ||
-      (appointment.status === 'pending' &&
-        (status === 'completed' || status === 'cancelled')) ||
-      (appointment.status === 'approved' && status === 'rejected')
-    ) {
-      throw new ConflictException('Status cannot be changed');
+    if (!doctor) {
+      throw new NotFoundException('Doctor not found');
+    }
+
+    if (appointment.status !== 'pending') {
+      throw new ConflictException('Appointment is not pending');
     }
 
     return this.prisma.appointment.update({
       where: { id: appointmentId },
-      data: { status },
+      data: {
+        status: 'approved',
+        doctorId,
+      },
+    });
+  }
+
+  async reject(appointmentId: string) {
+    const appointment = await this.prisma.appointment.findUnique({
+      where: { id: appointmentId },
+    });
+
+    if (!appointment) {
+      throw new NotFoundException('Appointment not found');
+    }
+
+    if (appointment.status !== 'pending') {
+      throw new ConflictException('Appointment is not pending');
+    }
+
+    return this.prisma.appointment.update({
+      where: { id: appointmentId },
+      data: {
+        status: 'rejected',
+      },
+    });
+  }
+
+  async cancel(appointmentId: string) {
+    const appointment = await this.prisma.appointment.findUnique({
+      where: { id: appointmentId },
+    });
+
+    if (!appointment) {
+      throw new NotFoundException('Appointment not found');
+    }
+
+    if (appointment.status !== 'approved') {
+      throw new ConflictException('Appointment is not approved');
+    }
+
+    return this.prisma.appointment.update({
+      where: { id: appointmentId },
+      data: {
+        status: 'cancelled',
+      },
+    });
+  }
+
+  async complete(appointmentId: string, billingStatus: BillingStatus) {
+    const appointment = await this.prisma.appointment.findUnique({
+      where: { id: appointmentId },
+    });
+
+    if (!appointment) {
+      throw new NotFoundException('Appointment not found');
+    }
+
+    if (appointment.status !== 'approved') {
+      throw new ConflictException('Appointment is not approved');
+    }
+
+    const patient = await this.prisma.user.findUnique({
+      where: { id: appointment.patientId, role: 'patient' },
+      include: {
+        emr: {
+          select: {
+            insurance: true,
+          },
+        },
+      },
+    });
+
+    if (billingStatus === 'insurance' && !patient.emr.insurance) {
+      throw new ConflictException('Patient does not have insurance');
+    }
+
+    await this.prisma.billing.update({
+      where: { id: appointment.billingId },
+      data: {
+        status: billingStatus,
+      },
+    });
+
+    return this.prisma.appointment.update({
+      where: { id: appointmentId },
+      data: {
+        status: 'completed',
+      },
     });
   }
 }

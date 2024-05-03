@@ -2,15 +2,7 @@
 
 import Link from 'next/link';
 import { format, formatDistanceToNow, parseISO } from 'date-fns';
-import {
-  Check,
-  CheckCheck,
-  CircleOff,
-  Download,
-  MoreVertical,
-  Timer,
-  X,
-} from 'lucide-react';
+import { Check, CheckCheck, CircleOff, Download, Timer, X } from 'lucide-react';
 
 import {
   Card,
@@ -20,13 +12,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import AppointmentDropdownMenu from '../../_components/AppointmentDropdownMenu';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
@@ -60,38 +46,13 @@ export default function AppointmentDetailsCard({
             </div>
 
             {role === 'admin' && (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="h-8 w-8 p-0">
-                    <span className="sr-only">Open menu</span>
-                    <MoreVertical className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-
-                <DropdownMenuContent align="end">
-                  <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                  {status === 'pending' && (
-                    <>
-                      <DropdownMenuItem>
-                        <Check className="mr-2 h-4 w-4" /> Approve appointment
-                      </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        <X className="mr-2 h-4 w-4" /> Reject appointment
-                      </DropdownMenuItem>
-                    </>
-                  )}
-                  {status !== 'pending' && (
-                    <>
-                      <DropdownMenuItem disabled={status === 'completed'}>
-                        <Check className="mr-2 h-4 w-4" /> Mark as completed
-                      </DropdownMenuItem>
-                      <DropdownMenuItem disabled={status === 'cancelled'}>
-                        <X className="mr-2 h-4 w-4" /> Cancel appointment
-                      </DropdownMenuItem>
-                    </>
-                  )}
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <AppointmentDropdownMenu
+                id={appointment.id}
+                appointmentNumber={appointment.number}
+                status={status}
+                viewOption={false}
+                queryKey={`appointment_${appointment.id}`}
+              />
             )}
           </div>
         </CardTitle>
@@ -245,7 +206,7 @@ export default function AppointmentDetailsCard({
           <span className="font-medium text-primary">Scans</span>
           <span className="text-foreground">
             {appointment.services.scans.length > 0
-              ? appointment.services.scans.join(', ')
+              ? appointment.services.scans.map((scan) => scan.name).join(', ')
               : 'NA'}
           </span>
         </div>
@@ -253,7 +214,9 @@ export default function AppointmentDetailsCard({
           <span className="font-medium text-primary">Lab Works</span>
           <span className="text-foreground">
             {appointment.services.labWorks.length > 0
-              ? appointment.services.labWorks.join(', ')
+              ? appointment.services.labWorks
+                  .map((labWork) => labWork.name)
+                  .join(', ')
               : 'NA'}
           </span>
         </div>

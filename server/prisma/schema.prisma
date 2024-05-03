@@ -92,6 +92,7 @@ enum AppointmentStatus {
 enum BillingStatus {
   initial
   paid
+  insurance
 }
 
 enum OtpType {
