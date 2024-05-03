@@ -243,7 +243,7 @@ export default function DeviceForm({ deviceId }: DeviceFormProps) {
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit((e) => mutateDevice(e))}
-          className="space-y-8 pb-10"
+          className="space-y-8 pb-10 text-foreground"
         >
           <div className="w-full space-y-2">
             <div>

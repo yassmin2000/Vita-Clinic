@@ -196,7 +196,7 @@ export default function UserForm() {
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit((e) => createUser(e))}
-          className="space-y-8 pb-10"
+          className="space-y-8 pb-10 text-foreground"
         >
           <div className="w-full space-y-2">
             <div>

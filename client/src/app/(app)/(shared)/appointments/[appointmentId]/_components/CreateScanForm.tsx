@@ -181,7 +181,10 @@ export default function CreateScanForm({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 p-2">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="space-y-8 p-2 text-foreground"
+      >
         {currentStep === 1 && (
           <>
             <div className="w-full space-y-2">
@@ -216,7 +219,7 @@ export default function CreateScanForm({
                 control={form.control}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Modality</FormLabel>
+                    <FormLabel required>Modality</FormLabel>
                     <FormControl className="flex-1">
                       <Combobox
                         value={field.value}

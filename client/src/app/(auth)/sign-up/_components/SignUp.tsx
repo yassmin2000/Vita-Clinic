@@ -341,11 +341,11 @@ export default function SignUp() {
           </form>
         </Form>
 
-        <p className="px-8 text-center text-sm text-zinc-700">
+        <p className="px-8 text-center text-sm text-foreground">
           Already have an account?{' '}
           <Link
             href="/sign-in"
-            className="text-sm underline underline-offset-4 transition-all hover:text-zinc-800"
+            className="text-sm underline underline-offset-4 transition-all hover:text-foreground/80"
           >
             Sign In
           </Link>

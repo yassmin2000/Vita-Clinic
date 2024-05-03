@@ -155,7 +155,10 @@ export default function CreateReportForm({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 p-2">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="space-y-8 p-2 text-foreground"
+      >
         {currentStep === 1 && (
           <>
             <div className="w-full space-y-2">
