@@ -41,14 +41,14 @@ export default function ScanItem({ id, title, date, modality }: ScanItemProps) {
         <span>{modality}</span>
 
         <div className="flex gap-1">
-          {role && role !== 'patient' && (
+          {role && role === 'doctor' && (
             <Button size="sm">
               <Pencil className="h-4 w-4 sm:mr-2" />
               <span className="sr-only sm:not-sr-only">Edit</span>
             </Button>
           )}
 
-          {role && role === 'patient' && (
+          {role && role !== 'doctor' && (
             <Button size="sm">
               <Info className="h-4 w-4 sm:mr-2" />
               <span className="sr-only sm:not-sr-only">Details</span>

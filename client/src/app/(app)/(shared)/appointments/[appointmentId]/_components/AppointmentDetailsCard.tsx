@@ -33,46 +33,17 @@ import { Separator } from '@/components/ui/separator';
 
 import useUserRole from '@/hooks/useUserRole';
 
-import type { AppointmentStatus } from '@/types/appointments.type';
+import type { AppointmentDetails } from '@/types/appointments.type';
 
 interface AppointmentDetailsCardProps {
-  id: string;
-  appointmentNumber: number;
-  status: AppointmentStatus;
-  doctorId?: string;
-  doctorName?: string;
-  patientId: string;
-  patientName: string;
-  date: string;
-  cancelledDate: string;
-  serviceName?: string;
-  therapyName?: string;
-  serviceScans: string[];
-  serviceLabWorks: string[];
-  billingNumber: number;
-  billingStatus: string;
-  billingAmount: number;
+  appointment: AppointmentDetails;
 }
 
 export default function AppointmentDetailsCard({
-  id,
-  appointmentNumber,
-  status,
-  doctorId,
-  doctorName,
-  patientId,
-  patientName,
-  date,
-  cancelledDate,
-  serviceName,
-  therapyName,
-  serviceScans,
-  serviceLabWorks,
-  billingNumber,
-  billingStatus,
-  billingAmount,
+  appointment,
 }: AppointmentDetailsCardProps) {
   const { role } = useUserRole();
+  const status = appointment.status;
 
   return (
     <Card>
@@ -81,7 +52,7 @@ export default function AppointmentDetailsCard({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <span className="text-xl font-semibold text-primary">
-                Appointment #{appointmentNumber}
+                Appointment #{appointment.number}
               </span>
               <Badge variant={status} className="capitalize">
                 {status}
@@ -127,18 +98,23 @@ export default function AppointmentDetailsCard({
         <CardDescription>
           Appointment by{' '}
           <Link
-            href={`/users/${patientId}`}
+            href={`/users/${appointment.patientId}`}
             className="text-primary transition-all hover:text-primary/80"
           >
-            {patientName}
-          </Link>{' '}
-          with Dr.{' '}
-          <Link
-            href={`/users/${doctorId}`}
-            className="text-primary transition-all hover:text-primary/80"
-          >
-            {doctorName}
+            {`${appointment.patient.firstName} ${appointment.patient.lastName}`}
           </Link>
+          {appointment.doctor && (
+            <>
+              {' '}
+              with Dr.{' '}
+              <Link
+                href={`/users/${appointment.doctorId}`}
+                className="text-primary transition-all hover:text-primary/80"
+              >
+                {`${appointment.doctor.firstName} ${appointment.doctor.lastName}`}
+              </Link>
+            </>
+          )}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -152,9 +128,9 @@ export default function AppointmentDetailsCard({
             </div>
             <p className="text-sm text-muted-foreground">
               The appointment was cancelled on{' '}
-              {format(parseISO(cancelledDate), 'EEE, do MMM, yyyy')} at{' '}
-              {format(parseISO(cancelledDate), 'h:mm a')} (
-              {formatDistanceToNow(parseISO(cancelledDate))} ago)
+              {format(parseISO(appointment.updatedAt), 'EEE, do MMM, yyyy')} at{' '}
+              {format(parseISO(appointment.updatedAt), 'h:mm a')} (
+              {formatDistanceToNow(parseISO(appointment.updatedAt))} ago)
             </p>
           </div>
         )}
@@ -168,9 +144,9 @@ export default function AppointmentDetailsCard({
             </div>
             <p className="text-sm text-muted-foreground">
               The appointment is scheduled for{' '}
-              {format(parseISO(date), 'EEE, do MMM, yyyy')} at{' '}
-              {format(parseISO(date), 'h:mm a')} (In{' '}
-              {formatDistanceToNow(parseISO(date))})
+              {format(parseISO(appointment.date), 'EEE, do MMM, yyyy')} at{' '}
+              {format(parseISO(appointment.date), 'h:mm a')} (In{' '}
+              {formatDistanceToNow(parseISO(appointment.date))})
             </p>
           </div>
         )}
@@ -184,9 +160,9 @@ export default function AppointmentDetailsCard({
             </div>
             <p className="text-sm text-muted-foreground">
               The appointment was completed on{' '}
-              {format(parseISO(date), 'EEE, do MMM, yyyy')} at{' '}
-              {format(parseISO(date), 'h:mm a')} (
-              {formatDistanceToNow(parseISO(date))} ago)
+              {format(parseISO(appointment.date), 'EEE, do MMM, yyyy')} at{' '}
+              {format(parseISO(appointment.date), 'h:mm a')} (
+              {formatDistanceToNow(parseISO(appointment.date))} ago)
             </p>
           </div>
         )}
@@ -200,9 +176,9 @@ export default function AppointmentDetailsCard({
             </div>
             <p className="text-sm text-muted-foreground">
               The appointment is approved and scheduled for{' '}
-              {format(parseISO(date), 'EEE, do MMM, yyyy')} at{' '}
-              {format(parseISO(date), 'h:mm a')} (In{' '}
-              {formatDistanceToNow(parseISO(date))})
+              {format(parseISO(appointment.date), 'EEE, do MMM, yyyy')} at{' '}
+              {format(parseISO(appointment.date), 'h:mm a')} (In{' '}
+              {formatDistanceToNow(parseISO(appointment.date))})
             </p>
           </div>
         )}
@@ -216,9 +192,9 @@ export default function AppointmentDetailsCard({
             </div>
             <p className="text-sm text-muted-foreground">
               The appointment was rejected on{' '}
-              {format(parseISO(cancelledDate), 'EEE, do MMM, yyyy')} at{' '}
-              {format(parseISO(cancelledDate), 'h:mm a')} (
-              {formatDistanceToNow(parseISO(cancelledDate))} ago)
+              {format(parseISO(appointment.updatedAt), 'EEE, do MMM, yyyy')} at{' '}
+              {format(parseISO(appointment.updatedAt), 'h:mm a')} (
+              {formatDistanceToNow(parseISO(appointment.updatedAt))} ago)
             </p>
           </div>
         )}
@@ -230,41 +206,55 @@ export default function AppointmentDetailsCard({
         <div className="flex flex-col">
           <span className="font-medium text-primary">Date</span>
           <span className="text-foreground">
-            {format(parseISO(date), 'do MMM, yyyy')}
+            {format(parseISO(appointment.date), 'do MMM, yyyy')}
           </span>
         </div>
         <div className="flex flex-col">
           <span className="font-medium text-primary">Time</span>
           <span className="text-foreground">
-            {format(parseISO(date), 'h:mm a')}
+            {format(parseISO(appointment.date), 'h:mm a')}
           </span>
         </div>
         <div className="flex flex-col">
           <span className="font-medium text-primary">Patient</span>
-          <span className="text-foreground">{patientName}</span>
+          <span className="text-foreground">
+            {`${appointment.patient.firstName} ${appointment.patient.lastName}`}
+          </span>
         </div>
         <div className="flex flex-col">
           <span className="font-medium text-primary">Doctor</span>
-          <span className="text-foreground">{doctorName || 'NA'}</span>
+          <span className="text-foreground">
+            {appointment.doctor
+              ? `${appointment.doctor.firstName} ${appointment.doctor.lastName}`
+              : 'NA'}
+          </span>
         </div>
         <div className="flex flex-col">
           <span className="font-medium text-primary">Service</span>
-          <span className="text-foreground">{serviceName || 'NA'}</span>
+          <span className="text-foreground">
+            {appointment.services.service?.name || 'NA'}
+          </span>
         </div>
         <div className="flex flex-col">
           <span className="font-medium text-primary">Therapy</span>
-          <span className="text-foreground">{therapyName || 'NA'}</span>
+          <span className="text-foreground">
+            {appointment.services.therapy?.name || 'NA'}
+          </span>
         </div>
         <div className="flex flex-col">
           <span className="font-medium text-primary">Scans</span>
           <span className="text-foreground">
-            {serviceScans.length > 0 ? serviceScans.join(', ') : 'NA'}
+            {appointment.services.scans.length > 0
+              ? appointment.services.scans.join(', ')
+              : 'NA'}
           </span>
         </div>
         <div className="flex flex-col">
           <span className="font-medium text-primary">Lab Works</span>
           <span className="text-foreground">
-            {serviceLabWorks.length > 0 ? serviceLabWorks.join(', ') : 'NA'}
+            {appointment.services.labWorks.length > 0
+              ? appointment.services.labWorks.join(', ')
+              : 'NA'}
           </span>
         </div>
       </CardFooter>
@@ -276,18 +266,24 @@ export default function AppointmentDetailsCard({
           <div className="flex flex-col">
             <span className="font-medium text-primary">Billing</span>
             <span className="flex items-center text-foreground">
-              Invoice #{billingNumber} -{' '}
-              {billingAmount.toLocaleString('en-US', {
+              Invoice #{appointment.billing.number} -{' '}
+              {appointment.billing.amount.toLocaleString('en-US', {
                 style: 'currency',
                 currency: 'USD',
               })}{' '}
               <Badge
                 variant={
-                  billingStatus === 'initial' ? 'cancelled' : 'completed'
+                  appointment.billing.status === 'initial'
+                    ? 'cancelled'
+                    : 'completed'
                 }
                 className="ml-2 capitalize"
               >
-                {billingStatus === 'initial' ? 'Not Paid' : 'Paid'}
+                {appointment.billing.status === 'initial'
+                  ? 'Not Paid'
+                  : appointment.billing.status === 'paid'
+                    ? 'Paid'
+                    : 'Covered By Insurance'}
               </Badge>
             </span>
           </div>

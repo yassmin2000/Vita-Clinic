@@ -42,42 +42,19 @@ export default function AppointmentDetailsLayout({
     <div className="flex flex-col gap-6">
       {isLoading && <AppointmentDetailsCardSkeleton />}
       {appointment && !isLoading && (
-        <AppointmentDetailsCard
-          id={appointmentId}
-          appointmentNumber={appointment.number}
-          status={appointment.status}
-          doctorId={appointment.doctor?.id}
-          doctorName={
-            appointment.doctor
-              ? `${appointment.doctor.firstName} ${appointment.doctor.lastName}`
-              : undefined
-          }
-          patientId={appointment.patient.id}
-          patientName={`${appointment.patient.firstName} ${appointment.patient.lastName}`}
-          date={appointment.date}
-          cancelledDate={appointment.updatedAt}
-          serviceName={appointment.services.service?.name}
-          therapyName={appointment.services.therapy?.name}
-          serviceScans={appointment.services.scans.map((scan) => scan.name)}
-          serviceLabWorks={appointment.services.labWorks.map(
-            (laboratoryTest) => laboratoryTest.name
-          )}
-          billingNumber={appointment.billing.number}
-          billingStatus={appointment.billing.status}
-          billingAmount={appointment.billing.amount}
-        />
+        <AppointmentDetailsCard appointment={appointment} />
       )}
 
-      {appointment && !isLoading && (
-        <AppointmentReports appointmentId={appointmentId} />
-      )}
-      {appointment && !isLoading && (
-        <>
-          <Separator className="my-1" />
-
-          <AppointmentScans id={appointmentId} />
-        </>
-      )}
+      {appointment &&
+        !isLoading &&
+        (appointment.status === 'approved' ||
+          appointment.status === 'completed') && (
+          <>
+            <AppointmentReports appointmentId={appointmentId} />
+            <Separator className="my-1" />
+            <AppointmentScans id={appointmentId} />
+          </>
+        )}
     </div>
   );
 }

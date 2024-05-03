@@ -61,12 +61,14 @@ export type Scan = {
   createdAt: string;
 };
 
+export type BillingStatus = 'initial' | 'paid' | 'insurance';
+
 export type Billing = {
   id: string;
   number: number;
   date: string;
   amount: number;
-  status: string;
+  status: BillingStatus;
 };
 
 export type AppointmentDetails = Appointment & {

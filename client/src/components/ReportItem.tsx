@@ -52,7 +52,7 @@ export default function ReportItem({
               <span className="sr-only sm:not-sr-only">Edit</span>
             </Button>
           )}
-          {role && role === 'patient' && (
+          {role && role !== 'doctor' && (
             <Button size="sm">
               <Info className="h-4 w-4 sm:mr-2" />
               <span className="sr-only sm:not-sr-only">Details</span>
