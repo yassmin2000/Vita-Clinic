@@ -346,7 +346,8 @@ model Appointment {
   billing               Billing             @relation(fields: [billingId], references: [id])
   billingId             String              @unique
 
-  vitals                Vitals[]
+  vitals Vitals?
+
   medications           PatientMedication[]
   reports               Report[]
   scans                 Scan[]
@@ -378,10 +379,9 @@ model Vitals {
   respiratoryRate  Int?
   oxygenSaturation Int?
 
-  appointment   Appointment @relation(fields: [appointmentId], references: [id])
-  appointmentId String
+  appointment   Appointment? @relation(fields: [appointmentId], references: [id])
+  appointmentId String? @unique
 }
-
 enum ReportStatus {
   initial
   processed

@@ -14,9 +14,10 @@ import { ReportsModule } from './reports/reports.module';
 import { ReportsService } from './reports/reports.service';
 import { ScansModule } from './scans/scans.module';
 import { ScansService } from './scans/scans.service';
+import { VitalsModule } from './vitals/vitals.module';
 
 @Module({
-  imports: [ReportsModule, ScansModule],
+  imports: [ReportsModule, ScansModule, VitalsModule],
   controllers: [AppointmentsController],
   providers: [
     AppointmentsService,
