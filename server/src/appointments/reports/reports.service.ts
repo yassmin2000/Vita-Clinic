@@ -94,7 +94,7 @@ export class ReportsService {
 
     const { appointmentId, reportURL, fileName, ...dto } = updateReportDto;
 
-    return this.prisma.allergy.update({
+    return this.prisma.report.update({
       where: { id },
       data: dto,
     });
