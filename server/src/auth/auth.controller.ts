@@ -25,12 +25,14 @@ import {
 } from 'src/users/dto/users.dto';
 
 import type { Payload } from 'src/types/payload.type';
+import { EmailOtpService } from 'src/email-otp/email-otp.service';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private userService: UsersService,
     private authService: AuthService,
+    private emailOtpService: EmailOtpService,
   ) {}
 
   @Post('login')
@@ -97,5 +99,16 @@ export class AuthController {
     resendPhoneVerificationDto: ResendPhoneVerificationDto,
   ) {
     return this.userService.resendPhoneVerification(resendPhoneVerificationDto);
+  }
+  @Post('send-test-email')
+  async sendEmail(
+    @Body() sendEmailDTO: { recipient: string, otp: string, date: string, name: string },
+  ): Promise<void> {
+    await this.emailOtpService.sendEmailWithTemplate(
+      sendEmailDTO.recipient,
+      sendEmailDTO.otp,
+      sendEmailDTO.date,
+      sendEmailDTO.name,
+    );
   }
 }
