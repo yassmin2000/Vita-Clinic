@@ -10,10 +10,11 @@ import { AdminsModule } from './admins/admins.module';
 import { DoctorsModule } from './doctors/doctors.module';
 import { PatientsModule } from './patients/patients.module';
 import { EmailOtpService } from 'src/email-otp/email-otp.service';
+import { PhoneOtpService } from 'src/phone-otp/phone-otp.service';
 
 @Module({
   imports: [AdminsModule, DoctorsModule, PatientsModule],
   controllers: [UsersController],
-  providers: [UsersService, JwtService, PrismaService, OtpService, EmailOtpService],
+  providers: [UsersService, JwtService, PrismaService, OtpService, EmailOtpService, PhoneOtpService],
 })
 export class UsersModule {}

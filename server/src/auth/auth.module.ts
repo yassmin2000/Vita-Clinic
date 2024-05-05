@@ -8,9 +8,10 @@ import { PrismaService } from 'src/prisma.service';
 import { UsersService } from 'src/users/users.service';
 import { OtpService } from 'src/otp/otp.service';
 import { EmailOtpService } from 'src/email-otp/email-otp.service';
+import { PhoneOtpService } from 'src/phone-otp/phone-otp.service';
 
 @Module({
   controllers: [AuthController],
-  providers: [AuthService, JwtService, PrismaService, UsersService, OtpService, EmailOtpService],
+  providers: [AuthService, JwtService, PrismaService, UsersService, OtpService, EmailOtpService, PhoneOtpService],
 })
 export class AuthModule {}
