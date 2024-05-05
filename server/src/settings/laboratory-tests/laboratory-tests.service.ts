@@ -7,12 +7,14 @@ import {
   CreateLaboratoryTestDto,
   UpdateLaboratoryTestDto,
 } from './dto/laboratory-test.dto';
+import { LogService } from 'src/log/log.service';
 
 @Injectable()
 export class LaboratoryTestsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly biomarkersService: BiomarkersService,
+    private logService: LogService
   ) {}
 
   async findAll() {
@@ -38,7 +40,7 @@ export class LaboratoryTestsService {
     return laboratoryTest;
   }
 
-  async create(createLaboratoryTestDto: CreateLaboratoryTestDto) {
+  async create(userId: string, createLaboratoryTestDto: CreateLaboratoryTestDto) {
     const { biomarkers, ...dto } = createLaboratoryTestDto;
 
     await Promise.all(
@@ -47,7 +49,7 @@ export class LaboratoryTestsService {
       }),
     );
 
-    return this.prisma.laboratoryTest.create({
+    const createdLaboratoryTest = await this.prisma.laboratoryTest.create({
       data: {
         ...dto,
         biomarkers: {
@@ -56,6 +58,16 @@ export class LaboratoryTestsService {
       },
       include: { biomarkers: true },
     });
+
+    await this.logService.create(
+      userId,
+      createdLaboratoryTest.id,
+      createdLaboratoryTest.name,
+      'Laboratory Test',
+      'Create',
+    );
+
+    return createdLaboratoryTest;
   }
 
   async update(id: string, updateLabTest: UpdateLaboratoryTestDto) {

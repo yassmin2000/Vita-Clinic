@@ -30,7 +30,7 @@ export class LaboratoryTestsController {
 
   @UseGuards(JwtGuard)
   @Get()
-  async getAllLaboratoryTests(@Req() request: Request) {
+  async getAllLaboratoryTests() {
     return this.laboratoryTestsService.findAll();
   }
 
@@ -60,7 +60,7 @@ export class LaboratoryTestsController {
     if (user.role === 'patient') {
       throw new UnauthorizedException();
     }
-    return this.laboratoryTestsService.create(dto);
+    return this.laboratoryTestsService.create(user.id,dto);
   }
 
   @UseGuards(JwtGuard)

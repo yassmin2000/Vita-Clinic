@@ -6,6 +6,7 @@ import { LaboratoryTestsController } from './laboratory-tests.controller';
 import { LaboratoryTestsService } from './laboratory-tests.service';
 import { PrismaService } from 'src/prisma.service';
 import { BiomarkersService } from '../biomarkers/biomarkers.service';
+import { LogService } from 'src/log/log.service';
 @Module({
   controllers: [LaboratoryTestsController],
   providers: [
@@ -13,6 +14,7 @@ import { BiomarkersService } from '../biomarkers/biomarkers.service';
     PrismaService,
     JwtService,
     BiomarkersService,
+    LogService
   ],
 })
 export class LaboratoryTestsModule {}
