@@ -20,4 +20,22 @@ import { CreateVitalsDto, UpdateVitalsDto } from './dto/vitals.dto';
 import type { Payload } from 'src/types/payload.type';
 
 @Controller('vitals')
-export class VitalsController {}
+export class VitalsController {
+  constructor(private readonly vitalsService: VitalsService) {}
+
+  @UseGuards(JwtGuard)
+  @Patch(':id')
+  async update(
+    @Param('id') id: string,
+    @Body() updateVitalsDto: UpdateVitalsDto,
+    @Req() request: Request,
+  ) {
+    const user: Payload = request['user'];
+
+    if (user.role !== 'doctor') {
+      throw new UnauthorizedException();
+    }
+
+    return this.vitalsService.update(id, updateVitalsDto);
+  }
+}

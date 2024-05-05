@@ -7,8 +7,12 @@ export class CreateVitalsDto {
   temperature?: number;
 
   @IsOptional()
-  @IsString()
-  bloodPressure?: string;
+  @IsNumber()
+  systolicBloodPressure?: number;
+
+  @IsOptional()
+  @IsNumber()
+  diastolicBloodPressure?: number;
 
   @IsOptional()
   @IsNumber()

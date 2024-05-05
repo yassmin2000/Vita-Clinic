@@ -230,6 +230,10 @@ export class AppointmentsService {
       },
     });
 
+    const vitals = await this.prisma.vitals.create({
+      data: {},
+    });
+
     return this.prisma.appointment.create({
       data: {
         date,
@@ -238,6 +242,7 @@ export class AppointmentsService {
         electronicMedicalRecordId: emr.id,
         appointmentServicesId: appointmentServices.id,
         billingId: billing.id,
+        vitalsId: vitals.id,
       },
       include: {
         services: {
@@ -248,6 +253,7 @@ export class AppointmentsService {
             labWorks: true,
           },
         },
+        billing: true,
       },
     });
   }

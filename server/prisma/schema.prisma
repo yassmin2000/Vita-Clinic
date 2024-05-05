@@ -307,7 +307,7 @@ model PatientMedication {
   emr   ElectronicMedicalRecord @relation(fields: [emrId], references: [id])
   emrId String
 
-  appointment   Appointment? @relation(fields: [appointmentId], references: [id])
+  appointment   Appointment? @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
   appointmentId String?
 
   createdAt DateTime @default(now())
@@ -345,8 +345,8 @@ model Appointment {
   appointmentServicesId String              @unique
   billing               Billing             @relation(fields: [billingId], references: [id])
   billingId             String              @unique
-
-  vitals Vitals?
+  vitals                Vitals              @relation(fields: [vitalsId], references: [id])
+  vitalsId              String              @unique
 
   medications           PatientMedication[]
   reports               Report[]
@@ -372,16 +372,21 @@ model AppointmentServices {
 }
 
 model Vitals {
-  id               String  @id @default(uuid())
-  temperature      Float?
-  bloodPressure    String?
-  heartRate        Int?
-  respiratoryRate  Int?
-  oxygenSaturation Int?
+  id                     String  @id @default(uuid())
+  temperature            Float?
+  bloodPressure          String?
+  systolicBloodPressure  Int?
+  diastolicBloodPressure Int?
+  heartRate              Int?
+  respiratoryRate        Int?
+  oxygenSaturation       Int?
 
-  appointment   Appointment? @relation(fields: [appointmentId], references: [id])
-  appointmentId String? @unique
+  appointment Appointment?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
+
 enum ReportStatus {
   initial
   processed
@@ -396,7 +401,7 @@ model Report {
   fileName    String
   status      ReportStatus @default(initial)
 
-  appointment   Appointment @relation(fields: [appointmentId], references: [id])
+  appointment   Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
   appointmentId String
 
   messages Message[]
@@ -413,7 +418,7 @@ model Message {
   user   User   @relation(fields: [userId], references: [id])
   userId String
 
-  report   Report @relation(fields: [reportId], references: [id])
+  report   Report @relation(fields: [reportId], references: [id], onDelete: Cascade)
   reportId String
 
   createdAt DateTime @default(now())
@@ -443,7 +448,7 @@ model Scan {
 
   scanURLs String[]
 
-  appointment   Appointment @relation(fields: [appointmentId], references: [id])
+  appointment   Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
   appointmentId String
 
   createdAt DateTime @default(now())
@@ -502,7 +507,7 @@ model LaboratoryTestResult {
 
   results Float[]
 
-  appointment   Appointment @relation(fields: [appointmentId], references: [id])
+  appointment   Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
   appointmentId String
 
   createdAt DateTime @default(now())

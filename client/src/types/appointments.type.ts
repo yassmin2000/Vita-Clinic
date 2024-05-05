@@ -71,6 +71,18 @@ export type Billing = {
   status: BillingStatus;
 };
 
+export type Vitals = {
+  id: string;
+  temperature?: number;
+  systolicBloodPressure?: number;
+  diastolicBloodPressure?: number;
+  heartRate?: number;
+  respiratoryRate?: number;
+  oxygenSaturation?: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type AppointmentDetails = Appointment & {
   services: {
     service?: PriceLookup;
@@ -79,4 +91,5 @@ export type AppointmentDetails = Appointment & {
     labWorks: LaboratoryTest[];
   };
   billing: Billing;
+  vitals: Vitals;
 };

@@ -13,6 +13,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import AppointmentDropdownMenu from '../../_components/AppointmentDropdownMenu';
+import AppointmentVitals from './AppointmentVitals';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
@@ -162,100 +163,106 @@ export default function AppointmentDetailsCard({
       </CardContent>
 
       <Separator />
-
-      <CardFooter className="grid grid-cols-1 gap-4 px-6 py-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-        <div className="flex flex-col">
-          <span className="font-medium text-primary">Date</span>
-          <span className="text-foreground">
-            {format(parseISO(appointment.date), 'do MMM, yyyy')}
-          </span>
-        </div>
-        <div className="flex flex-col">
-          <span className="font-medium text-primary">Time</span>
-          <span className="text-foreground">
-            {format(parseISO(appointment.date), 'h:mm a')}
-          </span>
-        </div>
-        <div className="flex flex-col">
-          <span className="font-medium text-primary">Patient</span>
-          <span className="text-foreground">
-            {`${appointment.patient.firstName} ${appointment.patient.lastName}`}
-          </span>
-        </div>
-        <div className="flex flex-col">
-          <span className="font-medium text-primary">Doctor</span>
-          <span className="text-foreground">
-            {appointment.doctor
-              ? `${appointment.doctor.firstName} ${appointment.doctor.lastName}`
-              : 'NA'}
-          </span>
-        </div>
-        <div className="flex flex-col">
-          <span className="font-medium text-primary">Service</span>
-          <span className="text-foreground">
-            {appointment.services.service?.name || 'NA'}
-          </span>
-        </div>
-        <div className="flex flex-col">
-          <span className="font-medium text-primary">Therapy</span>
-          <span className="text-foreground">
-            {appointment.services.therapy?.name || 'NA'}
-          </span>
-        </div>
-        <div className="flex flex-col">
-          <span className="font-medium text-primary">Scans</span>
-          <span className="text-foreground">
-            {appointment.services.scans.length > 0
-              ? appointment.services.scans.map((scan) => scan.name).join(', ')
-              : 'NA'}
-          </span>
-        </div>
-        <div className="flex flex-col">
-          <span className="font-medium text-primary">Lab Works</span>
-          <span className="text-foreground">
-            {appointment.services.labWorks.length > 0
-              ? appointment.services.labWorks
-                  .map((labWork) => labWork.name)
-                  .join(', ')
-              : 'NA'}
-          </span>
-        </div>
-      </CardFooter>
-
-      <Separator />
-
-      <div className="px-6 py-4">
-        <div className="flex items-center justify-between">
+      <CardFooter className="block p-0">
+        <div className="grid grid-cols-1 gap-4 px-6 py-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           <div className="flex flex-col">
-            <span className="font-medium text-primary">Billing</span>
-            <span className="flex items-center text-foreground">
-              Invoice #{appointment.billing.number} -{' '}
-              {appointment.billing.amount.toLocaleString('en-US', {
-                style: 'currency',
-                currency: 'USD',
-              })}{' '}
-              <Badge
-                variant={
-                  appointment.billing.status === 'initial'
-                    ? 'cancelled'
-                    : 'completed'
-                }
-                className="ml-2 capitalize"
-              >
-                {appointment.billing.status === 'initial'
-                  ? 'Not Paid'
-                  : appointment.billing.status === 'paid'
-                    ? 'Paid'
-                    : 'Covered By Insurance'}
-              </Badge>
+            <span className="font-medium text-primary">Date</span>
+            <span className="text-foreground">
+              {format(parseISO(appointment.date), 'do MMM, yyyy')}
             </span>
           </div>
-          <Button size="sm" variant="outline">
-            <Download className="mr-2 h-4 w-4" />
-            Export Invoice
-          </Button>
+          <div className="flex flex-col">
+            <span className="font-medium text-primary">Time</span>
+            <span className="text-foreground">
+              {format(parseISO(appointment.date), 'h:mm a')}
+            </span>
+          </div>
+          <div className="flex flex-col">
+            <span className="font-medium text-primary">Patient</span>
+            <span className="text-foreground">
+              {`${appointment.patient.firstName} ${appointment.patient.lastName}`}
+            </span>
+          </div>
+          <div className="flex flex-col">
+            <span className="font-medium text-primary">Doctor</span>
+            <span className="text-foreground">
+              {appointment.doctor
+                ? `${appointment.doctor.firstName} ${appointment.doctor.lastName}`
+                : 'NA'}
+            </span>
+          </div>
+          <div className="flex flex-col">
+            <span className="font-medium text-primary">Service</span>
+            <span className="text-foreground">
+              {appointment.services.service?.name || 'NA'}
+            </span>
+          </div>
+          <div className="flex flex-col">
+            <span className="font-medium text-primary">Therapy</span>
+            <span className="text-foreground">
+              {appointment.services.therapy?.name || 'NA'}
+            </span>
+          </div>
+          <div className="flex flex-col">
+            <span className="font-medium text-primary">Scans</span>
+            <span className="text-foreground">
+              {appointment.services.scans.length > 0
+                ? appointment.services.scans.map((scan) => scan.name).join(', ')
+                : 'NA'}
+            </span>
+          </div>
+          <div className="flex flex-col">
+            <span className="font-medium text-primary">Lab Works</span>
+            <span className="text-foreground">
+              {appointment.services.labWorks.length > 0
+                ? appointment.services.labWorks
+                    .map((labWork) => labWork.name)
+                    .join(', ')
+                : 'NA'}
+            </span>
+          </div>
         </div>
-      </div>
+
+        <Separator />
+        <AppointmentVitals
+          appointmentId={appointment.id}
+          vitals={appointment.vitals}
+        />
+        <Separator />
+
+        <div className="px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex flex-col">
+              <span className="font-medium text-primary">Billing</span>
+              <span className="flex items-center text-foreground">
+                Invoice #{appointment.billing.number} -{' '}
+                {appointment.billing.amount.toLocaleString('en-US', {
+                  style: 'currency',
+                  currency: 'USD',
+                })}{' '}
+                <Badge
+                  variant={
+                    appointment.billing.status === 'initial'
+                      ? 'cancelled'
+                      : 'completed'
+                  }
+                  className="ml-2 capitalize"
+                >
+                  {appointment.billing.status === 'initial'
+                    ? 'Not Paid'
+                    : appointment.billing.status === 'paid'
+                      ? 'Paid'
+                      : 'Covered By Insurance'}
+                </Badge>
+              </span>
+            </div>
+            <Button size="sm" variant="outline">
+              <Download className="mr-2 h-4 w-4" />
+              Export Invoice
+            </Button>
+          </div>
+        </div>
+      </CardFooter>
     </Card>
   );
 }
