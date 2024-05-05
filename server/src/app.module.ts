@@ -12,6 +12,8 @@ import { UsersModule } from './users/users.module';
 import { AppController } from './app.controller';
 
 import { AppService } from './app.service';
+import { EmailOtpModule } from './email-otp/email-otp.module';
+import { PhoneOtpModule } from './phone-otp/phone-otp.module';
 
 @Module({
   imports: [
@@ -23,6 +25,8 @@ import { AppService } from './app.service';
     SettingsModule,
     UsersModule,
     EmrModule,
+    EmailOtpModule,
+    PhoneOtpModule,
   ],
   controllers: [AppController],
   providers: [AppService],

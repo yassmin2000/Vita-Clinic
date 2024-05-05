@@ -234,7 +234,7 @@ export class UsersService {
     }
 
     if (!verified) {
-      await this.otp.create(newUser.id, 'email');
+      await this.otp.create(newUser.id, 'email', newUser.firstName, newUser.email, newUser.phoneNumber);
     }
 
     const { password, isEmailVerified, isPhoneVerified, ...result } = newUser;
@@ -295,7 +295,7 @@ export class UsersService {
       throw new ConflictException('Email is already verified');
     }
 
-    await this.otp.create(user.id, 'email');
+    await this.otp.create(user.id, 'email', user.firstName, user.email, user.phoneNumber);
 
     return { message: 'OTP sent successfully' };
   }
@@ -346,7 +346,7 @@ export class UsersService {
       throw new ConflictException('Phone number is already verified');
     }
 
-    await this.otp.create(user.id, 'phone');
+    await this.otp.create(user.id, 'phone', user.firstName, user.email, user.phoneNumber);
 
     return { message: 'OTP sent successfully' };
   }

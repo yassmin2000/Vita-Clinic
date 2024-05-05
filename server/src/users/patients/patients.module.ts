@@ -14,6 +14,8 @@ import { ModalitiesService } from 'src/settings/modalities/modalities.service';
 import { LaboratoryTestsService } from 'src/settings/laboratory-tests/laboratory-tests.service';
 import { ServicesService } from 'src/settings/services/services.service';
 import { TherapiesService } from 'src/settings/therapies/therapies.service';
+import { EmailOtpService } from 'src/email-otp/email-otp.service';
+import { PhoneOtpService } from 'src/phone-otp/phone-otp.service';
 
 @Module({
   controllers: [PatientsController],
@@ -30,6 +32,8 @@ import { TherapiesService } from 'src/settings/therapies/therapies.service';
     TherapiesService,
     PrismaService,
     OtpService,
+    EmailOtpService, 
+    PhoneOtpService
   ],
 })
 export class PatientsModule {}

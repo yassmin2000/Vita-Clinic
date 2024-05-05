@@ -2,12 +2,19 @@ import { Injectable } from '@nestjs/common';
 import * as randomstring from 'randomstring';
 
 import { PrismaService } from 'src/prisma.service';
+import { EmailOtpService } from 'src/email-otp/email-otp.service';
+import { format } from 'date-fns'
+import { PhoneOtpService } from 'src/phone-otp/phone-otp.service';
 
 @Injectable()
 export class OtpService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private readonly emailOtpService: EmailOtpService,
+    private readonly phoneOtpService: PhoneOtpService,
+  ) { }
 
-  async create(userId: string, type: 'email' | 'phone') {
+  async create(userId: string, type: 'email' | 'phone', firstName: string, userEmail: string, phoneNumber: string) {
     await this.prisma.otp.deleteMany({
       where: {
         userId,
@@ -32,7 +39,19 @@ export class OtpService {
         isUniqueOtp = true;
       }
     }
-
+    if (type == 'email') {
+      await this.emailOtpService.sendEmailWithTemplate(
+        userEmail,
+        otpString,
+        format(new Date(), 'dd MMM, yyyy'),
+        firstName
+      );
+    }else{
+      await this.phoneOtpService.sendSMS(
+        phoneNumber,
+        otpString,
+      );
+    }
     return this.prisma.otp.create({
       data: {
         otp: otpString,

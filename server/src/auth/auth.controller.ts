@@ -50,18 +50,10 @@ export class AuthController {
     return this.userService.create(createUserDto, 'patient');
   }
 
-  @UseGuards(JwtGuard)
   @Put('verify/email')
   async verifyUserEmail(
     @Body(ValidationPipe) verifyUserEmailDto: VerifyUserEmailDto,
-    @Req() request: Request,
   ) {
-    const user: Payload = request['user'];
-
-    if (user.email !== verifyUserEmailDto.email) {
-      throw new UnauthorizedException();
-    }
-
     return this.userService.verifyEmail(verifyUserEmailDto);
   }
 
@@ -90,7 +82,8 @@ export class AuthController {
 
     return this.userService.verifyPhone(verifyUserPhoneDto);
   }
-
+  
+  @UseGuards(JwtGuard)
   @Post('/resend/phone')
   async resendPhoneVerification(
     @Body(ValidationPipe)
