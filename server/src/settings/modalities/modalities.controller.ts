@@ -25,9 +25,7 @@ export class ModalitiesController {
 
   @UseGuards(JwtGuard)
   @Get()
-  async getAllModalities(@Req() request: Request) {
-    const user: Payload = request['user'];
-
+  async getAllModalities() {
     return this.modalitiesService.findAll();
   }
 
@@ -56,7 +54,7 @@ export class ModalitiesController {
     if (user.role === 'patient') {
       throw new UnauthorizedException();
     }
-    return this.modalitiesService.create(dto);
+    return this.modalitiesService.create(user.id,dto);
   }
 
   @UseGuards(JwtGuard)
