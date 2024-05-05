@@ -2,10 +2,15 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 
 import { PrismaService } from 'src/prisma.service';
 import { CreateAllergyDto, UpdateAllergyDto } from './dto/allergies.dto';
+import { LogService } from 'src/log/log.service';
+
 
 @Injectable()
 export class AllergiesService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private logService: LogService
+  ) {}
 
   async findAll() {
     return this.prisma.allergy.findMany();
@@ -23,10 +28,21 @@ export class AllergiesService {
     return allergy;
   }
 
-  async create(createAllergyDto: CreateAllergyDto) {
-    return this.prisma.allergy.create({
+  async create(createAllergyDto: CreateAllergyDto, userId: string) {
+    const createdAllergy = await this.prisma.allergy.create({
       data: createAllergyDto,
     });
+
+ 
+    await this.logService.create(
+      userId,
+      createdAllergy.id,
+      'Allergy',
+      'Create',
+      'New allergy record created'
+    );
+
+    return createdAllergy;
   }
 
   async update(id: string, updateAllergyDto: UpdateAllergyDto) {
