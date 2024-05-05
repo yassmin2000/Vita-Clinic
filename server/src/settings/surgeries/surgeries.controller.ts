@@ -60,7 +60,7 @@ export class SurgeriesController {
     if (user.role === 'patient') {
       throw new UnauthorizedException();
     }
-    return this.surgeriesService.create(dto);
+    return this.surgeriesService.create(user.id,dto);
   }
 
   @UseGuards(JwtGuard)

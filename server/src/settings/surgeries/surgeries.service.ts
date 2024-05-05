@@ -2,10 +2,14 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 
 import { PrismaService } from 'src/prisma.service';
 import { CreateSurgeryDto, UpdateSurgeryDto } from './dto/surgeries.dto';
+import { LogService } from 'src/log/log.service';
 
 @Injectable()
 export class SurgeriesService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private logService: LogService
+  ) {}
 
   async findAll() {
     return this.prisma.surgery.findMany();
@@ -23,12 +27,22 @@ export class SurgeriesService {
     return surgery;
   }
 
-  async create(createSurgeryDto: CreateSurgeryDto) {
-    return this.prisma.surgery.create({
+  async create(userId: string,createSurgeryDto: CreateSurgeryDto) {
+    const createdSurgery = await this.prisma.surgery.create({
       data: createSurgeryDto,
     });
-  }
 
+ 
+    await this.logService.create(
+      userId,
+      createdSurgery.id,
+      createdSurgery.name,
+      'Surgery',
+      'Create',
+    );
+
+    return createdSurgery;
+  }
   async update(id: string, updateSurgeryDto: UpdateSurgeryDto) {
     const existingSurgery = await this.prisma.surgery.findUnique({
       where: { id },
