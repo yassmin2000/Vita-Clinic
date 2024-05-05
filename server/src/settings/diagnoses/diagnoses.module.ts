@@ -5,9 +5,10 @@ import { DiagnosesController } from './diagnoses.controller';
 
 import { DiagnosesService } from './diagnoses.service';
 import { PrismaService } from 'src/prisma.service';
+import { LogService } from 'src/log/log.service';
 
 @Module({
   controllers: [DiagnosesController],
-  providers: [DiagnosesService, JwtService, PrismaService],
+  providers: [DiagnosesService, JwtService, PrismaService,LogService],
 })
 export class DiagnosesModule {}
