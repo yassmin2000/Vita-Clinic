@@ -14,15 +14,23 @@ export class LogService {
     });
   }
 
-  async create(userId: string, targetId: string, targetName: string, actionType: string, notes?: string ) {
+  async create(
+    userId: string,
+    targetId: string,
+    targetName: string,
+    type: string, 
+    action: string, 
+    notes?: string  
+  ) {
     return this.prisma.action.create({
       data: {
         userId,
         targetId,
         targetName,
-        type: actionType,
+        type,
+        action,
         notes,
       },
     });
-}
+  }
 }

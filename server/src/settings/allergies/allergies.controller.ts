@@ -60,7 +60,7 @@ export class AllergiesController {
     if (user.role === 'patient') {
       throw new UnauthorizedException();
     }
-    return this.allergiesService.create(dto,user.id);
+    return this.allergiesService.create(user.id,dto);
   }
 
   @UseGuards(JwtGuard)

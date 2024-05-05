@@ -28,7 +28,7 @@ export class AllergiesService {
     return allergy;
   }
 
-  async create(createAllergyDto: CreateAllergyDto, userId: string) {
+  async create(userId: string,createAllergyDto: CreateAllergyDto) {
     const createdAllergy = await this.prisma.allergy.create({
       data: createAllergyDto,
     });
@@ -37,9 +37,9 @@ export class AllergiesService {
     await this.logService.create(
       userId,
       createdAllergy.id,
+      createdAllergy.name,
       'Allergy',
       'Create',
-      'New allergy record created'
     );
 
     return createdAllergy;

@@ -598,6 +598,7 @@ model Action {
   targetId   String
   targetName String
   type       String
+  action     String
   notes      String?
 
   createdAt DateTime @default(now())
