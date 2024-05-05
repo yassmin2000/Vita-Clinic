@@ -30,7 +30,7 @@ const formSchema = z.object({
   oxygenSaturation: z.number().optional(),
 });
 
-interface VitalsForm {
+interface VitalsFormProps {
   vitalsId: string;
   appointmentId: string;
   onClose: () => void;
@@ -42,7 +42,7 @@ export default function VitalsForm({
   appointmentId,
   onClose,
   defaultValues,
-}: VitalsForm) {
+}: VitalsFormProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues,
@@ -101,9 +101,11 @@ export default function VitalsForm({
       >
         <div className="w-full space-y-2">
           <div>
-            <h3 className="text-lg font-medium">Update Patient's Vitals</h3>
+            <h3 className="text-lg font-medium">
+              Update Patient&apos;s Vitals
+            </h3>
             <p className="text-sm text-muted-foreground">
-              Update the patient's vitals for this appointment.
+              Update the patient&apos;s vitals for this appointment.
             </p>
           </div>
           <Separator className="bg-primary/10" />

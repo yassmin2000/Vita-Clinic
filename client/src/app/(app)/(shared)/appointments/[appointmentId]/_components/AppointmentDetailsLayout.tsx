@@ -6,6 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 import AppointmentDetailsCard from './AppointmentDetailsCard';
 import AppointmentReports from './AppointmentReports';
 import AppointmentScans from './AppointmentScans';
+import AppointmentPrescriptions from './AppointmentPrescriptions';
 import { Separator } from '@/components/ui/separator';
 import AppointmentDetailsCardSkeleton from './AppointmentDetailsCardSkeleton';
 
@@ -53,6 +54,8 @@ export default function AppointmentDetailsLayout({
             <AppointmentReports appointmentId={appointmentId} />
             <Separator className="my-1" />
             <AppointmentScans id={appointmentId} />
+            <Separator className="my-1" />
+            <AppointmentPrescriptions appointmentId={appointmentId} />
           </>
         )}
     </div>
