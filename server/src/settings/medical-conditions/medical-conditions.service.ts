@@ -5,10 +5,14 @@ import {
   CreateMedicalConditionDto,
   UpdateMedicalConditionDto,
 } from './dto/medical-conditions.dto';
+import { LogService } from 'src/log/log.service';
 
 @Injectable()
 export class MedicalConditionsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private logService: LogService
+  ) {}
 
   async findAll() {
     return this.prisma.medicalCondition.findMany();
@@ -26,10 +30,21 @@ export class MedicalConditionsService {
     return medicalCondition;
   }
 
-  async create(createMedicalConditionDto: CreateMedicalConditionDto) {
-    return this.prisma.medicalCondition.create({
+  async create(userId: string,createMedicalConditionDto: CreateMedicalConditionDto) {
+    const createdMedCondition = await this.prisma.allergy.create({
       data: createMedicalConditionDto,
     });
+
+ 
+    await this.logService.create(
+      userId,
+      createdMedCondition.id,
+      createdMedCondition.name,
+      'Medical Condition',
+      'Create',
+    );
+
+    return createdMedCondition;
   }
 
   async update(
