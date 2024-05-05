@@ -10,7 +10,6 @@ import {
   Patch,
   Param,
   Delete,
-  NotFoundException,
   ValidationPipe,
 } from '@nestjs/common';
 
@@ -53,7 +52,7 @@ export class MedicationsController {
 
   @UseGuards(JwtGuard)
   @Post()
-  async createMedication(
+  async create(
     @Body(ValidationPipe) createMeidicationDto: CreateMedicationDto,
     @Req() request: Request,
   ) {
@@ -63,7 +62,7 @@ export class MedicationsController {
       throw new UnauthorizedException();
     }
 
-    return this.medicationsService.createMedication(createMeidicationDto);
+    return this.medicationsService.create(user.id,createMeidicationDto);
   }
 
   @UseGuards(JwtGuard)

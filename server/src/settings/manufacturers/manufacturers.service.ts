@@ -31,7 +31,7 @@ export class ManufacturersService {
   }
 
   async create(userId: string,createManufacturerDto: CreateManufacturerDto) {
-    const createdManufacturer = await this.prisma.allergy.create({
+    const createdManufacturer = await this.prisma.manufacturer.create({
       data: createManufacturerDto,
     });
 

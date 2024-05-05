@@ -31,7 +31,7 @@ export class MedicalConditionsService {
   }
 
   async create(userId: string,createMedicalConditionDto: CreateMedicalConditionDto) {
-    const createdMedCondition = await this.prisma.allergy.create({
+    const createdMedCondition = await this.prisma.manufacturer.create({
       data: createMedicalConditionDto,
     });
 

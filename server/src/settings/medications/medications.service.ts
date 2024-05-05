@@ -5,10 +5,14 @@ import {
   CreateMedicationDto,
   UpdateMedicationDto,
 } from './dto/medications.dto';
+import { LogService } from 'src/log/log.service';
 
 @Injectable()
 export class MedicationsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private logService: LogService
+  ) {}
 
   async findAll() {
     return this.prisma.medication.findMany();
@@ -26,10 +30,21 @@ export class MedicationsService {
     return medication;
   }
 
-  async createMedication(createMedicationDto: CreateMedicationDto) {
-    return this.prisma.medication.create({
+  async create(userId: string,createMedicationDto: CreateMedicationDto) {
+    const createdMedication = await this.prisma.medication.create({
       data: createMedicationDto,
     });
+
+ 
+    await this.logService.create(
+      userId,
+      createdMedication.id,
+      createdMedication.name,
+      'Medication',
+      'Create',
+    );
+
+    return createdMedication;
   }
 
   async updateMedication(id: string, updateMedicationDto: UpdateMedicationDto) {
