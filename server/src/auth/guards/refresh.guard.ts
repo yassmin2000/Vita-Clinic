@@ -22,7 +22,7 @@ export class RefreshJwtGuard implements CanActivate {
 
     try {
       const payload: Payload = await this.jwtService.verifyAsync(token, {
-        secret: process.env.jwtRefreshTokenKey,
+        secret: process.env.JWT_REFRESH_TOKEN_KEY,
       });
       request['user'] = payload;
     } catch (error) {
