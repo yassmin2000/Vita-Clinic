@@ -25,9 +25,7 @@ export class ServicesController {
 
   @UseGuards(JwtGuard)
   @Get()
-  async getAllServices(@Req() request: Request) {
-    const user: Payload = request['user'];
-
+  async getAllServices() {
     return this.servicesService.findAll();
   }
 
@@ -56,7 +54,7 @@ export class ServicesController {
     if (user.role === 'patient') {
       throw new UnauthorizedException();
     }
-    return this.servicesService.create(dto);
+    return this.servicesService.create(user.id,dto);
   }
 
   @UseGuards(JwtGuard)
