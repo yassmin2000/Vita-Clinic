@@ -48,25 +48,44 @@ enum DrugsUsage {
 }
 
 enum DosageForm {
-  capsule
-  injection
-  liquid
-  suppository
   tablet
-  topical
+  capsule
+  syrup
+  injection
+  ointment
+  cream
+  lotion
+  inhaler
+  drops
+  suppository
+  patch
+  gel
+  spray
+  solution
+  powder
+  suspension
 }
 
 enum RouteOfAdministration {
-  inhalation
-  intramuscular
-  intravenous
-  nasal
-  ophthalmic
   oral
+  sublingual
+  buccal
   rectal
-  subcutaneous
-  transdermal
   vaginal
+  intravenous
+  intramuscular
+  subcutaneous
+  intradermal
+  transdermal
+  intrathecal
+  intraarticular
+  intranasal
+  inhalation
+  ocular
+  otic
+  topically
+  epidural
+  intracardiac
 }
 
 enum Frequency {
@@ -428,9 +447,9 @@ model Message {
 }
 
 model Modality {
-  id          String @id @default(uuid())
+  id          String  @id @default(uuid())
   name        String
-  description String
+  description String?
   price       Float
 
   scan Scan[]
@@ -603,5 +622,5 @@ model Action {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  userId    String
+  userId    String
 }

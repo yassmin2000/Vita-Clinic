@@ -15,13 +15,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Combobox } from '@/components/ui/combobox';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
@@ -29,6 +23,8 @@ import { useToast } from '@/components/ui/use-toast';
 
 import useAccessToken from '@/hooks/useAccessToken';
 import useSettingsStore from '@/hooks/useSettingsStore';
+
+import { dosageForms, routesOfAdministration } from '@/lib/constants';
 
 const formSchema = z.object({
   name: z
@@ -46,99 +42,55 @@ const formSchema = z.object({
     required_error: 'Unit is required.',
   }),
   dosageForm: z.enum(
-    ['capsule', 'injection', 'liquid', 'suppository', 'tablet', 'topical'],
+    [
+      'tablet',
+      'capsule',
+      'syrup',
+      'injection',
+      'ointment',
+      'cream',
+      'lotion',
+      'inhaler',
+      'drops',
+      'suppository',
+      'patch',
+      'gel',
+      'spray',
+      'solution',
+      'powder',
+      'suspension',
+    ],
     {
       required_error: 'Dosage form is required.',
     }
   ),
   routeOfAdministration: z.enum(
     [
-      'inhalation',
-      'intramuscular',
-      'intravenous',
-      'nasal',
-      'ophthalmic',
       'oral',
+      'sublingual',
+      'buccal',
       'rectal',
-      'subcutaneous',
-      'transdermal',
       'vaginal',
+      'intravenous',
+      'intramuscular',
+      'subcutaneous',
+      'intradermal',
+      'transdermal',
+      'intrathecal',
+      'intraarticular',
+      'intranasal',
+      'inhalation',
+      'ocular',
+      'otic',
+      'topically',
+      'epidural',
+      'intracardiac',
     ],
     {
       required_error: 'Route of administration is required.',
     }
   ),
 });
-
-const dosageForms = [
-  {
-    label: 'Capsule',
-    value: 'capsule',
-  },
-  {
-    label: 'Injection',
-    value: 'injection',
-  },
-  {
-    label: 'Liquid',
-    value: 'liquid',
-  },
-  {
-    label: 'Suppository',
-    value: 'suppository',
-  },
-  {
-    label: 'Tablet',
-    value: 'tablet',
-  },
-  {
-    label: 'Topical',
-    value: 'topical',
-  },
-];
-
-const routesOfAdministration = [
-  {
-    label: 'Inhalation',
-    value: 'inhalation',
-  },
-  {
-    label: 'Intramuscular',
-    value: 'intramuscular',
-  },
-  {
-    label: 'Intravenous',
-    value: 'intravenous',
-  },
-  {
-    label: 'Nasal',
-    value: 'nasal',
-  },
-  {
-    label: 'Ophthalmic',
-    value: 'ophthalmic',
-  },
-  {
-    label: 'Oral',
-    value: 'oral',
-  },
-  {
-    label: 'Rectal',
-    value: 'rectal',
-  },
-  {
-    label: 'Subcutaneous',
-    value: 'subcutaneous',
-  },
-  {
-    label: 'Transdermal',
-    value: 'transdermal',
-  },
-  {
-    label: 'Vaginal',
-    value: 'vaginal',
-  },
-];
 
 interface MedicationFormProps {
   currentId?: string | number;
@@ -301,28 +253,16 @@ export default function MedicationForm({
               render={({ field }) => (
                 <FormItem className="w-full">
                   <FormLabel required>Dosage Form</FormLabel>
-                  <Select
-                    disabled={isPending}
-                    onValueChange={field.onChange}
-                    value={field.value}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger className="bg-background">
-                        <SelectValue
-                          defaultValue={field.value}
-                          placeholder="Select dosage form"
-                        />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {dosageForms.map((item) => (
-                        <SelectItem key={item.value} value={item.value}>
-                          {item.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <FormControl>
+                    <Combobox
+                      value={field.value || ''}
+                      onChange={field.onChange}
+                      placeholder="Select dosage form"
+                      inputPlaceholder="Search dosage forms"
+                      options={dosageForms}
+                      disabled={isPending}
+                    />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
@@ -334,28 +274,16 @@ export default function MedicationForm({
               render={({ field }) => (
                 <FormItem className="w-full">
                   <FormLabel required>Route Of Administration</FormLabel>
-                  <Select
-                    disabled={isPending}
-                    onValueChange={field.onChange}
-                    value={field.value}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger className="bg-background">
-                        <SelectValue
-                          defaultValue={field.value}
-                          placeholder="Select route of administration"
-                        />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {routesOfAdministration.map((item) => (
-                        <SelectItem key={item.value} value={item.value}>
-                          {item.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <FormControl>
+                    <Combobox
+                      value={field.value || ''}
+                      onChange={field.onChange}
+                      placeholder="Select route of administration"
+                      inputPlaceholder="Search routes of administration"
+                      options={routesOfAdministration}
+                      disabled={isPending}
+                    />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}

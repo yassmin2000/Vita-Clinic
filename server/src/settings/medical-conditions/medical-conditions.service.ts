@@ -34,7 +34,7 @@ export class MedicalConditionsService {
     userId: string,
     createMedicalConditionDto: CreateMedicalConditionDto,
   ) {
-    const createdMedicalCondition = await this.prisma.manufacturer.create({
+    const createdMedicalCondition = await this.prisma.medicalCondition.create({
       data: createMedicalConditionDto,
     });
 
@@ -42,7 +42,7 @@ export class MedicalConditionsService {
       userId,
       targetId: createdMedicalCondition.id,
       targetName: createdMedicalCondition.name,
-      type: 'medication-condition',
+      type: 'medical-condition',
       action: 'create',
     });
 

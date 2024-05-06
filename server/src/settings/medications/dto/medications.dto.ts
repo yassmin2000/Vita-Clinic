@@ -27,22 +27,47 @@ export class CreateMedicationDto {
   unit: string;
 
   @IsNotEmpty()
-  @IsIn(['tablet', 'capsule', 'topical', 'syrup', 'injection', 'inhaler'])
+  @IsIn([
+    'tablet',
+    'capsule',
+    'syrup',
+    'injection',
+    'ointment',
+    'cream',
+    'lotion',
+    'inhaler',
+    'drops',
+    'suppository',
+    'patch',
+    'gel',
+    'spray',
+    'solution',
+    'powder',
+    'suspension',
+  ])
   dosageForm: DosageForm;
 
   @IsNotEmpty()
   @IsIn([
     'oral',
-    'injection',
-    'inhalation',
-    'nasal',
-    'otic',
-    'ophthalmic',
+    'sublingual',
+    'buccal',
     'rectal',
     'vaginal',
     'intravenous',
     'intramuscular',
     'subcutaneous',
+    'intradermal',
+    'transdermal',
+    'intrathecal',
+    'intraarticular',
+    'intranasal',
+    'inhalation',
+    'ocular',
+    'otic',
+    'topically',
+    'epidural',
+    'intracardiac',
   ])
   routeOfAdministration: RouteOfAdministration;
 }

@@ -77,3 +77,149 @@ export const drugStatus = [
     value: 'current',
   },
 ];
+
+export const dosageForms = [
+  {
+    label: 'Tablet',
+    value: 'tablet',
+  },
+  {
+    label: 'Capsule',
+    value: 'capsule',
+  },
+  {
+    label: 'Syrup',
+    value: 'syrup',
+  },
+  {
+    label: 'Injection',
+    value: 'injection',
+  },
+  {
+    label: 'Ointment',
+    value: 'ointment',
+  },
+  {
+    label: 'Cream',
+    value: 'cream',
+  },
+  {
+    label: 'Lotion',
+    value: 'lotion',
+  },
+  {
+    label: 'Inhaler',
+    value: 'inhaler',
+  },
+  {
+    label: 'Drops',
+    value: 'drops',
+  },
+  {
+    label: 'Suppository',
+    value: 'suppository',
+  },
+  {
+    label: 'Patch',
+    value: 'patch',
+  },
+  {
+    label: 'Gel',
+    value: 'gel',
+  },
+  {
+    label: 'Spray',
+    value: 'spray',
+  },
+  {
+    label: 'Solution',
+    value: 'solution',
+  },
+  {
+    label: 'Powder',
+    value: 'powder',
+  },
+  {
+    label: 'Suspension',
+    value: 'suspension',
+  },
+];
+
+export const routesOfAdministration = [
+  {
+    label: 'Oral',
+    value: 'oral',
+  },
+  {
+    label: 'Sublingual',
+    value: 'sublingual',
+  },
+  {
+    label: 'Buccal',
+    value: 'buccal',
+  },
+  {
+    label: 'Rectal',
+    value: 'rectal',
+  },
+  {
+    label: 'Vaginal',
+    value: 'vaginal',
+  },
+  {
+    label: 'Intravenous',
+    value: 'intravenous',
+  },
+  {
+    label: 'Intramuscular',
+    value: 'intramuscular',
+  },
+  {
+    label: 'Subcutaneous',
+    value: 'subcutaneous',
+  },
+  {
+    label: 'Intradermal',
+    value: 'intradermal',
+  },
+  {
+    label: 'Transdermal',
+    value: 'transdermal',
+  },
+  {
+    label: 'Intrathecal',
+    value: 'intrathecal',
+  },
+  {
+    label: 'Intraarticular',
+    value: 'intraarticular',
+  },
+  {
+    label: 'Intranasal',
+    value: 'intranasal',
+  },
+  {
+    label: 'Inhalation',
+    value: 'inhalation',
+  },
+  {
+    label: 'Ocular',
+    value: 'ocular',
+  },
+  {
+    label: 'Otic',
+    value: 'otic',
+  },
+  {
+    label: 'Topically',
+    value: 'topically',
+  },
+  {
+    label: 'Epidural',
+    value: 'epidural',
+  },
+  {
+    label: 'Intracardiac',
+    value: 'intracardiac',
+  },
+];
