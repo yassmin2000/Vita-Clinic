@@ -259,7 +259,10 @@ export default function MedicationForm({
                       onChange={field.onChange}
                       placeholder="Select dosage form"
                       inputPlaceholder="Search dosage forms"
-                      options={dosageForms}
+                      options={dosageForms.map((form) => ({
+                        label: form.label,
+                        value: form.value,
+                      }))}
                       disabled={isPending}
                     />
                   </FormControl>
@@ -280,7 +283,10 @@ export default function MedicationForm({
                       onChange={field.onChange}
                       placeholder="Select route of administration"
                       inputPlaceholder="Search routes of administration"
-                      options={routesOfAdministration}
+                      options={routesOfAdministration.map((route) => ({
+                        label: route.label,
+                        value: route.value,
+                      }))}
                       disabled={isPending}
                     />
                   </FormControl>
