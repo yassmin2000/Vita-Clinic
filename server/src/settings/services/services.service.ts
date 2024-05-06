@@ -43,7 +43,7 @@ export class ServicesService {
     return createdService;
   }
 
-  async update(id: string, updateServiceDto: UpdateServiceDto) {
+  async update(userId:string,id: string, updateServiceDto: UpdateServiceDto) {
     const existingService = await this.prisma.service.findUnique({
       where: { id },
     });
@@ -52,13 +52,23 @@ export class ServicesService {
       throw new NotFoundException('Service not found');
     }
 
-    return this.prisma.service.update({
+    const updatedService = await this.prisma.service.update({
       where: { id },
       data: updateServiceDto,
     });
+
+    await this.logService.create({
+      userId,
+      targetId: updatedService.id,
+      targetName: updatedService.name,
+      type: 'service',
+      action: 'update',
+    });
+
+    return updatedService;
   }
 
-  async delete(id: string) {
+  async delete(userId: string, id: string) {
     const existingService = await this.prisma.service.findUnique({
       where: { id },
     });
@@ -67,8 +77,18 @@ export class ServicesService {
       throw new NotFoundException('Service not found');
     }
 
-    return this.prisma.service.delete({
+    const deletedService = await this.prisma.service.delete({
       where: { id },
     });
+
+    await this.logService.create({
+      userId,
+      targetId: deletedService.id,
+      targetName: deletedService.name,
+      type: 'service',
+      action: 'delete',
+    });
+
+    return deletedService;
   }
 }

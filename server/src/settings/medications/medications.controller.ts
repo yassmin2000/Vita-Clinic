@@ -78,7 +78,11 @@ export class MedicationsController {
       throw new UnauthorizedException();
     }
 
-    return this.medicationsService.updateMedication(id, updateMedicationDto);
+    return this.medicationsService.updateMedication(
+      user.id,
+      id,
+      updateMedicationDto,
+    );
   }
 
   @UseGuards(JwtGuard)
@@ -90,6 +94,6 @@ export class MedicationsController {
       throw new UnauthorizedException();
     }
 
-    return this.medicationsService.deleteMedication(id);
+    return this.medicationsService.deleteMedication(user.id, id);
   }
 }

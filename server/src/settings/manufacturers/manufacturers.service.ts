@@ -46,7 +46,11 @@ export class ManufacturersService {
     return createdManufacturer;
   }
 
-  async update(id: string, updateManufacturerDto: UpdateManufacturerDto) {
+  async update(
+    userId: string,
+    id: string,
+    updateManufacturerDto: UpdateManufacturerDto,
+  ) {
     const existingManufacturer = await this.prisma.manufacturer.findUnique({
       where: { id },
     });
@@ -55,13 +59,23 @@ export class ManufacturersService {
       throw new NotFoundException('Manufacturer not found');
     }
 
-    return this.prisma.manufacturer.update({
+    const updatedManufacturer = await this.prisma.manufacturer.update({
       where: { id },
       data: updateManufacturerDto,
     });
+
+    await this.logService.create({
+      userId,
+      targetId: updatedManufacturer.id,
+      targetName: updatedManufacturer.name,
+      type: 'manufacturer',
+      action: 'update',
+    });
+
+    return updatedManufacturer;
   }
 
-  async delete(id: string) {
+  async delete(userId: string, id: string) {
     const existingManufacturers = await this.prisma.manufacturer.findUnique({
       where: { id },
     });
@@ -70,8 +84,18 @@ export class ManufacturersService {
       throw new NotFoundException('Manufacturer not found');
     }
 
-    return this.prisma.manufacturer.delete({
+    const deletedManufacturers = await this.prisma.manufacturer.delete({
       where: { id },
     });
+
+    await this.logService.create({
+      userId,
+      targetId: deletedManufacturers.id,
+      targetName: deletedManufacturers.name,
+      type: 'manufacturer',
+      action: 'delete',
+    });
+
+    return deletedManufacturers;
   }
 }

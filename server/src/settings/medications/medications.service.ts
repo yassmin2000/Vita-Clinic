@@ -46,7 +46,11 @@ export class MedicationsService {
     return createdMedication;
   }
 
-  async updateMedication(id: string, updateMedicationDto: UpdateMedicationDto) {
+  async updateMedication(
+    userId: string,
+    id: string,
+    updateMedicationDto: UpdateMedicationDto,
+  ) {
     const existingMedication = await this.prisma.medication.findUnique({
       where: { id },
     });
@@ -55,13 +59,23 @@ export class MedicationsService {
       throw new NotFoundException('Medication not found');
     }
 
-    return this.prisma.medication.update({
+    const updatedMedication = await this.prisma.medication.update({
       where: { id },
       data: updateMedicationDto,
     });
+
+    await this.logService.create({
+      userId,
+      targetId: updatedMedication.id,
+      targetName: updatedMedication.name,
+      type: 'medication',
+      action: 'update',
+    });
+
+    return updatedMedication;
   }
 
-  async deleteMedication(id: string) {
+  async deleteMedication(userId: string, id: string) {
     const existingMedication = await this.prisma.medication.findUnique({
       where: { id },
     });
@@ -70,8 +84,18 @@ export class MedicationsService {
       throw new NotFoundException('Medication not found');
     }
 
-    return this.prisma.medication.delete({
+    const deletedMedication = await this.prisma.medication.delete({
       where: { id },
     });
+
+    await this.logService.create({
+      userId,
+      targetId: deletedMedication.id,
+      targetName: deletedMedication.name,
+      type: 'medication',
+      action: 'delete',
+    });
+
+    return deletedMedication;
   }
 }

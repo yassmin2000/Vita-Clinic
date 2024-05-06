@@ -60,7 +60,7 @@ export class AllergiesController {
     if (user.role === 'patient') {
       throw new UnauthorizedException();
     }
-    return this.allergiesService.create(user.id,dto);
+    return this.allergiesService.create(user.id, dto);
   }
 
   @UseGuards(JwtGuard)
@@ -76,7 +76,7 @@ export class AllergiesController {
       throw new UnauthorizedException();
     }
 
-    return this.allergiesService.update(id, updateAllergyDto);
+    return this.allergiesService.update(user.id, id, updateAllergyDto);
   }
 
   @UseGuards(JwtGuard)
@@ -88,6 +88,6 @@ export class AllergiesController {
       throw new UnauthorizedException();
     }
 
-    return this.allergiesService.delete(id);
+    return this.allergiesService.delete(user.id, id);
   }
 }

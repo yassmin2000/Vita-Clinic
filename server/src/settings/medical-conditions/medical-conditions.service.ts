@@ -50,6 +50,7 @@ export class MedicalConditionsService {
   }
 
   async update(
+    userId: string,
     id: string,
     updateMedicalConditionDto: UpdateMedicalConditionDto,
   ) {
@@ -62,13 +63,23 @@ export class MedicalConditionsService {
       throw new NotFoundException('Medical Condition not found');
     }
 
-    return this.prisma.medicalCondition.update({
+    const updatedMedicalConditions = await this.prisma.medicalCondition.update({
       where: { id },
       data: updateMedicalConditionDto,
     });
+
+    await this.logService.create({
+      userId,
+      targetId: updatedMedicalConditions.id,
+      targetName: updatedMedicalConditions.name,
+      type: 'medical-condition',
+      action: 'update',
+    });
+
+    return updatedMedicalConditions;
   }
 
-  async delete(id: string) {
+  async delete(userId: string, id: string) {
     const existingMedicalConditions =
       await this.prisma.medicalCondition.findUnique({
         where: { id },
@@ -78,8 +89,18 @@ export class MedicalConditionsService {
       throw new NotFoundException('Medical Condition not found');
     }
 
-    return this.prisma.medicalCondition.delete({
+    const deletedMedicalConditions = await this.prisma.medicalCondition.delete({
       where: { id },
     });
+
+    await this.logService.create({
+      userId,
+      targetId: deletedMedicalConditions.id,
+      targetName: deletedMedicalConditions.name,
+      type: 'medical-condition',
+      action: 'delete',
+    });
+
+    return deletedMedicalConditions;
   }
 }

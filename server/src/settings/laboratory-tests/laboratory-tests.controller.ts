@@ -76,7 +76,7 @@ export class LaboratoryTestsController {
       throw new UnauthorizedException();
     }
 
-    return this.laboratoryTestsService.update(id, dto);
+    return this.laboratoryTestsService.update(user.id,id, dto);
   }
 
   @UseGuards(JwtGuard)
@@ -88,6 +88,6 @@ export class LaboratoryTestsController {
       throw new UnauthorizedException();
     }
 
-    return this.laboratoryTestsService.delete(id);
+    return this.laboratoryTestsService.delete(user.id,id);
   }
 }

@@ -79,7 +79,7 @@ export class SpecialitiesController {
       throw new UnauthorizedException();
     }
 
-    return this.specialitiesService.update(id, updateSpecialityDto);
+    return this.specialitiesService.update(user.id, id, updateSpecialityDto);
   }
 
   @UseGuards(JwtGuard)
@@ -91,6 +91,6 @@ export class SpecialitiesController {
       throw new UnauthorizedException();
     }
 
-    return this.specialitiesService.delete(id);
+    return this.specialitiesService.delete(user.id, id);
   }
 }

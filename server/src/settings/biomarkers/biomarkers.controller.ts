@@ -75,7 +75,7 @@ export class BiomarkersController {
       throw new UnauthorizedException();
     }
 
-    return this.biomarkersService.update(id, updateBiomarkerDto);
+    return this.biomarkersService.update(user.id, id, updateBiomarkerDto);
   }
 
   @UseGuards(JwtGuard)
@@ -87,6 +87,6 @@ export class BiomarkersController {
       throw new UnauthorizedException();
     }
 
-    return this.biomarkersService.delete(id);
+    return this.biomarkersService.delete(user.id, id);
   }
 }

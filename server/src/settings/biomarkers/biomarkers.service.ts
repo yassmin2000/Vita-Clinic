@@ -42,7 +42,11 @@ export class BiomarkersService {
     return createdBiomarker;
   }
 
-  async update(id: string, updateBiomarkerDto: UpdateBiomarkerDto) {
+  async update(
+    userId: string,
+    id: string,
+    updateBiomarkerDto: UpdateBiomarkerDto,
+  ) {
     const existingBiomarker = await this.prisma.biomarker.findUnique({
       where: { id },
     });
@@ -51,13 +55,23 @@ export class BiomarkersService {
       throw new NotFoundException('Biomarker not found');
     }
 
-    return this.prisma.biomarker.update({
+    const updatedBiomarker = await this.prisma.biomarker.update({
       where: { id },
       data: updateBiomarkerDto,
     });
+
+    await this.logService.create({
+      userId,
+      targetId: updatedBiomarker.id,
+      targetName: updatedBiomarker.name,
+      type: 'biomarker',
+      action: 'update',
+    });
+
+    return updatedBiomarker;
   }
 
-  async delete(id: string) {
+  async delete(userId: string, id: string) {
     const existingBiomarker = await this.prisma.biomarker.findUnique({
       where: { id },
     });
@@ -66,8 +80,18 @@ export class BiomarkersService {
       throw new NotFoundException('Biomarker not found');
     }
 
-    return this.prisma.biomarker.delete({
+    const deletedBiomarker = await this.prisma.biomarker.delete({
       where: { id },
     });
+
+    await this.logService.create({
+      userId,
+      targetId: deletedBiomarker.id,
+      targetName: deletedBiomarker.name,
+      type: 'biomarker',
+      action: 'delete',
+    });
+
+    return deletedBiomarker;
   }
 }

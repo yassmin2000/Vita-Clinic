@@ -70,7 +70,7 @@ export class ModalitiesController {
       throw new UnauthorizedException();
     }
 
-    return this.modalitiesService.update(id, updateModalityDto);
+    return this.modalitiesService.update(user.id, id, updateModalityDto);
   }
 
   @UseGuards(JwtGuard)
@@ -82,6 +82,6 @@ export class ModalitiesController {
       throw new UnauthorizedException();
     }
 
-    return this.modalitiesService.delete(id);
+    return this.modalitiesService.delete(user.id, id);
   }
 }

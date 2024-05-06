@@ -41,7 +41,12 @@ export class ModalitiesService {
 
     return createdModality;
   }
-  async update(id: string, updateModalityDto: UpdateModalityDto) {
+  
+  async update(
+    userId: string,
+    id: string,
+    updateModalityDto: UpdateModalityDto,
+  ) {
     const existingModality = await this.prisma.modality.findUnique({
       where: { id },
     });
@@ -50,13 +55,23 @@ export class ModalitiesService {
       throw new NotFoundException('Modality not found');
     }
 
-    return this.prisma.modality.update({
+    const updatedModality = await this.prisma.modality.update({
       where: { id },
       data: updateModalityDto,
     });
+
+    await this.logService.create({
+      userId,
+      targetId: updatedModality.id,
+      targetName: updatedModality.name,
+      type: 'modality',
+      action: 'update',
+    });
+
+    return updatedModality;
   }
 
-  async delete(id: string) {
+  async delete(userId: string, id: string) {
     const existingModality = await this.prisma.modality.findUnique({
       where: { id },
     });
@@ -65,8 +80,18 @@ export class ModalitiesService {
       throw new NotFoundException('Modality not found');
     }
 
-    return this.prisma.modality.delete({
+    const deletedModality = await this.prisma.modality.delete({
       where: { id },
     });
+
+    await this.logService.create({
+      userId,
+      targetId: deletedModality.id,
+      targetName: deletedModality.name,
+      type: 'modality',
+      action: 'delete',
+    });
+
+    return deletedModality;
   }
 }

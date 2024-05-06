@@ -83,7 +83,11 @@ export class MedicalConditionsController {
       throw new UnauthorizedException();
     }
 
-    return this.medicalConditionsService.update(id, UpdateMedicalConditionDto);
+    return this.medicalConditionsService.update(
+      user.id,
+      id,
+      UpdateMedicalConditionDto,
+    );
   }
 
   @UseGuards(JwtGuard)
@@ -98,6 +102,6 @@ export class MedicalConditionsController {
       throw new UnauthorizedException();
     }
 
-    return this.medicalConditionsService.delete(id);
+    return this.medicalConditionsService.delete(user.id, id);
   }
 }

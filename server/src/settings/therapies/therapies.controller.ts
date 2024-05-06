@@ -70,7 +70,7 @@ export class TherapiesController {
       throw new UnauthorizedException();
     }
 
-    return this.therapiesService.update(id, updateTherapyDto);
+    return this.therapiesService.update(user.id, id, updateTherapyDto);
   }
 
   @UseGuards(JwtGuard)
@@ -82,6 +82,6 @@ export class TherapiesController {
       throw new UnauthorizedException();
     }
 
-    return this.therapiesService.delete(id);
+    return this.therapiesService.delete(user.id, id);
   }
 }

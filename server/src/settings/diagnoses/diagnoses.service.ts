@@ -28,21 +28,25 @@ export class DiagnosesService {
   }
 
   async create(userId: string, createDiagnosisDto: CreateDiagnosisDto) {
-    const createDiagnosis = await this.prisma.diagnosis.create({
+    const createdDiagnosis = await this.prisma.diagnosis.create({
       data: createDiagnosisDto,
     });
 
     await this.logService.create({
       userId,
-      targetId: createDiagnosis.id,
-      targetName: createDiagnosis.name,
+      targetId: createdDiagnosis.id,
+      targetName: createdDiagnosis.name,
       type: 'diagnosis',
       action: 'create',
     });
-    return createDiagnosis;
+    return createdDiagnosis;
   }
 
-  async update(id: string, updateDiagnosisDto: UpdateDiagnosisDto) {
+  async update(
+    userId: string,
+    id: string,
+    updateDiagnosisDto: UpdateDiagnosisDto,
+  ) {
     const existingDiagnosis = await this.prisma.diagnosis.findUnique({
       where: { id },
     });
@@ -51,13 +55,23 @@ export class DiagnosesService {
       throw new NotFoundException('Diagnosis not found');
     }
 
-    return this.prisma.diagnosis.update({
+    const updateDiagnosis = await this.prisma.diagnosis.update({
       where: { id },
       data: updateDiagnosisDto,
     });
+
+    await this.logService.create({
+      userId,
+      targetId: updateDiagnosis.id,
+      targetName: updateDiagnosis.name,
+      type: 'diagnosis',
+      action: 'update',
+    });
+
+    return updateDiagnosis;
   }
 
-  async delete(id: string) {
+  async delete(userId: string, id: string) {
     const existingDiagnosis = await this.prisma.diagnosis.findUnique({
       where: { id },
     });
@@ -66,8 +80,18 @@ export class DiagnosesService {
       throw new NotFoundException('Diagnosis not found');
     }
 
-    return this.prisma.diagnosis.delete({
+    const deleteDiagnosis = await this.prisma.diagnosis.delete({
       where: { id },
     });
+
+    await this.logService.create({
+      userId,
+      targetId: deleteDiagnosis.id,
+      targetName: deleteDiagnosis.name,
+      type: 'diagnosis',
+      action: 'delete',
+    });
+
+    return deleteDiagnosis;
   }
 }

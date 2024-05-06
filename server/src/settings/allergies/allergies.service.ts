@@ -43,7 +43,7 @@ export class AllergiesService {
     return createdAllergy;
   }
 
-  async update(id: string, updateAllergyDto: UpdateAllergyDto) {
+  async update(id: string, userId: string, updateAllergyDto: UpdateAllergyDto) {
     const existingAllergy = await this.prisma.allergy.findUnique({
       where: { id },
     });
@@ -52,13 +52,23 @@ export class AllergiesService {
       throw new NotFoundException('Allergy not found');
     }
 
-    return this.prisma.allergy.update({
+    const updatedAllergy = await this.prisma.allergy.update({
       where: { id },
       data: updateAllergyDto,
     });
+
+    await this.logService.create({
+      userId,
+      targetId: updatedAllergy.id,
+      targetName: updatedAllergy.name,
+      type: 'allergy',
+      action: 'update',
+    });
+
+    return updatedAllergy;
   }
 
-  async delete(id: string) {
+  async delete(id: string, userId: string) {
     const existingAllergy = await this.prisma.allergy.findUnique({
       where: { id },
     });
@@ -67,8 +77,18 @@ export class AllergiesService {
       throw new NotFoundException('Allergy not found');
     }
 
-    return this.prisma.allergy.delete({
+    const deletedAllergy = await this.prisma.allergy.delete({
       where: { id },
     });
+
+    await this.logService.create({
+      userId,
+      targetId: deletedAllergy.id,
+      targetName: deletedAllergy.name,
+      type: 'allergy',
+      action: 'delete',
+    });
+
+    return deletedAllergy;
   }
 }

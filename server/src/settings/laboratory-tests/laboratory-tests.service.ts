@@ -73,7 +73,11 @@ export class LaboratoryTestsService {
     return createdLaboratoryTest;
   }
 
-  async update(id: string, updateLabTest: UpdateLaboratoryTestDto) {
+  async update(
+    userId: string,
+    id: string,
+    updateLabTest: UpdateLaboratoryTestDto,
+  ) {
     const { biomarkers, ...dto } = updateLabTest;
 
     const laboratoryTest = await this.findById(id);
@@ -84,7 +88,7 @@ export class LaboratoryTestsService {
       }),
     );
 
-    return this.prisma.laboratoryTest.update({
+    const updateLaboratoryTest = await this.prisma.laboratoryTest.update({
       where: { id },
       data: {
         ...dto,
@@ -97,13 +101,33 @@ export class LaboratoryTestsService {
         biomarkers: true,
       },
     });
+
+    await this.logService.create({
+      userId,
+      targetId: updateLaboratoryTest.id,
+      targetName: updateLaboratoryTest.name,
+      type: 'laboratory-test',
+      action: 'update',
+    });
+
+    return updateLaboratoryTest;
   }
 
-  async delete(id: string) {
+  async delete(userId: string, id: string) {
     await this.findById(id);
 
-    return this.prisma.laboratoryTest.delete({
+    const deletedLaboratoryTest = await this.prisma.laboratoryTest.delete({
       where: { id },
     });
+
+    await this.logService.create({
+      userId,
+      targetId: deletedLaboratoryTest.id,
+      targetName: deletedLaboratoryTest.name,
+      type: 'laboratory-test',
+      action: 'delete',
+    });
+
+    return deletedLaboratoryTest;
   }
 }

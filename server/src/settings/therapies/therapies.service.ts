@@ -43,7 +43,7 @@ export class TherapiesService {
     return createdTherapy;
   }
 
-  async update(id: string, updateTherapyDto: UpdateTherapyDto) {
+  async update(userId: string, id: string, updateTherapyDto: UpdateTherapyDto) {
     const existingTherapy = await this.prisma.therapy.findUnique({
       where: { id },
     });
@@ -52,13 +52,23 @@ export class TherapiesService {
       throw new NotFoundException('Therapy not found');
     }
 
-    return this.prisma.therapy.update({
+    const updatedTherapy = await this.prisma.therapy.update({
       where: { id },
       data: updateTherapyDto,
     });
+
+    await this.logService.create({
+      userId,
+      targetId: updatedTherapy.id,
+      targetName: updatedTherapy.name,
+      type: 'therapy',
+      action: 'update',
+    });
+
+    return updatedTherapy;
   }
 
-  async delete(id: string) {
+  async delete(userId: string, id: string) {
     const existingTherapy = await this.prisma.therapy.findUnique({
       where: { id },
     });
@@ -67,8 +77,18 @@ export class TherapiesService {
       throw new NotFoundException('Therapy not found');
     }
 
-    return this.prisma.therapy.delete({
+    const deletedTherapy = await this.prisma.therapy.delete({
       where: { id },
     });
+
+    await this.logService.create({
+      userId,
+      targetId: deletedTherapy.id,
+      targetName: deletedTherapy.name,
+      type: 'therapy',
+      action: 'delete',
+    });
+
+    return deletedTherapy;
   }
 }

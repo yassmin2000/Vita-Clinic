@@ -75,7 +75,7 @@ export class DiagnosesController {
       throw new UnauthorizedException();
     }
 
-    return this.diagnosesService.update(id, updateDiagnosisDto);
+    return this.diagnosesService.update(user.id, id, updateDiagnosisDto);
   }
 
   @UseGuards(JwtGuard)
@@ -87,6 +87,6 @@ export class DiagnosesController {
       throw new UnauthorizedException();
     }
 
-    return this.diagnosesService.delete(id);
+    return this.diagnosesService.delete(user.id, id);
   }
 }

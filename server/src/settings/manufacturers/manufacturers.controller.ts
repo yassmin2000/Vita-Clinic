@@ -77,7 +77,7 @@ export class ManufacturersController {
       throw new UnauthorizedException();
     }
 
-    return this.manufacturersService.update(id, updateManufacturerDto);
+    return this.manufacturersService.update(user.id, id, updateManufacturerDto);
   }
 
   @UseGuards(JwtGuard)
@@ -89,6 +89,6 @@ export class ManufacturersController {
       throw new UnauthorizedException();
     }
 
-    return this.manufacturersService.delete(id);
+    return this.manufacturersService.delete(user.id, id);
   }
 }

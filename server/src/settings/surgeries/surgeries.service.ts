@@ -42,7 +42,7 @@ export class SurgeriesService {
 
     return createdSurgery;
   }
-  async update(id: string, updateSurgeryDto: UpdateSurgeryDto) {
+  async update(userId: string, id: string, updateSurgeryDto: UpdateSurgeryDto) {
     const existingSurgery = await this.prisma.surgery.findUnique({
       where: { id },
     });
@@ -51,13 +51,23 @@ export class SurgeriesService {
       throw new NotFoundException('Surgery not found');
     }
 
-    return this.prisma.surgery.update({
+    const updatedSurgery = await this.prisma.surgery.update({
       where: { id },
       data: updateSurgeryDto,
     });
+
+    await this.logService.create({
+      userId,
+      targetId: updatedSurgery.id,
+      targetName: updatedSurgery.name,
+      type: 'surgery',
+      action: 'update',
+    });
+
+    return updatedSurgery;
   }
 
-  async delete(id: string) {
+  async delete(userId: string, id: string) {
     const existingSurgery = await this.prisma.surgery.findUnique({
       where: { id },
     });
@@ -66,8 +76,18 @@ export class SurgeriesService {
       throw new NotFoundException('Surgery not found');
     }
 
-    return this.prisma.surgery.delete({
+    const deletedSurgery = await this.prisma.surgery.delete({
       where: { id },
     });
+
+    await this.logService.create({
+      userId,
+      targetId: deletedSurgery.id,
+      targetName: deletedSurgery.name,
+      type: 'surgery',
+      action: 'delete',
+    });
+
+    return deletedSurgery;
   }
 }

@@ -70,7 +70,7 @@ export class ServicesController {
       throw new UnauthorizedException();
     }
 
-    return this.servicesService.update(id, updateServiceDto);
+    return this.servicesService.update(user.id, id, updateServiceDto);
   }
 
   @UseGuards(JwtGuard)
@@ -82,6 +82,6 @@ export class ServicesController {
       throw new UnauthorizedException();
     }
 
-    return this.servicesService.delete(id);
+    return this.servicesService.delete(user.id, id);
   }
 }

@@ -76,7 +76,7 @@ export class SurgeriesController {
       throw new UnauthorizedException();
     }
 
-    return this.surgeriesService.update(id, updateSurgeryDto);
+    return this.surgeriesService.update(user.id, id, updateSurgeryDto);
   }
 
   @UseGuards(JwtGuard)
@@ -88,6 +88,6 @@ export class SurgeriesController {
       throw new UnauthorizedException();
     }
 
-    return this.surgeriesService.delete(id);
+    return this.surgeriesService.delete(user.id, id);
   }
 }

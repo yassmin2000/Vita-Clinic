@@ -45,7 +45,11 @@ export class SpecialitiesService {
     return createdSpeciality;
   }
 
-  async update(id: string, updateSpecialityDto: UpdateSpecialityDto) {
+  async update(
+    userId: string,
+    id: string,
+    updateSpecialityDto: UpdateSpecialityDto,
+  ) {
     const existingSpeciality = await this.prisma.speciality.findUnique({
       where: { id },
     });
@@ -54,13 +58,23 @@ export class SpecialitiesService {
       throw new NotFoundException('Speciality not found');
     }
 
-    return this.prisma.speciality.update({
+    const updatedSpeciality = await this.prisma.speciality.update({
       where: { id },
       data: updateSpecialityDto,
     });
+
+    await this.logService.create({
+      userId,
+      targetId: updatedSpeciality.id,
+      targetName: updatedSpeciality.name,
+      type: 'speciality',
+      action: 'update',
+    });
+
+    return updatedSpeciality;
   }
 
-  async delete(id: string) {
+  async delete(userId: string, id: string) {
     const existingSpeciality = await this.prisma.speciality.findUnique({
       where: { id },
     });
@@ -69,8 +83,18 @@ export class SpecialitiesService {
       throw new NotFoundException('Speciality not found');
     }
 
-    return this.prisma.speciality.delete({
+    const deletedSpeciality = await this.prisma.speciality.delete({
       where: { id },
     });
+
+    await this.logService.create({
+      userId,
+      targetId: deletedSpeciality.id,
+      targetName: deletedSpeciality.name,
+      type: 'speciality',
+      action: 'delete',
+    });
+
+    return deletedSpeciality;
   }
 }
