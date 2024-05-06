@@ -6,6 +6,7 @@ import type {
   Lookup,
   Medication,
   PriceLookup,
+  Therapy,
 } from '@/types/settings.type';
 
 type useSettingsStoreProps = {
@@ -18,6 +19,8 @@ type useSettingsStoreProps = {
   setCurrentMedication: (medication: Medication | null) => void;
   currentPriceLookup: PriceLookup | null;
   setCurrentPriceLookup: (priceLookup: PriceLookup | null) => void;
+  currentTherapy: Therapy | null;
+  setCurrentTherapy: (therapy: Therapy | null) => void;
   currentLaboratoryTest: LaboratoryTest | null;
   setCurrentLaboratoryTest: (laboratoryTest: LaboratoryTest | null) => void;
   currentBiomarker: Biomarker | null;
@@ -36,6 +39,8 @@ const useSettingsStore = create<useSettingsStoreProps>((set) => ({
   currentPriceLookup: null,
   setCurrentPriceLookup: (priceLookup) =>
     set({ currentPriceLookup: priceLookup }),
+  currentTherapy: null,
+  setCurrentTherapy: (therapy) => set({ currentTherapy: therapy }),
   currentLaboratoryTest: null,
   setCurrentLaboratoryTest: (laboratoryTest) =>
     set({ currentLaboratoryTest: laboratoryTest }),
@@ -45,6 +50,7 @@ const useSettingsStore = create<useSettingsStoreProps>((set) => ({
     set({
       currentLookup: null,
       currentPriceLookup: null,
+      currentTherapy: null,
       currentLaboratoryTest: null,
       currentBiomarker: null,
     }),

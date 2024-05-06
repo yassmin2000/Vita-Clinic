@@ -6,10 +6,13 @@ export class CreateTherapyDto {
   @IsString()
   name: string;
 
-  @IsNotEmpty()
   @IsString()
   @IsOptional()
   description: string;
+
+  @IsString()
+  @IsOptional()
+  unit: string;
 
   @IsNotEmpty()
   @IsNumber()

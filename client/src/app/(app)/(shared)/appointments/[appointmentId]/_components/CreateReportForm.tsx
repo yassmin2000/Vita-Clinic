@@ -72,7 +72,7 @@ export default function CreateReportForm({
 
       const body = {
         title: form.getValues('title'),
-        description: form.getValues('notes'),
+        notes: form.getValues('notes'),
         reportURL: uploadedFile.url,
         fileName: file.name,
         appointmentId,

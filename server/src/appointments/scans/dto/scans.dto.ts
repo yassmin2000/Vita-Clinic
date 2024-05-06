@@ -9,7 +9,7 @@ export class CreateScanDto {
 
   @IsOptional()
   @IsString()
-  description?: string;
+  notes?: string;
 
   @IsNotEmpty()
   @IsString({ each: true })

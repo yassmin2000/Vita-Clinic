@@ -29,7 +29,7 @@ export class ScansService {
       },
       select: {
         title: true,
-        description: true,
+        notes: true,
         createdAt: true,
         updatedAt: true,
         modality: true,
@@ -54,7 +54,7 @@ export class ScansService {
       select: {
         id: true,
         title: true,
-        description: true,
+        notes: true,
         createdAt: true,
         updatedAt: true,
         modality: true,
@@ -80,8 +80,7 @@ export class ScansService {
   }
 
   async create(createScanDto: CreateScanDto) {
-    const { title, description, modalityId, scanURLs, appointmentId } =
-      createScanDto;
+    const { title, notes, modalityId, scanURLs, appointmentId } = createScanDto;
 
     const appointment = await this.prisma.appointment.findUnique({
       where: { id: appointmentId },
@@ -98,7 +97,7 @@ export class ScansService {
     return this.prisma.scan.create({
       data: {
         title,
-        description,
+        notes,
         modality: { connect: { id: modalityId } },
         scanURLs,
         appointment: { connect: { id: appointmentId } },
@@ -107,8 +106,7 @@ export class ScansService {
   }
 
   async update(id: string, updateScanDto: UpdateScanDto) {
-    const { title, description, modalityId, scanURLs, appointmentId } =
-      updateScanDto;
+    const { title, notes, scanURLs } = updateScanDto;
 
     const existingScan = await this.prisma.scan.findUnique({
       where: { id },
@@ -122,7 +120,7 @@ export class ScansService {
       where: { id },
       data: {
         title,
-        description,
+        notes,
         scanURLs,
       },
     });
