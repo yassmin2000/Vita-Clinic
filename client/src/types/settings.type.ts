@@ -40,6 +40,10 @@ export type PriceLookup = {
   createdAt: string;
 };
 
+export type Therapy = PriceLookup & {
+  unit?: string;
+}
+
 export type LaboratoryTest = {
   id: string;
   name: string;
