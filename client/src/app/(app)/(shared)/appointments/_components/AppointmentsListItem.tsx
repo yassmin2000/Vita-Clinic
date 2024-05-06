@@ -100,18 +100,19 @@ export default function AppointmentsListItem({
           <p className="text-sm text-muted-foreground">
             Booked at {format(parseISO(bookedAt), 'MMM dd, yyyy')}
           </p>
-          {status === 'pending' && (
-            <p className="text-sm text-muted-foreground">
-              Appointment to Dr.{' '}
-              <Link
-                href={`/users/${doctorName}`}
-                className="text-primary transition-all hover:text-primary/80"
-              >
-                {doctorName}
-              </Link>{' '}
-              on {format(parseISO(appointmentDate), 'MMM dd, yyyy - hh:mm a')}
-            </p>
-          )}
+          {status === 'pending' ||
+            (status === 'approved' && (
+              <p className="text-sm text-muted-foreground">
+                Appointment to Dr.{' '}
+                <Link
+                  href={`/users/${doctorName}`}
+                  className="text-primary transition-all hover:text-primary/80"
+                >
+                  {doctorName}
+                </Link>{' '}
+                on {format(parseISO(appointmentDate), 'MMM dd, yyyy - hh:mm a')}
+              </p>
+            ))}
           {status === 'cancelled' && (
             <p className="text-sm text-muted-foreground">
               Cancelled on {format(parseISO(cancelledAt), 'MMM dd, yyyy')},

@@ -415,12 +415,12 @@ enum ReportStatus {
 }
 
 model Report {
-  id          String       @id @default(uuid())
-  title       String
-  description String?
-  reportURL   String
-  fileName    String
-  status      ReportStatus @default(initial)
+  id        String       @id @default(uuid())
+  title     String
+  notes     String?
+  reportURL String
+  fileName  String
+  status    ReportStatus @default(initial)
 
   appointment   Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
   appointmentId String
@@ -460,9 +460,9 @@ model Modality {
 }
 
 model Scan {
-  id          String  @id @default(uuid())
-  title       String
-  description String?
+  id    String  @id @default(uuid())
+  title String
+  notes String?
 
   modality   Modality @relation(fields: [modalityId], references: [id])
   modalityId String
@@ -547,11 +547,31 @@ model Service {
 }
 
 model Therapy {
-  id                  String                @id @default(uuid())
-  name                String
-  description         String?
-  price               Float
+  id          String  @id @default(uuid())
+  name        String
+  description String?
+  price       Float
+  unit        String?
+
   appointmentServices AppointmentServices[]
+  treatments          Treatment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Treatment {
+  id   String @id @default(uuid())
+  name String
+
+  therapy   Therapy @relation(fields: [therapyId], references: [id])
+  therapyId String
+
+  dosage     Float
+  duration   Int
+  response   String?
+  sideEffect String?
+  notes      String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

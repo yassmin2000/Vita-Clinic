@@ -1,3 +1,5 @@
+import { dosageForms, routesOfAdministration } from '@/lib/constants';
+
 export type Lookup = {
   id: string;
   name: string;
@@ -5,30 +7,18 @@ export type Lookup = {
   createdAt: string;
 };
 
+export type DosageForm = (typeof dosageForms)[number]['value'];
+export type RouteOfAdministration =
+  (typeof routesOfAdministration)[number]['value'];
+
 export type Medication = {
   id: string;
   name: string;
   description?: string;
   strength: number;
   unit: string;
-  dosageForm:
-    | 'capsule'
-    | 'injection'
-    | 'liquid'
-    | 'suppository'
-    | 'tablet'
-    | 'topical';
-  routeOfAdministration:
-    | 'inhalation'
-    | 'intramuscular'
-    | 'intravenous'
-    | 'nasal'
-    | 'ophthalmic'
-    | 'oral'
-    | 'rectal'
-    | 'subcutaneous'
-    | 'transdermal'
-    | 'vaginal';
+  dosageForm: DosageForm;
+  routeOfAdministration: RouteOfAdministration;
   createdAt: string;
 };
 
@@ -49,6 +39,10 @@ export type PriceLookup = {
   description?: string;
   createdAt: string;
 };
+
+export type Therapy = PriceLookup & {
+  unit?: string;
+}
 
 export type LaboratoryTest = {
   id: string;

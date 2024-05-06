@@ -102,7 +102,7 @@ export default function CreateScanForm({
 
       const body = {
         title: form.getValues('title'),
-        description: form.getValues('notes'),
+        notes: form.getValues('notes'),
         scanURLs: scanURLs.map((url) => url.replace('https://', 'dicomweb://')),
         appointmentId,
         modalityId: form.getValues('modality'),

@@ -4,16 +4,16 @@ import axios from 'axios';
 import { useQuery } from '@tanstack/react-query';
 
 import { DataTable } from '@/components/DataTable';
-import { columns } from './PriceLookupsColumn';
+import { columns } from './TherapiesColumn';
 import NewEntityButton from './NewEntityButton';
 import Modal from '@/components/Modal';
-import PriceLookupForm from './PriceLookupForm';
+import TherapyForm from './TherapyForm';
 
 import useUserRole from '@/hooks/useUserRole';
 import useAccessToken from '@/hooks/useAccessToken';
 import useSettingsStore from '@/hooks/useSettingsStore';
 
-import type { PriceLookup } from '@/types/settings.type';
+import type { Therapy } from '@/types/settings.type';
 
 export default function TherapiesTable() {
   const { role } = useUserRole();
@@ -31,12 +31,12 @@ export default function TherapiesTable() {
         }
       );
 
-      return response.data as PriceLookup[];
+      return response.data as Therapy[];
     },
     enabled: !!accessToken,
   });
 
-  const { isFormOpen, closeForm, currentPriceLookup } = useSettingsStore();
+  const { isFormOpen, closeForm, currentTherapy } = useSettingsStore();
 
   return (
     <>
@@ -52,18 +52,15 @@ export default function TherapiesTable() {
         }
       />
       <Modal isOpen={isFormOpen} onClose={closeForm} className="h-fit">
-        <PriceLookupForm
-          title="Therapy"
-          endpoint="settings/therapies"
-          queryKey="therapies"
-          placeholder="Chemotherapy"
-          currentId={currentPriceLookup ? currentPriceLookup.id : undefined}
+        <TherapyForm
+          currentId={currentTherapy ? currentTherapy.id : undefined}
           defaultValues={
-            currentPriceLookup
+            currentTherapy
               ? {
-                  name: currentPriceLookup.name,
-                  description: currentPriceLookup.description,
-                  price: currentPriceLookup.price,
+                  name: currentTherapy.name,
+                  price: currentTherapy.price,
+                  unit: currentTherapy.unit,
+                  description: currentTherapy.description,
                 }
               : undefined
           }

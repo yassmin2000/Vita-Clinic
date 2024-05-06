@@ -17,7 +17,7 @@ export class CreateReportDto {
 
   @IsOptional()
   @IsString()
-  description?: string;
+  notes?: string;
 
   @IsNotEmpty()
   @IsUrl()

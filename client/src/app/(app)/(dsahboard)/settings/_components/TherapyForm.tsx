@@ -15,7 +15,6 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Combobox } from '@/components/ui/combobox';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
@@ -23,8 +22,6 @@ import { useToast } from '@/components/ui/use-toast';
 
 import useAccessToken from '@/hooks/useAccessToken';
 import useSettingsStore from '@/hooks/useSettingsStore';
-
-import { dosageForms, routesOfAdministration } from '@/lib/constants';
 
 const formSchema = z.object({
   name: z
@@ -34,73 +31,22 @@ const formSchema = z.object({
     .min(1, {
       message: 'Name is required.',
     }),
+  price: z.number({
+    required_error: 'Price is required.',
+  }),
+  unit: z.string().optional(),
   description: z.string().optional(),
-  strength: z.number({
-    required_error: 'Strength is required.',
-  }),
-  unit: z.string({
-    required_error: 'Unit is required.',
-  }),
-  dosageForm: z.enum(
-    [
-      'tablet',
-      'capsule',
-      'syrup',
-      'injection',
-      'ointment',
-      'cream',
-      'lotion',
-      'inhaler',
-      'drops',
-      'suppository',
-      'patch',
-      'gel',
-      'spray',
-      'solution',
-      'powder',
-      'suspension',
-    ],
-    {
-      required_error: 'Dosage form is required.',
-    }
-  ),
-  routeOfAdministration: z.enum(
-    [
-      'oral',
-      'sublingual',
-      'buccal',
-      'rectal',
-      'vaginal',
-      'intravenous',
-      'intramuscular',
-      'subcutaneous',
-      'intradermal',
-      'transdermal',
-      'intrathecal',
-      'intraarticular',
-      'intranasal',
-      'inhalation',
-      'ocular',
-      'otic',
-      'topically',
-      'epidural',
-      'intracardiac',
-    ],
-    {
-      required_error: 'Route of administration is required.',
-    }
-  ),
 });
 
-interface MedicationFormProps {
+interface TherapyFormProps {
   currentId?: string | number;
   defaultValues?: z.infer<typeof formSchema>;
 }
 
-export default function MedicationForm({
+export default function TherapyForm({
   currentId,
   defaultValues,
-}: MedicationFormProps) {
+}: TherapyFormProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues,
@@ -110,20 +56,19 @@ export default function MedicationForm({
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { mutate: mutateMedication, isPending } = useMutation({
+  const { mutate: mutateTherapy, isPending } = useMutation({
     mutationFn: async (values: z.infer<typeof formSchema>) => {
+      let response: AxiosResponse<any, any>;
       const body = {
         name: values.name,
         description: values.description,
-        strength: values.strength,
+        price: values.price,
         unit: values.unit,
-        dosageForm: values.dosageForm,
-        routeOfAdministration: values.routeOfAdministration,
       };
 
       if (currentId) {
-        return await axios.patch(
-          `${process.env.NEXT_PUBLIC_API_URL}/settings/medications/${currentId}`,
+        response = await axios.patch(
+          `${process.env.NEXT_PUBLIC_API_URL}/settings/therapies/${currentId}`,
           body,
           {
             headers: {
@@ -131,9 +76,13 @@ export default function MedicationForm({
             },
           }
         );
+
+        if (response.status !== 200) {
+          throw new Error('Failed to update');
+        }
       } else {
-        return await axios.post(
-          `${process.env.NEXT_PUBLIC_API_URL}/settings/medications`,
+        response = await axios.post(
+          `${process.env.NEXT_PUBLIC_API_URL}/settings/therapies`,
           body,
           {
             headers: {
@@ -141,26 +90,32 @@ export default function MedicationForm({
             },
           }
         );
+
+        if (response.status !== 201) {
+          throw new Error('Failed to create');
+        }
       }
+
+      return response;
     },
     onError: () => {
       return toast({
-        title: `Failed to ${currentId ? 'update' : 'create'} medication`,
+        title: `Failed to ${currentId ? 'update' : 'create'} therapy`,
         description: 'Please try again later.',
         variant: 'destructive',
       });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['medications'],
+        queryKey: ['therapies'],
       });
 
       closeForm();
       resetEntity();
 
       return toast({
-        title: `${currentId ? 'Updated' : 'Created'} medication successfully`,
-        description: `Medication has been ${currentId ? 'updated' : 'created'} successfully.`,
+        title: `${currentId ? 'Updated' : 'Created'} therapy successfully`,
+        description: `Therapy has been ${currentId ? 'updated' : 'created'} successfully.`,
       });
     },
   });
@@ -168,7 +123,7 @@ export default function MedicationForm({
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit((e) => mutateMedication(e))}
+        onSubmit={form.handleSubmit((e) => mutateTherapy(e))}
         className="space-y-6 px-4 py-2 text-foreground"
       >
         <div className="w-full space-y-2">
@@ -183,9 +138,9 @@ export default function MedicationForm({
             </div>
           ) : (
             <div>
-              <h3 className="text-lg font-medium">New Medication</h3>
+              <h3 className="text-lg font-medium">New Therapy</h3>
               <p className="text-sm text-muted-foreground">
-                Add a new medication to the list.
+                Add a new therapy to the list.
               </p>
             </div>
           )}
@@ -197,11 +152,11 @@ export default function MedicationForm({
             control={form.control}
             render={({ field }) => (
               <FormItem>
-                <FormLabel required>Medication Name</FormLabel>
+                <FormLabel required>Therapy Name</FormLabel>
                 <FormControl>
                   <Input
                     disabled={isPending}
-                    placeholder="Docetaxel"
+                    placeholder="Chemotherapy"
                     {...field}
                   />
                 </FormControl>
@@ -212,16 +167,16 @@ export default function MedicationForm({
 
           <div className="flex gap-4">
             <FormField
-              name="strength"
+              name="price"
               control={form.control}
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel required>Strength</FormLabel>
+                  <FormLabel required>Minimum</FormLabel>
                   <FormControl>
                     <Input
                       disabled={isPending}
                       type="number"
-                      placeholder="10"
+                      placeholder="200"
                       {...field}
                       onChange={(event) => field.onChange(+event.target.value)}
                     />
@@ -239,56 +194,6 @@ export default function MedicationForm({
                   <FormLabel required>Unit</FormLabel>
                   <FormControl>
                     <Input disabled={isPending} placeholder="mg" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          <div className="flex gap-4">
-            <FormField
-              name="dosageForm"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem className="w-full">
-                  <FormLabel required>Dosage Form</FormLabel>
-                  <FormControl>
-                    <Combobox
-                      value={field.value || ''}
-                      onChange={field.onChange}
-                      placeholder="Select dosage form"
-                      inputPlaceholder="Search dosage forms"
-                      options={dosageForms.map((form) => ({
-                        label: form.label,
-                        value: form.value,
-                      }))}
-                      disabled={isPending}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              name="routeOfAdministration"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem className="w-full">
-                  <FormLabel required>Route Of Administration</FormLabel>
-                  <FormControl>
-                    <Combobox
-                      value={field.value || ''}
-                      onChange={field.onChange}
-                      placeholder="Select route of administration"
-                      inputPlaceholder="Search routes of administration"
-                      options={routesOfAdministration.map((route) => ({
-                        label: route.label,
-                        value: route.value,
-                      }))}
-                      disabled={isPending}
-                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -319,7 +224,7 @@ export default function MedicationForm({
 
         <div className="flex justify-between gap-2">
           <Button type="submit" size="sm" disabled={isPending}>
-            {currentId ? 'Update' : 'Create'} Medication
+            {currentId ? 'Update' : 'Create'} Therapy
           </Button>
         </div>
       </form>

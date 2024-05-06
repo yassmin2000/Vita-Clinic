@@ -143,7 +143,7 @@ export const dosageForms = [
     label: 'Suspension',
     value: 'suspension',
   },
-];
+] as const;
 
 export const routesOfAdministration = [
   {
@@ -222,4 +222,4 @@ export const routesOfAdministration = [
     label: 'Intracardiac',
     value: 'intracardiac',
   },
-];
+] as const;
