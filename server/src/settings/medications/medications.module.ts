@@ -6,7 +6,7 @@ import { JwtService } from '@nestjs/jwt';
 import { LogService } from 'src/log/log.service';
 
 @Module({
-    controllers: [MedicationsController],
-    providers: [MedicationsService, PrismaService, JwtService,LogService],
+  controllers: [MedicationsController],
+  providers: [MedicationsService, PrismaService, JwtService, LogService],
 })
 export class MedicationsModule {}

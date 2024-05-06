@@ -54,7 +54,7 @@ export class ServicesController {
     if (user.role === 'patient') {
       throw new UnauthorizedException();
     }
-    return this.servicesService.create(user.id,dto);
+    return this.servicesService.create(user.id, dto);
   }
 
   @UseGuards(JwtGuard)

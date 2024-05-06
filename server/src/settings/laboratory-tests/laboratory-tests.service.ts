@@ -14,7 +14,7 @@ export class LaboratoryTestsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly biomarkersService: BiomarkersService,
-    private logService: LogService
+    private logService: LogService,
   ) {}
 
   async findAll() {
@@ -40,7 +40,10 @@ export class LaboratoryTestsService {
     return laboratoryTest;
   }
 
-  async create(userId: string, createLaboratoryTestDto: CreateLaboratoryTestDto) {
+  async create(
+    userId: string,
+    createLaboratoryTestDto: CreateLaboratoryTestDto,
+  ) {
     const { biomarkers, ...dto } = createLaboratoryTestDto;
 
     await Promise.all(
@@ -59,13 +62,13 @@ export class LaboratoryTestsService {
       include: { biomarkers: true },
     });
 
-    await this.logService.create(
+    await this.logService.create({
       userId,
-      createdLaboratoryTest.id,
-      createdLaboratoryTest.name,
-      'Laboratory Test',
-      'Create',
-    );
+      targetId: createdLaboratoryTest.id,
+      targetName: createdLaboratoryTest.name,
+      type: 'laboratory-test',
+      action: 'create',
+    });
 
     return createdLaboratoryTest;
   }

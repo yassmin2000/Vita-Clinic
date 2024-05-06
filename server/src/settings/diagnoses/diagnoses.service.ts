@@ -8,7 +8,7 @@ import { LogService } from 'src/log/log.service';
 export class DiagnosesService {
   constructor(
     private prisma: PrismaService,
-    private logService: LogService
+    private logService: LogService,
   ) {}
 
   async findAll() {
@@ -27,18 +27,18 @@ export class DiagnosesService {
     return diagnosis;
   }
 
-  async create(userId: string,createDiagnosisDto: CreateDiagnosisDto) {
+  async create(userId: string, createDiagnosisDto: CreateDiagnosisDto) {
     const createDiagnosis = await this.prisma.diagnosis.create({
       data: createDiagnosisDto,
     });
 
-    await this.logService.create(
+    await this.logService.create({
       userId,
-      createDiagnosis.id,
-      createDiagnosis.name,
-      'Diagnosis',
-      'Create',
-    );
+      targetId: createDiagnosis.id,
+      targetName: createDiagnosis.name,
+      type: 'diagnosis',
+      action: 'create',
+    });
     return createDiagnosis;
   }
 

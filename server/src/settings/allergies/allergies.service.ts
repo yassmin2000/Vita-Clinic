@@ -4,12 +4,11 @@ import { PrismaService } from 'src/prisma.service';
 import { CreateAllergyDto, UpdateAllergyDto } from './dto/allergies.dto';
 import { LogService } from 'src/log/log.service';
 
-
 @Injectable()
 export class AllergiesService {
   constructor(
     private prisma: PrismaService,
-    private logService: LogService
+    private logService: LogService,
   ) {}
 
   async findAll() {
@@ -28,19 +27,18 @@ export class AllergiesService {
     return allergy;
   }
 
-  async create(userId: string,createAllergyDto: CreateAllergyDto) {
+  async create(userId: string, createAllergyDto: CreateAllergyDto) {
     const createdAllergy = await this.prisma.allergy.create({
       data: createAllergyDto,
     });
 
- 
-    await this.logService.create(
+    await this.logService.create({
       userId,
-      createdAllergy.id,
-      createdAllergy.name,
-      'Allergy',
-      'Create',
-    );
+      targetId: createdAllergy.id,
+      targetName: createdAllergy.name,
+      type: 'allergy',
+      action: 'create',
+    });
 
     return createdAllergy;
   }

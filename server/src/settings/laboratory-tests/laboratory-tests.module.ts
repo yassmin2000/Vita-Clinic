@@ -14,7 +14,7 @@ import { LogService } from 'src/log/log.service';
     PrismaService,
     JwtService,
     BiomarkersService,
-    LogService
+    LogService,
   ],
 })
 export class LaboratoryTestsModule {}

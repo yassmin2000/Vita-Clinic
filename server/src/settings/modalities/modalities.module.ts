@@ -8,6 +8,6 @@ import { PrismaService } from 'src/prisma.service';
 import { LogService } from 'src/log/log.service';
 @Module({
   controllers: [ModalitiesController],
-  providers: [ModalitiesService, JwtService, PrismaService,LogService],
+  providers: [ModalitiesService, JwtService, PrismaService, LogService],
 })
 export class ModalitiesModule {}

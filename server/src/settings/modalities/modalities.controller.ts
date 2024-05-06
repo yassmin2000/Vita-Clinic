@@ -54,7 +54,7 @@ export class ModalitiesController {
     if (user.role === 'patient') {
       throw new UnauthorizedException();
     }
-    return this.modalitiesService.create(user.id,dto);
+    return this.modalitiesService.create(user.id, dto);
   }
 
   @UseGuards(JwtGuard)

@@ -5,6 +5,7 @@ import { AppointmentsController } from './appointments.controller';
 
 import { AppointmentsService } from './appointments.service';
 import { PrismaService } from 'src/prisma.service';
+import { LogService } from 'src/log/log.service';
 import { BiomarkersService } from 'src/settings/biomarkers/biomarkers.service';
 import { LaboratoryTestsService } from 'src/settings/laboratory-tests/laboratory-tests.service';
 import { ModalitiesService } from 'src/settings/modalities/modalities.service';
@@ -21,9 +22,11 @@ import { VitalsModule } from './vitals/vitals.module';
   controllers: [AppointmentsController],
   providers: [
     AppointmentsService,
-    JwtService,
     PrismaService,
+    JwtService,
+    LogService,
     ReportsService,
+
     ScansService,
     BiomarkersService,
     LaboratoryTestsService,

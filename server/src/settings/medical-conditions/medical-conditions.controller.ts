@@ -67,7 +67,7 @@ export class MedicalConditionsController {
       throw new UnauthorizedException();
     }
 
-    return this.medicalConditionsService.create(user.id,dto);
+    return this.medicalConditionsService.create(user.id, dto);
   }
 
   @UseGuards(JwtGuard)

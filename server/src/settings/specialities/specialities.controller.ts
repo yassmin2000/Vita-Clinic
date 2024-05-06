@@ -16,14 +16,17 @@ import {
 import { SpecialitiesService } from './specialities.service';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
 
-import { CreateSpecialityDto, UpdateSpecialityDto } from './dto/specialities.dto';
-import type { Payload } from 'src/types/payload.type'; 
+import {
+  CreateSpecialityDto,
+  UpdateSpecialityDto,
+} from './dto/specialities.dto';
+import type { Payload } from 'src/types/payload.type';
 
 @Controller('settings/specialities')
 export class SpecialitiesController {
-    constructor(private readonly specialitiesService: SpecialitiesService) {}
-  
-    @UseGuards(JwtGuard)
+  constructor(private readonly specialitiesService: SpecialitiesService) {}
+
+  @UseGuards(JwtGuard)
   @Get()
   async getAllSpecialities(@Req() request: Request) {
     const user: Payload = request['user'];
@@ -60,7 +63,7 @@ export class SpecialitiesController {
     if (user.role === 'patient') {
       throw new UnauthorizedException();
     }
-    return this.specialitiesService.create(user.id,dto);
+    return this.specialitiesService.create(user.id, dto);
   }
 
   @UseGuards(JwtGuard)
@@ -90,6 +93,4 @@ export class SpecialitiesController {
 
     return this.specialitiesService.delete(id);
   }
-
-
 }

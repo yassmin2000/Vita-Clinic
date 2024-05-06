@@ -8,7 +8,7 @@ import { LogService } from 'src/log/log.service';
 export class BiomarkersService {
   constructor(
     private readonly prisma: PrismaService,
-    private logService: LogService
+    private logService: LogService,
   ) {}
 
   async findAll() {
@@ -27,18 +27,18 @@ export class BiomarkersService {
     return biomarker;
   }
 
-  async create(userId: string,createBiomarkerDto: CreateBiomarkerDto) {
+  async create(userId: string, createBiomarkerDto: CreateBiomarkerDto) {
     const createdBiomarker = await this.prisma.biomarker.create({
       data: createBiomarkerDto,
     });
 
-    await this.logService.create(
+    await this.logService.create({
       userId,
-      createdBiomarker.id,
-      createdBiomarker.name,
-      'Biomarker',
-      'Create',
-    );
+      targetId: createdBiomarker.id,
+      targetName: createdBiomarker.name,
+      type: 'biomarker',
+      action: 'create',
+    });
     return createdBiomarker;
   }
 

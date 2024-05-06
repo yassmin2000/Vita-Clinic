@@ -60,7 +60,7 @@ export class LaboratoryTestsController {
     if (user.role === 'patient') {
       throw new UnauthorizedException();
     }
-    return this.laboratoryTestsService.create(user.id,dto);
+    return this.laboratoryTestsService.create(user.id, dto);
   }
 
   @UseGuards(JwtGuard)

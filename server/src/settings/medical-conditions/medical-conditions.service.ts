@@ -11,7 +11,7 @@ import { LogService } from 'src/log/log.service';
 export class MedicalConditionsService {
   constructor(
     private prisma: PrismaService,
-    private logService: LogService
+    private logService: LogService,
   ) {}
 
   async findAll() {
@@ -30,21 +30,23 @@ export class MedicalConditionsService {
     return medicalCondition;
   }
 
-  async create(userId: string,createMedicalConditionDto: CreateMedicalConditionDto) {
-    const createdMedCondition = await this.prisma.manufacturer.create({
+  async create(
+    userId: string,
+    createMedicalConditionDto: CreateMedicalConditionDto,
+  ) {
+    const createdMedicalCondition = await this.prisma.manufacturer.create({
       data: createMedicalConditionDto,
     });
 
- 
-    await this.logService.create(
+    await this.logService.create({
       userId,
-      createdMedCondition.id,
-      createdMedCondition.name,
-      'Medical Condition',
-      'Create',
-    );
+      targetId: createdMedicalCondition.id,
+      targetName: createdMedicalCondition.name,
+      type: 'medication-condition',
+      action: 'create',
+    });
 
-    return createdMedCondition;
+    return createdMedicalCondition;
   }
 
   async update(

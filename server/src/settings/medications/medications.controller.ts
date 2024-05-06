@@ -62,7 +62,7 @@ export class MedicationsController {
       throw new UnauthorizedException();
     }
 
-    return this.medicationsService.create(user.id,createMeidicationDto);
+    return this.medicationsService.create(user.id, createMeidicationDto);
   }
 
   @UseGuards(JwtGuard)

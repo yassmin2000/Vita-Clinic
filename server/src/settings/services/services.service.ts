@@ -8,7 +8,7 @@ import { LogService } from 'src/log/log.service';
 export class ServicesService {
   constructor(
     private readonly prisma: PrismaService,
-    private logService: LogService
+    private logService: LogService,
   ) {}
 
   async findAll() {
@@ -27,20 +27,18 @@ export class ServicesService {
     return service;
   }
 
-
-  async create(userId: string,createServiceDto: CreateServiceDto) {
+  async create(userId: string, createServiceDto: CreateServiceDto) {
     const createdService = await this.prisma.service.create({
       data: createServiceDto,
     });
 
- 
-    await this.logService.create(
+    await this.logService.create({
       userId,
-      createdService.id,
-      createdService.name,
-      'Service',
-      'Create',
-    );
+      targetId: createdService.id,
+      targetName: createdService.name,
+      type: 'service',
+      action: 'create',
+    });
 
     return createdService;
   }

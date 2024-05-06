@@ -61,7 +61,7 @@ export class ManufacturersController {
       throw new UnauthorizedException();
     }
 
-    return this.manufacturersService.create(user.id,createManufacturerDto);
+    return this.manufacturersService.create(user.id, createManufacturerDto);
   }
 
   @UseGuards(JwtGuard)

@@ -11,7 +11,7 @@ import { LogService } from 'src/log/log.service';
 export class ManufacturersService {
   constructor(
     private prisma: PrismaService,
-    private logService: LogService
+    private logService: LogService,
   ) {}
 
   async findAll() {
@@ -30,18 +30,18 @@ export class ManufacturersService {
     return manufacturer;
   }
 
-  async create(userId: string,createManufacturerDto: CreateManufacturerDto) {
+  async create(userId: string, createManufacturerDto: CreateManufacturerDto) {
     const createdManufacturer = await this.prisma.manufacturer.create({
       data: createManufacturerDto,
     });
 
-    await this.logService.create(
+    await this.logService.create({
       userId,
-      createdManufacturer.id,
-      createdManufacturer.name,
-      'Manufacturer',
-      'Create',
-    );
+      targetId: createdManufacturer.id,
+      targetName: createdManufacturer.name,
+      type: 'manufacturer',
+      action: 'create',
+    });
 
     return createdManufacturer;
   }

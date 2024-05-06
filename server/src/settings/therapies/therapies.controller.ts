@@ -26,7 +26,6 @@ export class TherapiesController {
   @UseGuards(JwtGuard)
   @Get()
   async getAllTherapies() {
-  
     return this.therapiesService.findAll();
   }
 
@@ -55,7 +54,7 @@ export class TherapiesController {
     if (user.role === 'patient') {
       throw new UnauthorizedException();
     }
-    return this.therapiesService.create(user.id,dto);
+    return this.therapiesService.create(user.id, dto);
   }
 
   @UseGuards(JwtGuard)

@@ -59,7 +59,7 @@ export class BiomarkersController {
       throw new UnauthorizedException();
     }
 
-    return this.biomarkersService.create(user.id,createBiomarkerDto);
+    return this.biomarkersService.create(user.id, createBiomarkerDto);
   }
 
   @UseGuards(JwtGuard)

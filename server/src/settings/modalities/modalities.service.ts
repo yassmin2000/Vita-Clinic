@@ -7,7 +7,7 @@ import { LogService } from 'src/log/log.service';
 export class ModalitiesService {
   constructor(
     private prisma: PrismaService,
-    private logService: LogService
+    private logService: LogService,
   ) {}
 
   async findAll() {
@@ -26,20 +26,18 @@ export class ModalitiesService {
     return modality;
   }
 
-
-  async create(userId: string,createModalityDto: CreateModalityDto) {
+  async create(userId: string, createModalityDto: CreateModalityDto) {
     const createdModality = await this.prisma.modality.create({
       data: createModalityDto,
     });
 
- 
-    await this.logService.create(
+    await this.logService.create({
       userId,
-      createdModality.id,
-      createdModality.name,
-      'Modality',
-      'Create',
-    );
+      targetId: createdModality.id,
+      targetName: createdModality.name,
+      type: 'modality',
+      action: 'create',
+    });
 
     return createdModality;
   }
