@@ -14,11 +14,13 @@ import { UsersService } from '../users.service';
 import { AppointmentsService } from 'src/appointments/appointments.service';
 import { ReportsService } from 'src/appointments/reports/reports.service';
 import { ScansService } from 'src/appointments/scans/scans.service';
+import { TreatmentService } from 'src/appointments/treatments/treatments.service';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
 
 import { GetAllUsersQuery } from '../dto/users.dto';
 import { GetAllAppointmentsQuery } from 'src/appointments/dto/appointments.dto';
 import { GetPatientReportsQuery } from 'src/appointments/reports/dto/reports.dto';
+import { GetPatientTreatmentsQuery } from 'src/appointments/treatments/dto/treatments.dto';
 import { GetPatientScansQuery } from 'src/appointments/scans/dto/scans.dto';
 import type { Payload } from 'src/types/payload.type';
 
@@ -29,6 +31,7 @@ export class PatientsController {
     private readonly appointmentsService: AppointmentsService,
     private readonly reportsService: ReportsService,
     private readonly scansService: ScansService,
+    private readonly treatmentService: TreatmentService,
   ) {}
 
   @UseGuards(JwtGuard)
@@ -96,6 +99,23 @@ export class PatientsController {
     }
 
     return this.reportsService.findAllByPatientId(id, query);
+  }
+
+  @UseGuards(JwtGuard)
+  @Get(':id/treatments')
+  async getPatientTreatmentsById(
+    @Param('id') id: string,
+    @Req() request: Request,
+    @Query(new ValidationPipe({ transform: true }))
+    query: GetPatientTreatmentsQuery,
+  ) {
+    const user: Payload = request['user'];
+
+    if (user.role === 'patient') {
+      throw new UnauthorizedException();
+    }
+
+    return this.treatmentService.findAllByPatientId(id, query);
   }
 
   @UseGuards(JwtGuard)

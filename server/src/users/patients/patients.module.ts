@@ -17,6 +17,7 @@ import { TherapiesService } from 'src/settings/therapies/therapies.service';
 import { OtpService } from 'src/otp/otp.service';
 import { EmailOtpService } from 'src/email-otp/email-otp.service';
 import { PhoneOtpService } from 'src/phone-otp/phone-otp.service';
+import { TreatmentService } from 'src/appointments/treatments/treatments.service';
 
 @Module({
   controllers: [PatientsController],
@@ -34,6 +35,7 @@ import { PhoneOtpService } from 'src/phone-otp/phone-otp.service';
     ModalitiesService,
     ServicesService,
     TherapiesService,
+    TreatmentService,
 
     OtpService,
     EmailOtpService,

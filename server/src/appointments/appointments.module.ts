@@ -16,9 +16,11 @@ import { ReportsService } from './reports/reports.service';
 import { ScansModule } from './scans/scans.module';
 import { ScansService } from './scans/scans.service';
 import { VitalsModule } from './vitals/vitals.module';
+import { TreatmentsModule } from './treatments/treatments.module';
+import { TreatmentService } from './treatments/treatments.service';
 
 @Module({
-  imports: [ReportsModule, ScansModule, VitalsModule],
+  imports: [ReportsModule, ScansModule, VitalsModule, TreatmentsModule],
   controllers: [AppointmentsController],
   providers: [
     AppointmentsService,
@@ -33,6 +35,7 @@ import { VitalsModule } from './vitals/vitals.module';
     ModalitiesService,
     ServicesService,
     TherapiesService,
+    TreatmentService,
   ],
 })
 export class AppointmentsModule {}

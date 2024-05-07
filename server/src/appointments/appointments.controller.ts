@@ -16,8 +16,9 @@ import {
 import { AppointmentsService } from './appointments.service';
 import { ReportsService } from './reports/reports.service';
 import { ScansService } from './scans/scans.service';
-import { VitalsService } from './vitals/vitals.service';
+import { TreatmentService } from './treatments/treatments.service';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
+import { VitalsService } from './vitals/vitals.service';
 import { CreateVitalsDto, UpdateVitalsDto } from './vitals/dto/vitals.dto';
 import {
   ApproveAppointmentDto,
@@ -33,6 +34,7 @@ export class AppointmentsController {
     private readonly appointmentsService: AppointmentsService,
     private readonly reportsService: ReportsService,
     private readonly scansService: ScansService,
+    private readonly treatmentService: TreatmentService,
   ) {}
 
   @UseGuards(JwtGuard)
@@ -82,6 +84,25 @@ export class AppointmentsController {
     }
 
     return reports;
+  }
+
+  @UseGuards(JwtGuard)
+  @Get(':id/treatments')
+  async getAppointmentTreatmentsById(
+    @Param('id') id: string,
+    @Req() request: Request,
+  ) {
+    const user: Payload = request['user'];
+
+    const treatments = await this.treatmentService.findAllByAppointmentId(id);
+
+    if (user.role === 'patient') {
+      return treatments.filter(
+        (treatment) => treatment.appointment.patientId === user.id,
+      );
+    }
+
+    return treatments;
   }
 
   @UseGuards(JwtGuard)
