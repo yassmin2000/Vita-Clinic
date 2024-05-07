@@ -64,6 +64,20 @@ const ActionsCell = ({ row }: { row: Row<Patient> }) => {
             </DropdownMenuItem>
           </Link>
         )}
+        <Link href={`/patients/${row.original.id}/reports`}>
+          <DropdownMenuItem asChild>
+            <div className="flex items-center gap-2">
+              <Eye className="h-4 w-4" /> View Patient Reports
+            </div>
+          </DropdownMenuItem>
+        </Link>
+        <Link href={`/patients/${row.original.id}/scans`}>
+          <DropdownMenuItem asChild>
+            <div className="flex items-center gap-2">
+              <Eye className="h-4 w-4" /> View Patient Scans
+            </div>
+          </DropdownMenuItem>
+        </Link>
         {isSuperAdmin && (
           <>
             <DropdownMenuSeparator />

@@ -2,6 +2,7 @@ import { Request } from 'express';
 import {
   Controller,
   Get,
+  Param,
   Query,
   Req,
   UnauthorizedException,
@@ -81,6 +82,23 @@ export class PatientsController {
   }
 
   @UseGuards(JwtGuard)
+  @Get(':id/reports')
+  async getPatientReportsById(
+    @Param('id') id: string,
+    @Req() request: Request,
+    @Query(new ValidationPipe({ transform: true }))
+    query: GetPatientReportsQuery,
+  ) {
+    const user: Payload = request['user'];
+
+    if (user.role === 'patient') {
+      throw new UnauthorizedException();
+    }
+
+    return this.reportsService.findAllByPatientId(id, query);
+  }
+
+  @UseGuards(JwtGuard)
   @Get('/scans')
   async getPatientScans(
     @Req() request: Request,
@@ -94,5 +112,22 @@ export class PatientsController {
     }
 
     return this.scansService.findAllByPatientId(user.id, query);
+  }
+
+  @UseGuards(JwtGuard)
+  @Get(':id/scans')
+  async getPatientScansById(
+    @Param('id') id: string,
+    @Req() request: Request,
+    @Query(new ValidationPipe({ transform: true }))
+    query: GetPatientReportsQuery,
+  ) {
+    const user: Payload = request['user'];
+
+    if (user.role === 'patient') {
+      throw new UnauthorizedException();
+    }
+
+    return this.scansService.findAllByPatientId(id, query);
   }
 }

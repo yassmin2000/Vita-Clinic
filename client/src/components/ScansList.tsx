@@ -14,7 +14,11 @@ import { useTableOptions } from '@/hooks/useTableOptions';
 
 import type { Scan } from '@/types/appointments.type';
 
-export default function ScansList() {
+interface ScansListProps {
+  patientId?: string;
+}
+
+export default function ScansList({ patientId }: ScansListProps) {
   const { currentPage, countPerPage, reset, setSortBy, searchValue, sortBy } =
     useTableOptions();
   const accessToken = useAccessToken();
@@ -28,14 +32,18 @@ export default function ScansList() {
       `scans_page_${currentPage}_count_${countPerPage}_sort_${sortBy}_search_${searchValue}`,
     ],
     queryFn: async () => {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/users/patients/scans?page=${currentPage}&limit=${countPerPage}&value=${searchValue}&sort=${sortBy}`,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
+      let url;
+      if (patientId) {
+        url = `${process.env.NEXT_PUBLIC_API_URL}/users/patients/${patientId}/scans?page=${currentPage}&limit=${countPerPage}&value=${searchValue}&sort=${sortBy}`;
+      } else {
+        url = `${process.env.NEXT_PUBLIC_API_URL}/users/patients/scans?page=${currentPage}&limit=${countPerPage}&value=${searchValue}&sort=${sortBy}`;
+      }
+
+      const response = await axios.get(url, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
 
       return response.data as Scan[];
     },
