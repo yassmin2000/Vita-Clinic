@@ -101,9 +101,10 @@ export default function TreatmentForm({
 
   const { mutate: mutateTreatment, isPending } = useMutation({
     mutationFn: async (values: z.infer<typeof formSchema>) => {
-      const response = await axios.patch(
+      const response = await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/treatments`,
         {
+          name: values.name,
           appointmentId,
           therapyId: values.therapy.value,
           dosage: values.dosage,
@@ -275,7 +276,7 @@ export default function TreatmentForm({
           />
 
           <FormField
-            name="name"
+            name="sideEffect"
             control={form.control}
             render={({ field }) => (
               <FormItem className="col-span-2">
