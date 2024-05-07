@@ -43,7 +43,7 @@ export class AllergiesService {
     return createdAllergy;
   }
 
-  async update(id: string, userId: string, updateAllergyDto: UpdateAllergyDto) {
+  async update(userId: string, id: string, updateAllergyDto: UpdateAllergyDto) {
     const existingAllergy = await this.prisma.allergy.findUnique({
       where: { id },
     });

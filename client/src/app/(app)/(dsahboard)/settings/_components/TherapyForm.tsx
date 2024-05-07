@@ -171,7 +171,7 @@ export default function TherapyForm({
               control={form.control}
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel required>Minimum</FormLabel>
+                  <FormLabel required>Price</FormLabel>
                   <FormControl>
                     <Input
                       disabled={isPending}
@@ -191,7 +191,7 @@ export default function TherapyForm({
               control={form.control}
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel required>Unit</FormLabel>
+                  <FormLabel>Unit</FormLabel>
                   <FormControl>
                     <Input disabled={isPending} placeholder="mg" {...field} />
                   </FormControl>
