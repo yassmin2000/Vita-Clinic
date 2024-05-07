@@ -49,12 +49,14 @@ export default function SignIn() {
         redirect: false,
       });
 
-      if (!response?.ok) {
-        toast({
-          title: 'An error occurred',
-          description: 'Invalid email or password.',
-          variant: 'destructive',
-        });
+      if (response && !response.ok) {
+        if (response) {
+          return toast({
+            title: 'An error occurred',
+            description: response.error?.replace('Error: ', ''),
+            variant: 'destructive',
+          });
+        }
       } else {
         router.push('/');
       }

@@ -2,7 +2,6 @@ import { getServerSession, NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import type { JWT } from 'next-auth/jwt';
 import axios from 'axios';
-import { signOut } from 'next-auth/react';
 
 async function refreshToken(token: JWT): Promise<JWT> {
   try {
@@ -49,19 +48,26 @@ export const authOptions: NextAuthOptions = {
         }
 
         const { email, password } = credentials;
+        try {
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/auth/login`,
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ email, password }),
+            }
+          );
 
-        const response = await axios.post(
-          `${process.env.NEXT_PUBLIC_API_URL}/auth/login`,
-          {
-            email,
-            password,
+          const data = await response.json();
+          if (!response.ok) {
+            throw new Error(data.message);
           }
-        );
 
-        if (response.status === 201) {
-          return response.data;
-        } else {
-          return null;
+          return data;
+        } catch (error) {
+          throw new Error(error as string);
         }
       },
     }),
