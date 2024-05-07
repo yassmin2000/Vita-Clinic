@@ -76,6 +76,7 @@ export default function PatientAllergiesForm({
         return data.map((allergy) => ({
           label: allergy.name,
           value: allergy.id,
+          description: allergy.description,
         }));
       }
 
@@ -114,6 +115,9 @@ export default function PatientAllergiesForm({
           notes: data.notes || undefined,
           allergy: {
             name: data.allergy.label,
+            description:
+              allergies?.find((allergy) => allergy.value === data.allergy.value)
+                ?.description || undefined,
           },
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),

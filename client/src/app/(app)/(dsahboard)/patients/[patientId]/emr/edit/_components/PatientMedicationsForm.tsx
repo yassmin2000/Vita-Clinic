@@ -106,6 +106,7 @@ export default function PatientMedicationsForm({
           label: medication.name,
           value: medication.id,
           unit: medication.unit,
+          description: medication.description,
         }));
       }
 
@@ -155,7 +156,13 @@ export default function PatientMedicationsForm({
           notes: data.notes,
           medication: {
             name: data.medication.label,
-            unit: '',
+            unit:
+              medications?.find(
+                (medication) => medication.value === data.medication.value
+              )?.unit || '',
+            description: medications?.find(
+              (medication) => medication.value === data.medication.value
+            )?.description,
           },
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),

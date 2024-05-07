@@ -62,6 +62,7 @@ export class EmrService {
             allergy: {
               select: {
                 name: true,
+                description: true,
               },
             },
           },
@@ -71,6 +72,7 @@ export class EmrService {
             diagnosis: {
               select: {
                 name: true,
+                description: true,
               },
             },
           },
@@ -80,6 +82,7 @@ export class EmrService {
             medicalCondition: {
               select: {
                 name: true,
+                description: true,
               },
             },
           },
@@ -89,6 +92,7 @@ export class EmrService {
             surgery: {
               select: {
                 name: true,
+                description: true,
               },
             },
           },
@@ -99,6 +103,7 @@ export class EmrService {
               select: {
                 name: true,
                 unit: true,
+                description: true,
               },
             },
           },

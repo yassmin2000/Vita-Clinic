@@ -89,6 +89,7 @@ export default function PatientDiagnosesForm({
         return data.map((diagnosis) => ({
           label: diagnosis.name,
           value: diagnosis.id,
+          description: diagnosis.description,
         }));
       }
 
@@ -127,6 +128,9 @@ export default function PatientDiagnosesForm({
           notes: data.notes || undefined,
           diagnosis: {
             name: data.diagnosis.label,
+            description: diagnoses?.find(
+              (diagnosis) => diagnosis.value === data.diagnosis.value
+            )?.description,
           },
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),

@@ -43,7 +43,7 @@ export class EmrController {
   ) {
     const user: Payload = request['user'];
 
-    if (user.role === 'patient') {
+    if (user.role !== 'doctor') {
       throw new UnauthorizedException();
     }
 

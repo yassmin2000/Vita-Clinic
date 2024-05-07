@@ -89,6 +89,7 @@ export default function PatientSurgeriesForm({
         return data.map((surgery) => ({
           label: surgery.name,
           value: surgery.id,
+          description: surgery.description,
         }));
       }
 
@@ -127,6 +128,9 @@ export default function PatientSurgeriesForm({
           notes: data.notes || undefined,
           surgery: {
             name: data.surgery.label,
+            description: surgeries?.find(
+              (surgery) => surgery.value === data.surgery.value
+            )?.description,
           },
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),

@@ -54,7 +54,9 @@ export default function Modal({
         }
       }}
     >
-      <DrawerContent className={cn('h-[80%] w-full p-2', className)}>
+      <DrawerContent
+        className={cn('h-[80%] max-h-[95%] w-full p-2', className)}
+      >
         <DrawerDescription className="overflow-y-auto">
           {children}
         </DrawerDescription>

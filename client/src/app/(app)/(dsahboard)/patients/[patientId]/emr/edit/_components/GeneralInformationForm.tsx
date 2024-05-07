@@ -26,6 +26,8 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 
 import useAccessToken from '@/hooks/useAccessToken';
+import useUserRole from '@/hooks/useUserRole';
+import { cn } from '@/lib/utils';
 import {
   alcoholStatus,
   bloodTypes,
@@ -66,11 +68,13 @@ const formSchema = z.object({
 interface GeneralInformationFormProps {
   patientId: string;
   defaultValues: z.infer<typeof formSchema>;
+  view?: boolean;
 }
 
 export default function GeneralInformationForm({
   patientId,
   defaultValues,
+  view = false,
 }: GeneralInformationFormProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -78,6 +82,7 @@ export default function GeneralInformationForm({
   });
 
   const accessToken = useAccessToken();
+  const { role } = useUserRole();
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
@@ -128,7 +133,11 @@ export default function GeneralInformationForm({
           Patient General Information
         </h2>
         <h3 className="text-sm text-muted-foreground">
-          Add or edit the general information of the patient.
+          {view
+            ? role === 'patient'
+              ? 'View your general information.'
+              : 'View the general information of the patient.'
+            : 'Edit the general information of the patient.'}
         </h3>
       </div>
 
@@ -146,19 +155,31 @@ export default function GeneralInformationForm({
                 control={form.control}
                 render={({ field }) => (
                   <FormItem className="w-full">
-                    <FormLabel>Weight (kg)</FormLabel>
-                    <FormControl>
-                      <Input
-                        disabled={isPending}
-                        type="number"
-                        placeholder="90"
-                        {...field}
-                        value={field.value || undefined}
-                        onChange={(event) =>
-                          field.onChange(+event.target.value)
-                        }
-                      />
-                    </FormControl>
+                    <FormLabel
+                      className={cn(view && 'font-medium text-primary')}
+                    >
+                      Weight (kg)
+                    </FormLabel>
+                    {!view ? (
+                      <FormControl>
+                        <Input
+                          disabled={isPending}
+                          type="number"
+                          placeholder="90"
+                          {...field}
+                          value={field.value || undefined}
+                          onChange={(event) =>
+                            field.onChange(+event.target.value)
+                          }
+                        />
+                      </FormControl>
+                    ) : (
+                      <p>
+                        {defaultValues.weight
+                          ? `${defaultValues.weight} kg`
+                          : 'NA'}
+                      </p>
+                    )}
                     <FormMessage />
                   </FormItem>
                 )}
@@ -169,19 +190,31 @@ export default function GeneralInformationForm({
                 control={form.control}
                 render={({ field }) => (
                   <FormItem className="w-full">
-                    <FormLabel>Height (cm)</FormLabel>
-                    <FormControl>
-                      <Input
-                        disabled={isPending}
-                        type="number"
-                        placeholder="75"
-                        {...field}
-                        value={field.value || undefined}
-                        onChange={(event) =>
-                          field.onChange(+event.target.value)
-                        }
-                      />
-                    </FormControl>
+                    <FormLabel
+                      className={cn(view && 'font-medium text-primary')}
+                    >
+                      Height (cm)
+                    </FormLabel>
+                    {!view ? (
+                      <FormControl>
+                        <Input
+                          disabled={isPending}
+                          type="number"
+                          placeholder="75"
+                          {...field}
+                          value={field.value || undefined}
+                          onChange={(event) =>
+                            field.onChange(+event.target.value)
+                          }
+                        />
+                      </FormControl>
+                    ) : (
+                      <p>
+                        {defaultValues.height
+                          ? `${defaultValues.height} cm`
+                          : 'NA'}
+                      </p>
+                    )}
                     <FormMessage />
                   </FormItem>
                 )}
@@ -192,28 +225,42 @@ export default function GeneralInformationForm({
                 control={form.control}
                 render={({ field }) => (
                   <FormItem className="w-full">
-                    <FormLabel>Blood Type</FormLabel>
-                    <Select
-                      disabled={isPending}
-                      onValueChange={field.onChange}
-                      value={field.value || undefined}
+                    <FormLabel
+                      className={cn(view && 'font-medium text-primary')}
                     >
-                      <FormControl>
-                        <SelectTrigger className="bg-background">
-                          <SelectValue
-                            defaultValue={field.value}
-                            placeholder="Select patient's blood type"
-                          />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {bloodTypes.map((item) => (
-                          <SelectItem key={item.value} value={item.value}>
-                            {item.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                      Blood Type
+                    </FormLabel>
+                    {!view ? (
+                      <Select
+                        disabled={isPending}
+                        onValueChange={field.onChange}
+                        value={field.value || undefined}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="bg-background">
+                            <SelectValue
+                              defaultValue={field.value}
+                              placeholder="Select patient's blood type"
+                            />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {bloodTypes.map((item) => (
+                            <SelectItem key={item.value} value={item.value}>
+                              {item.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <p>
+                        {defaultValues.bloodType
+                          ? bloodTypes.find(
+                              (type) => type.value === defaultValues.bloodType
+                            )?.label
+                          : 'NA'}
+                      </p>
+                    )}
                     <FormMessage />
                   </FormItem>
                 )}
@@ -226,28 +273,43 @@ export default function GeneralInformationForm({
                 control={form.control}
                 render={({ field }) => (
                   <FormItem className="w-full">
-                    <FormLabel>Smoking Status</FormLabel>
-                    <Select
-                      disabled={isPending}
-                      onValueChange={field.onChange}
-                      value={field.value || undefined}
+                    <FormLabel
+                      className={cn(view && 'font-medium text-primary')}
                     >
-                      <FormControl>
-                        <SelectTrigger className="bg-background">
-                          <SelectValue
-                            defaultValue={field.value}
-                            placeholder="Select patient's smoking status"
-                          />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {smokingStatus.map((item) => (
-                          <SelectItem key={item.value} value={item.value}>
-                            {item.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                      Smoking Status
+                    </FormLabel>
+                    {!view ? (
+                      <Select
+                        disabled={isPending}
+                        onValueChange={field.onChange}
+                        value={field.value || undefined}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="bg-background">
+                            <SelectValue
+                              defaultValue={field.value}
+                              placeholder="Select patient's smoking status"
+                            />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {smokingStatus.map((item) => (
+                            <SelectItem key={item.value} value={item.value}>
+                              {item.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <p>
+                        {defaultValues.smokingStatus
+                          ? smokingStatus.find(
+                              (status) =>
+                                status.value === defaultValues.smokingStatus
+                            )?.label
+                          : 'NA'}
+                      </p>
+                    )}
                     <FormMessage />
                   </FormItem>
                 )}
@@ -258,28 +320,43 @@ export default function GeneralInformationForm({
                 control={form.control}
                 render={({ field }) => (
                   <FormItem className="w-full">
-                    <FormLabel>Alcohol Status</FormLabel>
-                    <Select
-                      disabled={isPending}
-                      onValueChange={field.onChange}
-                      value={field.value || undefined}
+                    <FormLabel
+                      className={cn(view && 'font-medium text-primary')}
                     >
-                      <FormControl>
-                        <SelectTrigger className="bg-background">
-                          <SelectValue
-                            defaultValue={field.value}
-                            placeholder="Select patient's alcohol status"
-                          />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {alcoholStatus.map((item) => (
-                          <SelectItem key={item.value} value={item.value}>
-                            {item.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                      Alcohol Status
+                    </FormLabel>
+                    {!view ? (
+                      <Select
+                        disabled={isPending}
+                        onValueChange={field.onChange}
+                        value={field.value || undefined}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="bg-background">
+                            <SelectValue
+                              defaultValue={field.value}
+                              placeholder="Select patient's alcohol status"
+                            />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {alcoholStatus.map((item) => (
+                            <SelectItem key={item.value} value={item.value}>
+                              {item.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <p>
+                        {defaultValues.alcoholStatus
+                          ? alcoholStatus.find(
+                              (status) =>
+                                status.value === defaultValues.alcoholStatus
+                            )?.label
+                          : 'NA'}
+                      </p>
+                    )}
                     <FormMessage />
                   </FormItem>
                 )}
@@ -290,28 +367,43 @@ export default function GeneralInformationForm({
                 control={form.control}
                 render={({ field }) => (
                   <FormItem className="w-full">
-                    <FormLabel>Drugs Usage</FormLabel>
-                    <Select
-                      disabled={isPending}
-                      onValueChange={field.onChange}
-                      value={field.value || undefined}
+                    <FormLabel
+                      className={cn(view && 'font-medium text-primary')}
                     >
-                      <FormControl>
-                        <SelectTrigger className="bg-background">
-                          <SelectValue
-                            defaultValue={field.value}
-                            placeholder="Select patient's drugs usage"
-                          />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {drugStatus.map((item) => (
-                          <SelectItem key={item.value} value={item.value}>
-                            {item.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                      Drugs Usage
+                    </FormLabel>
+                    {!view ? (
+                      <Select
+                        disabled={isPending}
+                        onValueChange={field.onChange}
+                        value={field.value || undefined}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="bg-background">
+                            <SelectValue
+                              defaultValue={field.value}
+                              placeholder="Select patient's drugs usage"
+                            />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {drugStatus.map((item) => (
+                            <SelectItem key={item.value} value={item.value}>
+                              {item.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <p>
+                        {defaultValues.drugsUsage
+                          ? drugStatus.find(
+                              (status) =>
+                                status.value === defaultValues.drugsUsage
+                            )?.label
+                          : 'NA'}
+                      </p>
+                    )}
                     <FormMessage />
                   </FormItem>
                 )}
@@ -319,11 +411,13 @@ export default function GeneralInformationForm({
             </div>
           </div>
 
-          <div className="flex justify-between gap-2">
-            <Button type="submit" size="sm" disabled={isPending}>
-              Update
-            </Button>
-          </div>
+          {!view && (
+            <div className="flex justify-between gap-2">
+              <Button type="submit" size="sm" disabled={isPending}>
+                Update
+              </Button>
+            </div>
+          )}
         </form>
       </Form>
     </div>

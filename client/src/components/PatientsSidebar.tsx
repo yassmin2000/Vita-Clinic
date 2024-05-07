@@ -10,6 +10,7 @@ import {
   TestTubes,
   Calendar,
   SquareUser,
+  FileStack,
 } from 'lucide-react';
 
 import {
@@ -22,6 +23,11 @@ import { cn } from '@/lib/utils';
 
 const routes = [
   { icon: SquareUser, href: '/portal', label: 'Patient Portal' },
+  {
+    icon: FileStack,
+    href: '/emr',
+    label: 'Electronic Medical Record',
+  },
   {
     icon: Calendar,
     href: '/schedule',

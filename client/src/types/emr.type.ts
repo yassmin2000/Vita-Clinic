@@ -19,6 +19,7 @@ export type PatientAllergy = {
   updatedAt: string;
   allergy: {
     name: string;
+    description?: string;
   };
 };
 
@@ -31,6 +32,7 @@ export type PatientDiagnosis = {
   updatedAt: string;
   diagnosis: {
     name: string;
+    description?: string;
   };
 };
 
@@ -43,6 +45,7 @@ export type PatientMedicalCondition = {
   updatedAt: string;
   medicalCondition: {
     name: string;
+    description?: string;
   };
 };
 
@@ -55,6 +58,7 @@ export type PatientSurgery = {
   updatedAt: string;
   surgery: {
     name: string;
+    description?: string;
   };
 };
 
@@ -72,6 +76,7 @@ export type PatientMedication = {
   medication: {
     name: string;
     unit: string;
+    description?: string;
   };
 };
 

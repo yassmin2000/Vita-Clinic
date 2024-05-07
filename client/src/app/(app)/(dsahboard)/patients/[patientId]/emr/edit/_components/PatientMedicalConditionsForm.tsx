@@ -94,6 +94,7 @@ export default function PatientMedicalConditionsForm({
           return data.map((medicalCondition) => ({
             label: medicalCondition.name,
             value: medicalCondition.id,
+            description: medicalCondition.description,
           }));
         }
 
@@ -132,6 +133,10 @@ export default function PatientMedicalConditionsForm({
           notes: data.notes || undefined,
           medicalCondition: {
             name: data.medicalCondition.label,
+            description: medicalConditions?.find(
+              (medicalCondition) =>
+                medicalCondition.value === data.medicalCondition.value
+            )?.description,
           },
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),

@@ -3,16 +3,16 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { format } from 'date-fns';
-import { Edit, Plus, Save, Trash } from 'lucide-react';
+import { Save } from 'lucide-react';
 
 import PatientMedicalConditionsForm from './PatientMedicalConditionsForm';
-import { Card } from '@/components/ui/card';
+import PatientMedicalConditionItem from './PatientMedicalConditionItem';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/components/ui/use-toast';
 
 import useAccessToken from '@/hooks/useAccessToken';
+import useUserRole from '@/hooks/useUserRole';
 
 import type { PatientMedicalCondition } from '@/types/emr.type';
 
@@ -25,20 +25,24 @@ export type PatientMedicalConditionField = PatientMedicalCondition & {
 interface PatientMedicalConditionsProps {
   patientId: string;
   patientMedicalConditions: PatientMedicalCondition[];
+  view?: boolean;
 }
 
 export default function PatientMedicalConditions({
   patientId,
   patientMedicalConditions,
+  view = false,
 }: PatientMedicalConditionsProps) {
   const [medicalConditions, setMedicalConditions] = useState<
     PatientMedicalConditionField[]
   >([...patientMedicalConditions]);
   const [currentMedicalCondition, setCurrentMedicalCondition] =
     useState<PatientMedicalConditionField | null>(null);
-  const { toast } = useToast();
+
   const accessToken = useAccessToken();
+  const { role } = useUserRole();
   const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   const { mutate: mutatePatientMedicalConditions, isPending } = useMutation({
     mutationFn: async () => {
@@ -108,95 +112,68 @@ export default function PatientMedicalConditions({
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-1">
         <h2 className="text-base font-semibold text-primary">
-          Patient MedicalConditions
+          Patient Medical Conditions
         </h2>
         <h3 className="text-sm text-muted-foreground">
-          Manage all the medicalConditions of the patient.
+          {view
+            ? role === 'patient'
+              ? 'View your medical conditions information.'
+              : 'View the medical conditions information of the patient.'
+            : 'Manage all the medical conditions of the patient.'}
         </h3>
       </div>
-      <PatientMedicalConditionsForm
-        patientMedicalConditions={medicalConditions}
-        setMedicalConditions={setMedicalConditions}
-        currentMedicalCondition={currentMedicalCondition}
-        setCurrentMedicalCondition={setCurrentMedicalCondition}
-      />
-      <Separator />
+      {!view && (
+        <>
+          <PatientMedicalConditionsForm
+            patientMedicalConditions={medicalConditions}
+            setMedicalConditions={setMedicalConditions}
+            currentMedicalCondition={currentMedicalCondition}
+            setCurrentMedicalCondition={setCurrentMedicalCondition}
+          />
+          <Separator />
+        </>
+      )}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         {medicalConditions
           .filter((medicalCondition) => !medicalCondition.isDeleted)
           .map((medicalCondition) => (
-            <Card
+            <PatientMedicalConditionItem
               key={medicalCondition.medicalConditionId}
-              className="col-span-1 rounded-lg transition-all"
-            >
-              <div className="truncate px-4 pt-6">
-                <div className="flex flex-col gap-0.5">
-                  <h3 className="truncate text-lg font-medium">
-                    {medicalCondition.medicalCondition.name}
-                  </h3>
-                  {medicalCondition.date && (
-                    <span className="mt-0.5 truncate">
-                      Diagnosed at:{' '}
-                      {format(new Date(medicalCondition.date), 'dd MMM yyyy')}
-                    </span>
-                  )}
-                </div>
-              </div>
+              medicalCondition={medicalCondition}
+              isEditDisabled={
+                currentMedicalCondition?.id === medicalCondition.id || isPending
+              }
+              onEdit={() => setCurrentMedicalCondition(medicalCondition)}
+              isDeleteDisabled={
+                currentMedicalCondition?.id === medicalCondition.id || isPending
+              }
+              onDelete={() => {
+                if (medicalCondition.id === currentMedicalCondition?.id) {
+                  setCurrentMedicalCondition(null);
+                }
 
-              <div className="mt-4 flex flex-wrap items-center justify-between gap-2 px-4 py-2 text-xs text-muted-foreground">
-                <div className="flex items-center gap-2">
-                  <Plus className="h-4 w-4" />
-                  {format(new Date(medicalCondition.createdAt), 'dd MMM yyyy')}
-                </div>
-
-                <div className="flex flex-wrap gap-2">
-                  <Button
-                    size="sm"
-                    variant="secondary"
-                    disabled={
-                      currentMedicalCondition?.id === medicalCondition.id ||
-                      isPending
-                    }
-                    onClick={() => setCurrentMedicalCondition(medicalCondition)}
-                  >
-                    <Edit className="mr-2 h-4 w-4" /> Edit
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="destructive"
-                    disabled={
-                      currentMedicalCondition?.id === medicalCondition.id ||
-                      isPending
-                    }
-                    onClick={() => {
-                      if (medicalCondition.id === currentMedicalCondition?.id) {
-                        setCurrentMedicalCondition(null);
-                      }
-
-                      setMedicalConditions((prev) =>
-                        prev.map((diag) =>
-                          diag.id === medicalCondition.id
-                            ? { ...diag, isDeleted: true }
-                            : diag
-                        )
-                      );
-                    }}
-                  >
-                    <Trash className="mr-2 h-4 w-4" /> Delete
-                  </Button>
-                </div>
-              </div>
-            </Card>
+                setMedicalConditions((prev) =>
+                  prev.map((diag) =>
+                    diag.id === medicalCondition.id
+                      ? { ...diag, isDeleted: true }
+                      : diag
+                  )
+                );
+              }}
+              view={view}
+            />
           ))}
       </div>
 
-      <Button
-        onClick={() => mutatePatientMedicalConditions()}
-        disabled={isPending}
-        className="flex w-full items-center gap-2 sm:w-[100px]"
-      >
-        <Save className="h-5 w-5" /> Save
-      </Button>
+      {!view && (
+        <Button
+          onClick={() => mutatePatientMedicalConditions()}
+          disabled={isPending}
+          className="flex w-full items-center gap-2 sm:w-[100px]"
+        >
+          <Save className="h-5 w-5" /> Save
+        </Button>
+      )}
     </div>
   );
 }

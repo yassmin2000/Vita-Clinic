@@ -24,13 +24,15 @@ import useAccessToken from '@/hooks/useAccessToken';
 
 import type { EMR } from '@/types/emr.type';
 
-interface EditEmrAccordionsProps {
+interface EmrAccordionsProps {
   patientId: string;
+  view?: boolean;
 }
 
-export default function EditEmrAccordions({
+export default function EmrAccordions({
   patientId,
-}: EditEmrAccordionsProps) {
+  view = false,
+}: EmrAccordionsProps) {
   const accessToken = useAccessToken();
   const router = useRouter();
   const { toast } = useToast();
@@ -115,6 +117,7 @@ export default function EditEmrAccordions({
               alcoholStatus: data.alcoholStatus,
               drugsUsage: data.drugsUsage,
             }}
+            view={view}
           />
         </AccordionContent>
       </AccordionItem>
@@ -127,6 +130,7 @@ export default function EditEmrAccordions({
           <PatientAllergies
             patientId={patientId}
             patientAllergies={data.allergies}
+            view={view}
           />
         </AccordionContent>
       </AccordionItem>
@@ -139,6 +143,7 @@ export default function EditEmrAccordions({
           <PatientDiagnoses
             patientId={patientId}
             patientDiagnoses={data.diagnoses}
+            view={view}
           />
         </AccordionContent>
       </AccordionItem>
@@ -151,6 +156,7 @@ export default function EditEmrAccordions({
           <PatientMedicalConditions
             patientId={patientId}
             patientMedicalConditions={data.medicalConditions}
+            view={view}
           />
         </AccordionContent>
       </AccordionItem>
@@ -163,6 +169,7 @@ export default function EditEmrAccordions({
           <PatientSurgeries
             patientId={patientId}
             patientSurgeries={data.surgeries}
+            view={view}
           />
         </AccordionContent>
       </AccordionItem>
@@ -175,6 +182,7 @@ export default function EditEmrAccordions({
           <PatientMedications
             patientId={patientId}
             patientMedications={data.medications}
+            view={view}
           />
         </AccordionContent>
       </AccordionItem>

@@ -1,17 +1,17 @@
 import { redirect } from 'next/navigation';
 
-import EditEmrAccordions from './_components/EditEmrAccordions';
+import EmrAccordions from './_components/EmrAccordions';
 import { getUserRole } from '@/lib/auth';
 
-interface EditEMRPageProps {
+interface EditEmrPageProps {
   params: {
     patientId: string;
   };
 }
 
-export default async function EditEMRPage({
+export default async function EditEmrPage({
   params: { patientId },
-}: EditEMRPageProps) {
+}: EditEmrPageProps) {
   const { role } = await getUserRole();
 
   if (role !== 'doctor') {
@@ -30,7 +30,7 @@ export default async function EditEMRPage({
           </h3>
         </div>
 
-        <EditEmrAccordions patientId={patientId} />
+        <EmrAccordions patientId={patientId} />
       </div>
     </section>
   );
