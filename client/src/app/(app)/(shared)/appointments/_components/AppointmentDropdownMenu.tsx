@@ -344,7 +344,6 @@ export default function AppointmentDropdownMenu({
               value={currentDoctor}
               onValueChange={(value) => {
                 setCurrentDoctor(value);
-                console.log(value);
               }}
             >
               <SelectTrigger className="bg-background">

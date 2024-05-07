@@ -2,14 +2,14 @@ import { Module } from '@nestjs/common';
 import { EmailOtpService } from './email-otp.service';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { join } from 'path';
-import {HandlebarsAdapter} from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 
 @Module({
   imports: [
     MailerModule.forRoot({
-      transport:{
+      transport: {
         host: 'smtp.sendgrid.net',
-        auth:{
+        auth: {
           user: 'apikey',
           pass: process.env.SENDGRID_API_KEY,
         },
@@ -24,6 +24,6 @@ import {HandlebarsAdapter} from '@nestjs-modules/mailer/dist/adapters/handlebars
     }),
   ],
   providers: [EmailOtpService],
-  exports: [EmailOtpService]
+  exports: [EmailOtpService],
 })
 export class EmailOtpModule {}

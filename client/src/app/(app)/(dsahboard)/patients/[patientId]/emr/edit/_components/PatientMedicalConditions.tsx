@@ -75,8 +75,6 @@ export default function PatientMedicalConditions({
         },
       };
 
-      console.log(body);
-
       return await axios.patch(
         `${process.env.NEXT_PUBLIC_API_URL}/emr/${patientId}`,
         body,

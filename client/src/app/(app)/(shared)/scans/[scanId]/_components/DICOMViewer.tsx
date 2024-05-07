@@ -40,7 +40,6 @@ export default function DICOMViewer({ index, dicomURLs }: DICOMViewerProps) {
       });
 
       Promise.all(loadImagePromises).then((images) => {
-        console.log('All images are loaded');
         const stack = {
           currentImageIdIndex: 0,
           imageIds: dicomURLs,
