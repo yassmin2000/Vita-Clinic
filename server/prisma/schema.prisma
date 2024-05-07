@@ -373,6 +373,7 @@ model Appointment {
   reports               Report[]
   scans                 Scan[]
   laboratoryTestResults LaboratoryTestResult[]
+  treatments            Treatment[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -564,8 +565,10 @@ model Treatment {
   id   String @id @default(uuid())
   name String
 
-  therapy   Therapy @relation(fields: [therapyId], references: [id])
-  therapyId String
+  therapy       Therapy     @relation(fields: [therapyId], references: [id])
+  therapyId     String
+  appointment   Appointment @relation(fields: [appointmentId], references: [id])
+  appointmentId String
 
   dosage     Float
   duration   Int

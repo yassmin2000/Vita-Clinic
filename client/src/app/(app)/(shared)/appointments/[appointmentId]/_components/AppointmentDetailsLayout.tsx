@@ -12,6 +12,7 @@ import AppointmentDetailsCardSkeleton from './AppointmentDetailsCardSkeleton';
 
 import useAccessToken from '@/hooks/useAccessToken';
 import type { AppointmentDetails } from '@/types/appointments.type';
+import AppointmentTreatments from './AppointmentTreatments';
 
 interface AppointmentDetailsLayoutProps {
   appointmentId: string;
@@ -56,6 +57,8 @@ export default function AppointmentDetailsLayout({
             <AppointmentScans id={appointmentId} />
             <Separator className="my-1" />
             <AppointmentPrescriptions appointmentId={appointmentId} />
+            <Separator className="my-1" />
+            <AppointmentTreatments appointmentId={appointmentId} />
           </>
         )}
     </div>

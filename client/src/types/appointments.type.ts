@@ -1,4 +1,4 @@
-import { LaboratoryTest, PriceLookup } from './settings.type';
+import type { LaboratoryTest, PriceLookup, Therapy } from './settings.type';
 
 export type AppointmentStatus =
   | 'completed'
@@ -34,7 +34,7 @@ export type Report = {
   appointmentId: string;
   title: string;
   status: 'initial' | 'processed' | 'failed';
-  description?: string;
+  notes?: string;
   fileName: string;
   reportURL: string;
   createdAt: string;
@@ -52,12 +52,25 @@ export type Scan = {
   id: string;
   appointmentId: string;
   title: string;
-  description: string;
+  notes: string;
   modality: {
     id: string;
     name: string;
   };
   scanURLs: string[];
+  createdAt: string;
+};
+
+export type Treatment = {
+  id: string;
+  appointmentId: string;
+  name: string;
+  dosage: number;
+  duration: number;
+  therapy: Therapy;
+  response?: string;
+  sideEffect?: string;
+  notes?: string;
   createdAt: string;
 };
 

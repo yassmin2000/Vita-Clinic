@@ -30,7 +30,9 @@ export default function Modal({
         open={isOpen}
         onOpenChange={onClose ? onClose : () => router.back()}
       >
-        <DialogContent className={cn('h-[80%] max-w-2xl px-2', className)}>
+        <DialogContent
+          className={cn('h-[80%] max-h-[95%] max-w-2xl px-2', className)}
+        >
           <DialogDescription className="overflow-y-auto">
             {children}
           </DialogDescription>

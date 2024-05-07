@@ -5,29 +5,29 @@ import { Plus } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import Modal from '@/components/Modal';
-import PrescriptionForm from './PrescriptionForm';
+import TreatmentForm from './TreatmentForm';
 
-interface NewPrescriptionButtonProps {
+interface NewTreatmentButtonProps {
   appointmentId: string;
 }
 
-export default function NewPrescriptionButton({
+export default function NewTreatmentButton({
   appointmentId,
-}: NewPrescriptionButtonProps) {
+}: NewTreatmentButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
     <>
       <Button size="sm" onClick={() => setIsOpen(true)}>
         <Plus className="mr-1" />
-        New Prescription
+        New Treatment
       </Button>
       <Modal
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
         className="px-6 py-8"
       >
-        <PrescriptionForm
+        <TreatmentForm
           appointmentId={appointmentId}
           onClose={() => setIsOpen(false)}
         />
