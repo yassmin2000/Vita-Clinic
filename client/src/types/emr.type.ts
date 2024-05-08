@@ -1,3 +1,5 @@
+import type { DosageForm, RouteOfAdministration } from './settings.type';
+
 export type BloodType =
   | 'a_positive'
   | 'a_negative'
@@ -77,6 +79,8 @@ export type PatientMedication = {
     name: string;
     unit: string;
     description?: string;
+    dosageForm: DosageForm;
+    routeOfAdministration: RouteOfAdministration;
   };
 };
 

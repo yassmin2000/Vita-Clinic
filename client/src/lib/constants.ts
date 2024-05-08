@@ -1,3 +1,5 @@
+import { Icons } from '@/components/Icons';
+
 export const bloodTypes = [
   {
     label: 'A+',
@@ -82,66 +84,82 @@ export const dosageForms = [
   {
     label: 'Tablet',
     value: 'tablet',
+    icon: Icons.tablet,
   },
   {
     label: 'Capsule',
     value: 'capsule',
+    icon: Icons.capsule,
   },
   {
     label: 'Syrup',
     value: 'syrup',
+    icon: Icons.syurp,
   },
   {
     label: 'Injection',
     value: 'injection',
+    icon: Icons.injection,
   },
   {
     label: 'Ointment',
     value: 'ointment',
+    icon: Icons.ointment,
   },
   {
     label: 'Cream',
     value: 'cream',
+    icon: Icons.cream,
   },
   {
     label: 'Lotion',
     value: 'lotion',
+    icon: Icons.cream,
   },
   {
     label: 'Inhaler',
     value: 'inhaler',
+    icon: Icons.inhaler,
   },
   {
     label: 'Drops',
     value: 'drops',
+    icon: Icons.drops,
   },
   {
     label: 'Suppository',
     value: 'suppository',
+    icon: Icons.suppository,
   },
   {
     label: 'Patch',
     value: 'patch',
+    icon: Icons.patch,
   },
   {
     label: 'Gel',
     value: 'gel',
+    icon: Icons.ointment,
   },
   {
     label: 'Spray',
     value: 'spray',
+    icon: Icons.spray,
   },
   {
     label: 'Solution',
     value: 'solution',
+    icon: Icons.syurp,
   },
   {
     label: 'Powder',
     value: 'powder',
+    icon: Icons.powder,
   },
   {
     label: 'Suspension',
     value: 'suspension',
+    icon: Icons.syurp,
   },
 ] as const;
 

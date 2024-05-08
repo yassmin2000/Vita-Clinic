@@ -8,9 +8,18 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Modal from '@/components/Modal';
 import { Separator } from '@/components/ui/separator';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+import { Icons } from '@/components/Icons';
+
+import { capitalize } from '@/lib/utils';
+import { dosageForms } from '@/lib/constants';
 
 import type { PatientMedicationField } from './PatientMedications';
-import { capitalize } from '@/lib/utils';
 
 interface PatientMedicationItemProps {
   medication: PatientMedicationField;
@@ -30,30 +39,52 @@ export default function PatientMedicationItem({
   view = false,
 }: PatientMedicationItemProps) {
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const Icon = dosageForms.find(
+    (form) => form.value === medication.medication.dosageForm
+  )?.icon;
 
   return (
     <Card className="col-span-1 rounded-lg transition-all">
-      <div className="truncate px-4 pt-6">
-        <div className="flex flex-col gap-0.5">
-          <h3 className="truncate text-lg font-medium">
-            {medication.medication.name}
-          </h3>
-          <span className="mt-0.5 truncate">
-            Dosage: {medication.dosage} {medication.medication.unit}{' '}
-            {medication.frequency} (
-            {medication.required ? 'Required' : 'Optional'})
-          </span>
-          <div className="flex items-center gap-1">
-            {medication.startDate && (
-              <span className="mt-0.5 truncate">
-                {format(new Date(medication.startDate), 'dd MMM yyyy')}
-              </span>
-            )}
-            {medication.endDate && (
-              <span className="mt-0.5 truncate">
-                - {format(new Date(medication.endDate), 'dd MMM yyyy')}
-              </span>
-            )}
+      <div className="flex w-full items-center gap-4 px-4 pt-6">
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger>
+              <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border">
+                {Icon ? (
+                  <Icon className="h-6 w-6" />
+                ) : (
+                  <Icons.tablet className="h-6 w-6" />
+                )}
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              {capitalize(medication.medication.dosageForm)} medicine taken by{' '}
+              {medication.medication.routeOfAdministration}
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+        <div className="flex-1 truncate">
+          <div className="flex flex-col gap-0.5">
+            <h3 className="truncate text-lg font-medium">
+              {medication.medication.name}
+            </h3>
+            <span className="mt-0.5 truncate">
+              Dosage: {medication.dosage} {medication.medication.unit}{' '}
+              {medication.frequency} (
+              {medication.required ? 'Required' : 'Optional'})
+            </span>
+            <div className="flex items-center gap-1">
+              {medication.startDate && (
+                <span className="mt-0.5 truncate">
+                  {format(new Date(medication.startDate), 'dd MMM yyyy')}
+                </span>
+              )}
+              {medication.endDate && (
+                <span className="mt-0.5 truncate">
+                  - {format(new Date(medication.endDate), 'dd MMM yyyy')}
+                </span>
+              )}
+            </div>
           </div>
         </div>
       </div>

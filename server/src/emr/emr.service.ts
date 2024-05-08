@@ -104,6 +104,8 @@ export class EmrService {
                 name: true,
                 unit: true,
                 description: true,
+                dosageForm: true,
+                routeOfAdministration: true,
               },
             },
           },

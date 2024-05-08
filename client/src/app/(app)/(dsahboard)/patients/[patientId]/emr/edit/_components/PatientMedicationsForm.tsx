@@ -107,6 +107,8 @@ export default function PatientMedicationsForm({
           value: medication.id,
           unit: medication.unit,
           description: medication.description,
+          dosageForm: medication.dosageForm,
+          routeOfAdministration: medication.routeOfAdministration,
         }));
       }
 
@@ -134,6 +136,10 @@ export default function PatientMedicationsForm({
                 medication: {
                   name: medication.medication.name,
                   unit: medication.medication.unit,
+                  description: medication.medication.description,
+                  dosageForm: medication.medication.dosageForm,
+                  routeOfAdministration:
+                    medication.medication.routeOfAdministration,
                 },
                 updatedAt: new Date().toISOString(),
                 isNew: currentMedication.isNew,
@@ -163,6 +169,14 @@ export default function PatientMedicationsForm({
             description: medications?.find(
               (medication) => medication.value === data.medication.value
             )?.description,
+            dosageForm:
+              medications?.find(
+                (medication) => medication.value === data.medication.value
+              )?.dosageForm || 'capsule',
+            routeOfAdministration:
+              medications?.find(
+                (medication) => medication.value === data.medication.value
+              )?.routeOfAdministration || 'oral',
           },
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
