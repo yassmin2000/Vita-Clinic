@@ -20,6 +20,7 @@ import { capitalize } from '@/lib/utils';
 import { dosageForms } from '@/lib/constants';
 
 import type { PatientMedicationField } from './PatientMedications';
+import DeleteAlert from '@/components/DeleteAlert';
 
 interface PatientMedicationItemProps {
   medication: PatientMedicationField;
@@ -38,7 +39,9 @@ export default function PatientMedicationItem({
   onDelete,
   view = false,
 }: PatientMedicationItemProps) {
+  const [isDeleting, setIsDeleting] = useState(false);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+
   const Icon = dosageForms.find(
     (form) => form.value === medication.medication.dosageForm
   )?.icon;
@@ -123,6 +126,14 @@ export default function PatientMedicationItem({
         </div>
       </div>
 
+      <DeleteAlert
+        title={`Delete ${medication.medication.name}`}
+        description={`Are you sure you want to delete this medication (${medication.medication.name}) from this EMR?`}
+        isOpen={isDeleting}
+        onClose={() => setIsDeleting(false)}
+        onDelete={onDelete}
+      />
+
       <Modal
         isOpen={isDetailsOpen}
         onClose={() => setIsDetailsOpen(false)}
@@ -145,6 +156,18 @@ export default function PatientMedicationItem({
                 {medication.medication.name}
                 {medication.required && <span> (Required)</span>}
               </p>
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <p className="font-medium text-primary">Medication Dosage Form</p>
+              <p>{capitalize(medication.medication.dosageForm)}</p>
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <p className="font-medium text-primary">
+                Medication Route of Administration
+              </p>
+              <p>{capitalize(medication.medication.routeOfAdministration)}</p>
             </div>
 
             {medication.dosage && (

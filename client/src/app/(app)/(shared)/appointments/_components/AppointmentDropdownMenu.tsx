@@ -311,7 +311,7 @@ export default function AppointmentDropdownMenu({
       </DropdownMenu>
 
       <DeleteAlert
-        title="Reject appointment"
+        title="Reject Appointment"
         description="Are you sure you want to reject this appointment?"
         deleteText="Reject"
         isOpen={isRejecting}
@@ -320,7 +320,7 @@ export default function AppointmentDropdownMenu({
       />
 
       <DeleteAlert
-        title="Cancel appointment"
+        title="Cancel Appointment"
         description="Are you sure you want to cancel this appointment?"
         deleteText="Cancel"
         isOpen={isCanceling}

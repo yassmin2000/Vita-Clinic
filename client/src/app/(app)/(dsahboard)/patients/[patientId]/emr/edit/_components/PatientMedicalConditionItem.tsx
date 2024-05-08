@@ -6,6 +6,7 @@ import { Edit, Info, Plus, Trash } from 'lucide-react';
 
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import DeleteAlert from '@/components/DeleteAlert';
 import Modal from '@/components/Modal';
 import { Separator } from '@/components/ui/separator';
 
@@ -28,6 +29,7 @@ export default function PatientMedicalConditionItem({
   onDelete,
   view = false,
 }: PatientMedicalConditionItemProps) {
+  const [isDeleting, setIsDeleting] = useState(false);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
   return (
@@ -71,7 +73,7 @@ export default function PatientMedicalConditionItem({
                 size="sm"
                 variant="destructive"
                 disabled={isDeleteDisabled}
-                onClick={onDelete}
+                onClick={() => setIsDeleting(true)}
               >
                 <Trash className="mr-2 h-4 w-4" /> Delete
               </Button>
@@ -79,6 +81,14 @@ export default function PatientMedicalConditionItem({
           )}
         </div>
       </div>
+
+      <DeleteAlert
+        title={`Delete ${medicalCondition.medicalCondition.name}`}
+        description={`Are you sure you want to delete this medical condition (${medicalCondition.medicalCondition.name}) from this EMR?`}
+        isOpen={isDeleting}
+        onClose={() => setIsDeleting(false)}
+        onDelete={onDelete}
+      />
 
       <Modal
         isOpen={isDetailsOpen}
