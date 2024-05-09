@@ -57,6 +57,15 @@ export class EmrService {
     return this.prisma.electronicMedicalRecord.findUnique({
       where: { patientId },
       include: {
+        patient: {
+          select: {
+            firstName: true,
+            lastName: true,
+            birthDate: true,
+            sex: true,
+            avatarURL: true,
+          },
+        },
         allergies: {
           include: {
             allergy: {

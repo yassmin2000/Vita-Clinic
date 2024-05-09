@@ -1,10 +1,14 @@
 'use client';
 
 import { useEffect } from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import { useQuery } from '@tanstack/react-query';
+import { differenceInYears, format, parseISO } from 'date-fns';
 
+import { Card } from '@/components/ui/card';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
   Accordion,
   AccordionContent,
@@ -21,6 +25,8 @@ import { useToast } from '@/components/ui/use-toast';
 import PatientMedications from './PatientMedications';
 
 import useAccessToken from '@/hooks/useAccessToken';
+import useUserRole from '@/hooks/useUserRole';
+import { capitalize } from '@/lib/utils';
 
 import type { EMR } from '@/types/emr.type';
 
@@ -34,6 +40,7 @@ export default function EmrAccordions({
   view = false,
 }: EmrAccordionsProps) {
   const accessToken = useAccessToken();
+  const { role } = useUserRole();
   const router = useRouter();
   const { toast } = useToast();
 
@@ -83,6 +90,22 @@ export default function EmrAccordions({
   if (isLoading || !data) {
     return (
       <>
+        {role !== 'patient' && (
+          <Card className="flex items-center justify-between border-black/5 p-4 transition-all dark:border-gray-800">
+            <div className="flex items-center gap-x-4">
+              <div className="h-20 w-24">
+                <Skeleton className="h-full w-full rounded-full" />
+              </div>
+              <div className="flex w-full flex-col gap-2">
+                <Skeleton className="h-4 w-40 sm:w-96" />
+                <Skeleton className="h-4 w-[70%]" />
+                <Skeleton className="h-4 w-[50%]" />
+                <Skeleton className="h-4 w-[80%]" />
+              </div>
+            </div>
+          </Card>
+        )}
+
         {Array.from({ length: 5 }).map((_, index) => (
           <div key={index} className="flex flex-col">
             <Skeleton className="h-14 rounded-b-none bg-primary" />
@@ -102,6 +125,53 @@ export default function EmrAccordions({
       defaultValue="general-info"
       className="flex w-full flex-col gap-2"
     >
+      {role !== 'patient' && (
+        <Card className="flex flex-col items-center gap-8 border-black/5 p-4 dark:border-gray-800 sm:flex-row">
+          <Avatar className="h-20 w-20 bg-primary">
+            {data.patient.avatarURL ? (
+              <div className="relative aspect-square h-full w-full">
+                <Image
+                  src={data.patient.avatarURL}
+                  alt={`${data.patient.firstName} ${data.patient.lastName} profile picture`}
+                  referrerPolicy="no-referrer"
+                  fill
+                />
+              </div>
+            ) : (
+              <AvatarFallback>
+                <span>
+                  {data.patient.firstName[0].toUpperCase() +
+                    data.patient.lastName[0].toUpperCase()}
+                </span>
+              </AvatarFallback>
+            )}
+          </Avatar>
+          <div className="flex flex-1 flex-col gap-1">
+            <h2 className="text-base font-semibold text-primary">
+              Patient Basic Information
+            </h2>
+            <p>
+              <span className="font-medium text-primary">Patient Name:</span>{' '}
+              {`${data.patient.firstName} ${data.patient.lastName}`}
+            </p>
+
+            <p className="flex items-center gap-0.5">
+              <span className="font-medium text-primary">Age:</span>{' '}
+              {differenceInYears(new Date(), parseISO(data.patient.birthDate))}{' '}
+              years old.{' '}
+              <span className="text-sm text-muted-foreground">
+                ({format(parseISO(data.patient.birthDate), 'MMM dd, yyyy')})
+              </span>
+            </p>
+
+            <p>
+              <span className="font-medium text-primary">Sex:</span>{' '}
+              {capitalize(data.patient.sex)}
+            </p>
+          </div>
+        </Card>
+      )}
+
       <AccordionItem value="general-info" className="border-none">
         <AccordionTrigger className="rounded-t-md bg-primary px-4 text-lg font-semibold text-white transition-all hover:bg-primary/90 hover:no-underline">
           General Information

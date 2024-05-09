@@ -87,6 +87,13 @@ export type PatientMedication = {
 export type EMR = {
   id: string;
   patientId: string;
+  patient: {
+    firstName: string;
+    lastName: string;
+    birthDate: string;
+    sex: 'male' | 'female';
+    avatarURL?: string;
+  };
   height?: number;
   weight?: number;
   bloodType?: BloodType;

@@ -77,7 +77,7 @@ export default function AppointmentsListItem({
   return (
     <Card
       key={id}
-      className="flex items-center justify-between border-black/5 p-4 transition-all dark:border-gray-800"
+      className="flex items-center justify-between border-black/5 p-4 dark:border-gray-800"
     >
       <div className="flex items-center gap-x-4">
         <div
