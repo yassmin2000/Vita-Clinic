@@ -32,7 +32,7 @@ export class AdminsController {
       throw new UnauthorizedException();
     }
 
-    return this.usersService.findAll('admin', {
+    return this.usersService.findAll(user.isSuperAdmin, 'admin', {
       ...query,
     });
   }

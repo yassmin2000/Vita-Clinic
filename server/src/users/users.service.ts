@@ -27,11 +27,13 @@ export class UsersService {
   ) {}
 
   async findAll(
+    isSuperAdmin: boolean,
     role: Role,
     {
       page = 1,
       limit = 10,
       sex = 'all',
+      status = 'all',
       value = '',
       sort = 'createdAt-desc',
     }: GetAllUsersQuery,
@@ -59,6 +61,11 @@ export class UsersService {
       where: {
         role,
         sex: sex === 'all' ? undefined : sex,
+        isActive: isSuperAdmin
+          ? status === 'all'
+            ? undefined
+            : status === 'active'
+          : true,
         OR: [
           ...nameConditions,
           {
@@ -79,6 +86,7 @@ export class UsersService {
         birthDate: true,
         sex: true,
         isSuperAdmin: true,
+        isActive: true,
         speciality: {
           select: {
             id: true,
@@ -109,6 +117,9 @@ export class UsersService {
         },
         {
           createdAt: sortField === 'createdAt' ? sortOrder : undefined,
+        },
+        {
+          isActive: sortField === 'isActive' ? sortOrder : undefined,
         },
       ],
     });
@@ -234,12 +245,32 @@ export class UsersService {
     }
 
     if (!verified) {
-      await this.otp.create(newUser.id, 'email', newUser.firstName, newUser.email, newUser.phoneNumber);
+      await this.otp.create(
+        newUser.id,
+        'email',
+        newUser.firstName,
+        newUser.email,
+        newUser.phoneNumber,
+      );
     }
 
     const { password, isEmailVerified, isPhoneVerified, ...result } = newUser;
 
     return result;
+  }
+
+  async deactivate(id: string) {
+    return this.prisma.user.update({
+      where: { id },
+      data: { isActive: false },
+    });
+  }
+
+  async activate(id: string) {
+    return this.prisma.user.update({
+      where: { id },
+      data: { isActive: true },
+    });
   }
 
   async changeRole(id: string, role: Role) {
@@ -295,7 +326,13 @@ export class UsersService {
       throw new ConflictException('Email is already verified');
     }
 
-    await this.otp.create(user.id, 'email', user.firstName, user.email, user.phoneNumber);
+    await this.otp.create(
+      user.id,
+      'email',
+      user.firstName,
+      user.email,
+      user.phoneNumber,
+    );
 
     return { message: 'OTP sent successfully' };
   }
@@ -346,7 +383,13 @@ export class UsersService {
       throw new ConflictException('Phone number is already verified');
     }
 
-    await this.otp.create(user.id, 'phone', user.firstName, user.email, user.phoneNumber);
+    await this.otp.create(
+      user.id,
+      'phone',
+      user.firstName,
+      user.email,
+      user.phoneNumber,
+    );
 
     return { message: 'OTP sent successfully' };
   }

@@ -7,6 +7,8 @@ import {
   Post,
   Body,
   ValidationPipe,
+  Patch,
+  Param,
 } from '@nestjs/common';
 
 import { UsersService } from './users.service';
@@ -36,5 +38,29 @@ export class UsersController {
     }
 
     return this.userService.create(dto, dto.role || 'patient', true);
+  }
+
+  @UseGuards(JwtGuard)
+  @Patch(':id/deactivate')
+  async deactivateUser(@Param('id') id: string, @Req() request: Request) {
+    const user: Payload = request['user'];
+
+    if (!user.isSuperAdmin) {
+      throw new UnauthorizedException();
+    }
+
+    return this.userService.deactivate(id);
+  }
+
+  @UseGuards(JwtGuard)
+  @Patch(':id/activate')
+  async activateUser(@Param('id') id: string, @Req() request: Request) {
+    const user: Payload = request['user'];
+
+    if (!user.isSuperAdmin) {
+      throw new UnauthorizedException();
+    }
+
+    return this.userService.activate(id);
   }
 }

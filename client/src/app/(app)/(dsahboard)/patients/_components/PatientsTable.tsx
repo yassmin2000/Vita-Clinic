@@ -17,14 +17,16 @@ import type { Patient } from '@/types/users.type';
 
 export default function PatientsTable() {
   const accessToken = useAccessToken();
-  const { role } = useUserRole();
+  const { role, isSuperAdmin } = useUserRole();
 
   const {
     sortBy,
     searchValue,
     currentGender,
+    currentStatus,
     currentPage,
     countPerPage,
+    setCurrentStatus,
     reset,
   } = useTableOptions();
 
@@ -34,11 +36,11 @@ export default function PatientsTable() {
     isLoading,
   } = useQuery({
     queryKey: [
-      `patients_page_${currentPage}_count_${countPerPage}_sex_${currentGender}_sort_${sortBy}_search_${searchValue}`,
+      `patients_page_${currentPage}_count_${countPerPage}_sex_${currentGender}_status_${currentStatus}_sort_${sortBy}_search_${searchValue}`,
     ],
     queryFn: async () => {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/users/patients?page=${currentPage}&limit=${countPerPage}&sex=${currentGender}&value=${searchValue}&sort=${sortBy}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/users/patients?page=${currentPage}&limit=${countPerPage}&sex=${currentGender}&status=${currentStatus}&value=${searchValue}&sort=${sortBy}`,
         {
           headers: {
             authorization: `Bearer ${accessToken}`,
@@ -53,6 +55,7 @@ export default function PatientsTable() {
 
   useEffect(() => {
     reset();
+    setCurrentStatus('active');
   }, []);
 
   return (
@@ -60,12 +63,14 @@ export default function PatientsTable() {
       <FiltersBar
         refetch={refetch}
         genderFilter
+        statusFilter={isSuperAdmin}
         searchFilter
         searchPlaceholder="Search by name or email address"
         sortingEnabled
         sortByNameEnabled
         sortByAgeEnabled
         sortByDateEnabled
+        sortByActiveEnabled={isSuperAdmin}
         addNewButton={role === 'admin'}
         addNewRoute="/users/new?role=patient"
         addNewContent="New Patient"

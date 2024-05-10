@@ -48,19 +48,24 @@ export class AuthService {
     const user = await this.userService.findByEmail(dto.email);
 
     if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException('Your credentials are invalid');
     }
 
     const isSamePassword = await compare(dto.password, user.password);
     if (!isSamePassword) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException('Your credentials are invalid');
+    }
+
+    if (!user.isActive) {
+      throw new UnauthorizedException('Your account is deactivated');
     }
 
     if (!user.isEmailVerified) {
-      throw new UnauthorizedException('Email is not verified');
+      throw new UnauthorizedException('Your email is not verified');
     }
 
-    const { password, isEmailVerified, isPhoneVerified, ...result } = user;
+    const { password, isEmailVerified, isPhoneVerified, isActive, ...result } =
+      user;
     return result;
   }
 

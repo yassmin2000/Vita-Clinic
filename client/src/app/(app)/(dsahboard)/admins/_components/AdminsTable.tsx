@@ -22,8 +22,10 @@ export default function AdminsTable() {
     sortBy,
     searchValue,
     currentGender,
+    currentStatus,
     currentPage,
     countPerPage,
+    setCurrentStatus,
     reset,
   } = useTableOptions();
 
@@ -33,11 +35,11 @@ export default function AdminsTable() {
     isLoading,
   } = useQuery({
     queryKey: [
-      `admins_page_${currentPage}_count_${countPerPage}_sex_${currentGender}_sort_${sortBy}_search_${searchValue}`,
+      `admins_page_${currentPage}_count_${countPerPage}_sex_${currentGender}_status_${currentStatus}_sort_${sortBy}_search_${searchValue}`,
     ],
     queryFn: async () => {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/users/admins?page=${currentPage}&limit=${countPerPage}&sex=${currentGender}&value=${searchValue}&sort=${sortBy}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/users/admins?page=${currentPage}&limit=${countPerPage}&sex=${currentGender}&status=${currentStatus}&value=${searchValue}&sort=${sortBy}`,
         {
           headers: {
             authorization: `Bearer ${accessToken}`,
@@ -52,6 +54,7 @@ export default function AdminsTable() {
 
   useEffect(() => {
     reset();
+    setCurrentStatus('active');
   }, []);
 
   return (
@@ -59,12 +62,14 @@ export default function AdminsTable() {
       <FiltersBar
         refetch={refetch}
         genderFilter
+        statusFilter={isSuperAdmin}
         searchFilter
         searchPlaceholder="Search by name or email address"
         sortingEnabled
         sortByNameEnabled
         sortByAgeEnabled
         sortByDateEnabled
+        sortByActiveEnabled={isSuperAdmin}
         addNewButton={isSuperAdmin}
         addNewRoute="/users/new?role=admin"
         addNewContent="New Admin"

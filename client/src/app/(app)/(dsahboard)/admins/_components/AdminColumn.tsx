@@ -1,15 +1,25 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import type { ColumnDef, Row } from '@tanstack/react-table';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import axios from 'axios';
 import {
   differenceInYears,
   parseISO,
   format,
   formatDistanceToNow,
 } from 'date-fns';
-import { Eye, MoreHorizontal, ShieldMinus, Sparkles } from 'lucide-react';
+import {
+  Ban,
+  Eye,
+  MoreHorizontal,
+  ShieldMinus,
+  ShieldPlus,
+  Sparkles,
+} from 'lucide-react';
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -22,48 +32,157 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import DeleteAlert from '@/components/DeleteAlert';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { useToast } from '@/components/ui/use-toast';
+
+import useAccessToken from '@/hooks/useAccessToken';
+import useUserRole from '@/hooks/useUserRole';
+import { useTableOptions } from '@/hooks/useTableOptions';
 
 import type { Admin } from '@/types/users.type';
-import useUserRole from '@/hooks/useUserRole';
 
 const ActionsCell = ({ row }: { row: Row<Admin> }) => {
+  const accessToken = useAccessToken();
   const { isSuperAdmin } = useUserRole();
 
+  const userId = row.original.id;
+  const isActive = row.original.isActive;
+  const [isActivating, setIsActivating] = useState(false);
+  const [isDeactivating, setIsDeactivating] = useState(false);
+
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+  const {
+    sortBy,
+    searchValue,
+    currentGender,
+    currentStatus,
+    currentPage,
+    countPerPage,
+  } = useTableOptions();
+
+  const { mutate: activateUser } = useMutation({
+    mutationFn: async () => {
+      return await axios.patch(
+        `${process.env.NEXT_PUBLIC_API_URL}/users/${userId}/activate`,
+        {},
+        {
+          headers: {
+            authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+    },
+    onError: () => {
+      return toast({
+        title: `Failed to activate user`,
+        description: 'Please try again later.',
+        variant: 'destructive',
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [
+          `admins_page_${currentPage}_count_${countPerPage}_sex_${currentGender}_status_${currentStatus}_sort_${sortBy}_search_${searchValue}`,
+        ],
+      });
+
+      return toast({
+        title: `User activated successfully`,
+        description: 'User can now log in and access the system.',
+      });
+    },
+  });
+
+  const { mutate: deactivateUser } = useMutation({
+    mutationFn: async () => {
+      return await axios.patch(
+        `${process.env.NEXT_PUBLIC_API_URL}/users/${userId}/deactivate`,
+        {},
+        {
+          headers: {
+            authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+    },
+    onError: () => {
+      return toast({
+        title: `Failed to deactivate user`,
+        description: 'Please try again later.',
+        variant: 'destructive',
+      });
+    },
+    onSuccess: () => {
+      return toast({
+        title: `User deactivated successfully`,
+        description: 'User can no longer log in and access the system.',
+      });
+    },
+  });
+
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="h-8 w-8 p-0">
-          <span className="sr-only">Open menu</span>
-          <MoreHorizontal className="h-4 w-4" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-        <Link href={`/users/${row.original.id}`}>
-          <DropdownMenuItem asChild>
-            <div className="flex items-center gap-2">
-              <Eye className="h-4 w-4" /> View Profile
-            </div>
-          </DropdownMenuItem>
-        </Link>
-        {isSuperAdmin && (
-          <>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" className="h-8 w-8 p-0">
+            <span className="sr-only">Open menu</span>
+            <MoreHorizontal className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+          <Link href={`/users/${row.original.id}`}>
+            <DropdownMenuItem asChild>
               <div className="flex items-center gap-2">
-                <ShieldMinus className="h-4 w-4" /> Deactivate
+                <Eye className="h-4 w-4" /> View Profile
               </div>
             </DropdownMenuItem>
-          </>
-        )}
-      </DropdownMenuContent>
-    </DropdownMenu>
+          </Link>
+          {isSuperAdmin && !row.original.isSuperAdmin && (
+            <>
+              <DropdownMenuSeparator />
+              {isActive ? (
+                <DropdownMenuItem onClick={() => setIsDeactivating(true)}>
+                  <div className="flex items-center gap-2">
+                    <ShieldMinus className="h-4 w-4" /> Deactivate
+                  </div>
+                </DropdownMenuItem>
+              ) : (
+                <DropdownMenuItem onClick={() => setIsActivating(true)}>
+                  <div className="flex items-center gap-2">
+                    <ShieldPlus className="h-4 w-4" /> Activate
+                  </div>
+                </DropdownMenuItem>
+              )}
+            </>
+          )}
+        </DropdownMenuContent>
+      </DropdownMenu>
+      <DeleteAlert
+        title={`Activate ${row.original.firstName} ${row.original.lastName} account`}
+        description={`Are you sure you want to activate ${row.original.firstName} ${row.original.lastName} account? This means they will be able to log in and access the system as an admin.`}
+        deleteText="Activate"
+        isOpen={isActivating}
+        onClose={() => setIsActivating(false)}
+        onDelete={activateUser}
+      />
+
+      <DeleteAlert
+        title={`Deactivate ${row.original.firstName} ${row.original.lastName} account`}
+        description={`Are you sure you want to deactivate ${row.original.firstName} ${row.original.lastName} account? This means they will not be able to log in and access the system.`}
+        deleteText="Deactivate"
+        isOpen={isDeactivating}
+        onClose={() => setIsDeactivating(false)}
+        onDelete={deactivateUser}
+      />
+    </>
   );
 };
 
@@ -76,6 +195,7 @@ export const columns: ColumnDef<Admin>[] = [
       const lastName = row.original.lastName;
       const avatar = row.original.avatarURL;
       const isSuperAdmin = row.original.isSuperAdmin;
+      const isActive = row.original.isActive;
 
       return (
         <div className="flex items-center gap-3">
@@ -101,8 +221,8 @@ export const columns: ColumnDef<Admin>[] = [
             <span>
               {firstName} {lastName}
             </span>
-            {isSuperAdmin && (
-              <TooltipProvider>
+            <TooltipProvider>
+              {isSuperAdmin && (
                 <Tooltip>
                   <TooltipTrigger>
                     <div className="flex items-center justify-center rounded-full p-0.5 dark:bg-white">
@@ -111,8 +231,18 @@ export const columns: ColumnDef<Admin>[] = [
                   </TooltipTrigger>
                   <TooltipContent>System Admin</TooltipContent>
                 </Tooltip>
-              </TooltipProvider>
-            )}
+              )}
+              {!isActive && (
+                <Tooltip>
+                  <TooltipTrigger>
+                    <div className="flex items-center justify-center rounded-full p-0.5 dark:bg-white">
+                      <Ban className="h-5 w-5 fill-red-500 text-gray-900" />
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>Inactive</TooltipContent>
+                </Tooltip>
+              )}
+            </TooltipProvider>
           </p>
         </div>
       );

@@ -124,6 +124,11 @@ export class GetAllUsersQuery {
   sex?: 'all' | Sex;
 
   @IsOptional()
+  @IsIn(['all', 'active', 'inactive'])
+  @Transform(({ value }) => value.toLowerCase(), { toClassOnly: true })
+  status?: 'all' | 'active' | 'inactive';
+
+  @IsOptional()
   @IsString()
   value?: string;
 
@@ -135,6 +140,8 @@ export class GetAllUsersQuery {
     'birthDate-asc',
     'createdAt-desc',
     'createdAt-asc',
+    'isActive-desc',
+    'isActive-asc',
   ])
   sort?:
     | 'name-desc'
@@ -142,5 +149,7 @@ export class GetAllUsersQuery {
     | 'birthDate-desc'
     | 'birthDate-asc'
     | 'createdAt-desc'
-    | 'createdAt-asc';
+    | 'createdAt-asc'
+    | 'isActive-desc'
+    | 'isActive-asc';
 }

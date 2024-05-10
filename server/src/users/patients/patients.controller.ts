@@ -47,7 +47,7 @@ export class PatientsController {
       throw new UnauthorizedException();
     }
 
-    return this.usersService.findAll('patient', {
+    return this.usersService.findAll(user.isSuperAdmin, 'patient', {
       ...query,
     });
   }

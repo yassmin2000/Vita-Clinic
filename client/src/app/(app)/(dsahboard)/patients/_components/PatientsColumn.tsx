@@ -1,15 +1,25 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import type { ColumnDef, Row } from '@tanstack/react-table';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import axios from 'axios';
 import {
   differenceInYears,
   parseISO,
   format,
   formatDistanceToNow,
 } from 'date-fns';
-import { Eye, MoreHorizontal, Pencil, ShieldMinus } from 'lucide-react';
+import {
+  Ban,
+  Eye,
+  MoreHorizontal,
+  Pencil,
+  ShieldMinus,
+  ShieldPlus,
+} from 'lucide-react';
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -22,74 +32,188 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import DeleteAlert from '@/components/DeleteAlert';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+import { useToast } from '@/components/ui/use-toast';
 
+import useAccessToken from '@/hooks/useAccessToken';
 import useUserRole from '@/hooks/useUserRole';
+import { useTableOptions } from '@/hooks/useTableOptions';
 
-import type { Patient } from '@/types/users.type';
 import { bloodTypes } from '@/lib/constants';
+import type { Patient } from '@/types/users.type';
 
 const ActionsCell = ({ row }: { row: Row<Patient> }) => {
+  const accessToken = useAccessToken();
   const { role, isSuperAdmin } = useUserRole();
 
+  const userId = row.original.id;
+  const isActive = row.original.isActive;
+  const [isActivating, setIsActivating] = useState(false);
+  const [isDeactivating, setIsDeactivating] = useState(false);
+
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+  const {
+    sortBy,
+    searchValue,
+    currentGender,
+    currentStatus,
+    currentPage,
+    countPerPage,
+  } = useTableOptions();
+
+  const { mutate: activateUser } = useMutation({
+    mutationFn: async () => {
+      return await axios.patch(
+        `${process.env.NEXT_PUBLIC_API_URL}/users/${userId}/activate`,
+        {},
+        {
+          headers: {
+            authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+    },
+    onError: () => {
+      return toast({
+        title: `Failed to activate user`,
+        description: 'Please try again later.',
+        variant: 'destructive',
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [
+          `patients_page_${currentPage}_count_${countPerPage}_sex_${currentGender}_status_${currentStatus}_sort_${sortBy}_search_${searchValue}`,
+        ],
+      });
+
+      return toast({
+        title: `User activated successfully`,
+        description: 'User can now log in and access the system.',
+      });
+    },
+  });
+
+  const { mutate: deactivateUser } = useMutation({
+    mutationFn: async () => {
+      return await axios.patch(
+        `${process.env.NEXT_PUBLIC_API_URL}/users/${userId}/deactivate`,
+        {},
+        {
+          headers: {
+            authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+    },
+    onError: () => {
+      return toast({
+        title: `Failed to deactivate user`,
+        description: 'Please try again later.',
+        variant: 'destructive',
+      });
+    },
+    onSuccess: () => {
+      return toast({
+        title: `User deactivated successfully`,
+        description: 'User can no longer log in and access the system.',
+      });
+    },
+  });
+
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="h-8 w-8 p-0">
-          <span className="sr-only">Open menu</span>
-          <MoreHorizontal className="h-4 w-4" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-        <Link href={`/users/${row.original.id}`}>
-          <DropdownMenuItem asChild>
-            <div className="flex items-center gap-2">
-              <Eye className="h-4 w-4" /> View Profile
-            </div>
-          </DropdownMenuItem>
-        </Link>
-        <Link href={`/patients/${row.original.id}/emr`}>
-          <DropdownMenuItem asChild>
-            <div className="flex items-center gap-2">
-              <Eye className="h-4 w-4" /> View EMR
-            </div>
-          </DropdownMenuItem>
-        </Link>
-        {role === 'doctor' && (
-          <Link href={`/patients/${row.original.id}/emr/edit`}>
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" className="h-8 w-8 p-0">
+            <span className="sr-only">Open menu</span>
+            <MoreHorizontal className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+          <Link href={`/users/${userId}`}>
             <DropdownMenuItem asChild>
               <div className="flex items-center gap-2">
-                <Pencil className="h-4 w-4" /> Edit EMR
+                <Eye className="h-4 w-4" /> View Profile
               </div>
             </DropdownMenuItem>
           </Link>
-        )}
-        <Link href={`/patients/${row.original.id}/reports`}>
-          <DropdownMenuItem asChild>
-            <div className="flex items-center gap-2">
-              <Eye className="h-4 w-4" /> View Patient Reports
-            </div>
-          </DropdownMenuItem>
-        </Link>
-        <Link href={`/patients/${row.original.id}/scans`}>
-          <DropdownMenuItem asChild>
-            <div className="flex items-center gap-2">
-              <Eye className="h-4 w-4" /> View Patient Scans
-            </div>
-          </DropdownMenuItem>
-        </Link>
-        {isSuperAdmin && (
-          <>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
+          <Link href={`/patients/${userId}/emr`}>
+            <DropdownMenuItem asChild>
               <div className="flex items-center gap-2">
-                <ShieldMinus className="h-4 w-4" /> Deactivate
+                <Eye className="h-4 w-4" /> View EMR
               </div>
             </DropdownMenuItem>
-          </>
-        )}
-      </DropdownMenuContent>
-    </DropdownMenu>
+          </Link>
+          {role === 'doctor' && (
+            <Link href={`/patients/${userId}/emr/edit`}>
+              <DropdownMenuItem asChild>
+                <div className="flex items-center gap-2">
+                  <Pencil className="h-4 w-4" /> Edit EMR
+                </div>
+              </DropdownMenuItem>
+            </Link>
+          )}
+          <Link href={`/patients/${userId}/reports`}>
+            <DropdownMenuItem asChild>
+              <div className="flex items-center gap-2">
+                <Eye className="h-4 w-4" /> View Patient Reports
+              </div>
+            </DropdownMenuItem>
+          </Link>
+          <Link href={`/patients/${userId}/scans`}>
+            <DropdownMenuItem asChild>
+              <div className="flex items-center gap-2">
+                <Eye className="h-4 w-4" /> View Patient Scans
+              </div>
+            </DropdownMenuItem>
+          </Link>
+          {isSuperAdmin && (
+            <>
+              <DropdownMenuSeparator />
+              {isActive ? (
+                <DropdownMenuItem onClick={() => setIsDeactivating(true)}>
+                  <div className="flex items-center gap-2">
+                    <ShieldMinus className="h-4 w-4" /> Deactivate
+                  </div>
+                </DropdownMenuItem>
+              ) : (
+                <DropdownMenuItem onClick={() => setIsActivating(true)}>
+                  <div className="flex items-center gap-2">
+                    <ShieldPlus className="h-4 w-4" /> Activate
+                  </div>
+                </DropdownMenuItem>
+              )}
+            </>
+          )}
+        </DropdownMenuContent>
+      </DropdownMenu>
+      <DeleteAlert
+        title={`Activate ${row.original.firstName} ${row.original.lastName} account`}
+        description={`Are you sure you want to activate ${row.original.firstName} ${row.original.lastName} account? This means they will be able to log in and access the system.`}
+        deleteText="Activate"
+        isOpen={isActivating}
+        onClose={() => setIsActivating(false)}
+        onDelete={activateUser}
+      />
+
+      <DeleteAlert
+        title={`Deactivate ${row.original.firstName} ${row.original.lastName} account`}
+        description={`Are you sure you want to deactivate ${row.original.firstName} ${row.original.lastName} account? This means they will not be able to log in and access the system.`}
+        deleteText="Deactivate"
+        isOpen={isDeactivating}
+        onClose={() => setIsDeactivating(false)}
+        onDelete={deactivateUser}
+      />
+    </>
   );
 };
 
@@ -101,6 +225,7 @@ export const columns: ColumnDef<Patient>[] = [
       const firstName = row.original.firstName;
       const lastName = row.original.lastName;
       const avatar = row.original.avatarURL;
+      const isActive = row.original.isActive;
 
       return (
         <div className="flex items-center gap-3">
@@ -122,8 +247,22 @@ export const columns: ColumnDef<Patient>[] = [
               </AvatarFallback>
             )}
           </Avatar>
-          <p className="font-medium text-foreground">
-            {firstName} {lastName}
+          <p className="flex items-center gap-1.5 font-medium text-foreground">
+            <span>
+              {firstName} {lastName}
+            </span>
+            <TooltipProvider>
+              {!isActive && (
+                <Tooltip>
+                  <TooltipTrigger>
+                    <div className="flex items-center justify-center rounded-full p-0.5 dark:bg-white">
+                      <Ban className="h-5 w-5 fill-red-500 text-gray-900" />
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>Inactive</TooltipContent>
+                </Tooltip>
+              )}
+            </TooltipProvider>
           </p>
         </div>
       );

@@ -42,6 +42,7 @@ interface FiltersBarProps {
   sortByDoctorNameEnabled?: boolean;
   sortByAgeEnabled?: boolean;
   sortByDateEnabled?: boolean;
+  sortByActiveEnabled?: boolean;
   dateTitle?: string;
   sortByLastMaintenanceDateEnabled?: boolean;
   sortByPurchaseDateEnabled?: boolean;
@@ -64,6 +65,7 @@ export default function FiltersBar({
   sortByDoctorNameEnabled = false,
   sortByAgeEnabled = false,
   sortByDateEnabled = false,
+  sortByActiveEnabled = false,
   dateTitle = 'Joined at',
   sortByLastMaintenanceDateEnabled = false,
   sortByPurchaseDateEnabled = false,
@@ -229,6 +231,14 @@ export default function FiltersBar({
                   <SelectLabel>{dateTitle}</SelectLabel>
                   <SelectItem value="createdAt-asc">Oldest first</SelectItem>
                   <SelectItem value="createdAt-desc">Newest first</SelectItem>
+                </SelectGroup>
+              )}
+
+              {sortByActiveEnabled && (
+                <SelectGroup>
+                  <SelectLabel>Status</SelectLabel>
+                  <SelectItem value="isActive-desc">Active first</SelectItem>
+                  <SelectItem value="isActive-asc">Inactive first</SelectItem>
                 </SelectGroup>
               )}
 
