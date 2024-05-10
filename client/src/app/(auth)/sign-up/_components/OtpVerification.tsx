@@ -102,7 +102,7 @@ export default function OtpVerification({ email }: OtpVerification) {
             Verify your email
           </h1>
           <p className="mx-auto max-w-xs text-sm">
-            We've sent a 6-digit code to{' '}
+            We&apos;ve sent a 6-digit code to{' '}
             <span className="font-semibold">{email}</span>, please enter it
             below to verify your email and be able to sign in.
           </p>
