@@ -20,6 +20,7 @@ import {
   FileStack,
   MoreHorizontal,
   Pencil,
+  Pill,
   ShieldMinus,
   ShieldPlus,
 } from 'lucide-react';
@@ -186,6 +187,13 @@ const ActionsCell = ({ row }: { row: Row<Patient> }) => {
             <DropdownMenuItem asChild>
               <div className="flex items-center gap-2">
                 <FileScan className="h-4 w-4" /> View Patient Scans
+              </div>
+            </DropdownMenuItem>
+          </Link>
+          <Link href={`/patients/${userId}/prescriptions`}>
+            <DropdownMenuItem asChild>
+              <div className="flex items-center gap-2">
+                <Pill className="h-4 w-4" /> View Patient Prescriptions
               </div>
             </DropdownMenuItem>
           </Link>

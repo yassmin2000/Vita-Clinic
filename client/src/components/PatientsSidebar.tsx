@@ -42,8 +42,8 @@ const routes = [
   },
   {
     icon: Pill,
-    href: '/medications',
-    label: 'Medications',
+    href: '/prescriptions',
+    label: 'Prescriptions',
   },
   {
     icon: File,
