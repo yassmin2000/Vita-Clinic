@@ -24,6 +24,13 @@ import {
 } from '@/components/ui/tooltip';
 
 import useUserRole from '@/hooks/useUserRole';
+import DeleteAlert from '@/components/DeleteAlert';
+import { useState } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import axios from 'axios';
+import useAccessToken from '@/hooks/useAccessToken';
+import { useToast } from '@/components/ui/use-toast';
+import { useTableOptions } from '@/hooks/useTableOptions';
 
 interface DeviceCardProps {
   id: string;
@@ -47,7 +54,47 @@ export default function DeviceCard({
   serialNumber,
 }: DeviceCardProps) {
   const router = useRouter();
+  const accessToken = useAccessToken();
   const { role, isSuperAdmin } = useUserRole();
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+  const { sortBy, searchValue, currentPage, countPerPage, currentStatus } =
+    useTableOptions();
+
+  const { mutate: deleteDevice, isPending } = useMutation({
+    mutationFn: async () => {
+      return await axios.delete(
+        `${process.env.NEXT_PUBLIC_API_URL}/devices/${id}`,
+        {
+          headers: {
+            authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+    },
+    onError: () => {
+      return toast({
+        title: `Failed to delete device`,
+        description: 'Please try again later.',
+        variant: 'destructive',
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [
+          `devices_page_${currentPage}_count_${countPerPage}_status_${currentStatus}_sort_${sortBy}_search_${searchValue}`,
+        ],
+      });
+      setIsDeleting(false);
+
+      return toast({
+        title: `Device deleted successfully`,
+        description: 'The device has been deleted successfully.',
+      });
+    },
+  });
 
   return (
     <Card>
@@ -81,7 +128,7 @@ export default function DeviceCard({
                     <Pencil className="mr-2 h-4 w-4" /> Edit
                   </DropdownMenuItem>
                   {isSuperAdmin && (
-                    <DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setIsDeleting(true)}>
                       <Trash className="mr-2 h-4 w-4" /> Delete
                     </DropdownMenuItem>
                   )}
@@ -133,6 +180,15 @@ export default function DeviceCard({
           </div>
         </div>
       </CardHeader>
+
+      <DeleteAlert
+        title={`Delete ${deviceName}`}
+        description={`Are you sure you want to delete ${deviceName}?`}
+        isOpen={isDeleting}
+        onClose={() => setIsDeleting(false)}
+        onDelete={deleteDevice}
+        disabled={isPending}
+      />
     </Card>
   );
 }
