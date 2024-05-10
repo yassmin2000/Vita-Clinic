@@ -75,16 +75,7 @@ export default function TreatmentsList({ patientId }: TreatmentsListProps) {
         {treatments &&
           treatments.length > 0 &&
           treatments.map((treatment) => (
-            <TreatmentItem
-              key={treatment.id}
-              id={treatment.id}
-              title={treatment.name}
-              therapyName={treatment.therapy.name}
-              therapyUnit={treatment.therapy.unit}
-              treatmentDosage={treatment.dosage}
-              treatmentDuration={treatment.duration}
-              date={treatment.createdAt}
-            />
+            <TreatmentItem key={treatment.id} treatment={treatment} />
           ))}
       </div>
 

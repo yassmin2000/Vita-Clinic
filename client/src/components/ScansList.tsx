@@ -74,15 +74,7 @@ export default function ScansList({ patientId }: ScansListProps) {
           ))}
         {scans &&
           scans.length > 0 &&
-          scans.map((scan) => (
-            <ScanItem
-              key={scan.id}
-              id={scan.id}
-              title={scan.title}
-              modality={scan.modality.name}
-              date={scan.createdAt}
-            />
-          ))}
+          scans.map((scan) => <ScanItem key={scan.id} scan={scan} />)}
       </div>
 
       <Pagination

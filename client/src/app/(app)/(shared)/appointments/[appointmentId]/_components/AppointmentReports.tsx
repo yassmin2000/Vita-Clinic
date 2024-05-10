@@ -56,13 +56,7 @@ export default function AppointmentReports({
         {reports &&
           reports.length > 0 &&
           reports.map((report) => (
-            <ReportItem
-              key={report.id}
-              id={report.id}
-              title={report.title}
-              fileName={report.fileName}
-              date={report.createdAt}
-            />
+            <ReportItem key={report.id} report={report} />
           ))}
       </div>
     </div>

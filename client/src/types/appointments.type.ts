@@ -1,4 +1,5 @@
 import type { LaboratoryTest, PriceLookup, Therapy } from './settings.type';
+import type { PatientMedication } from './emr.type';
 
 export type AppointmentStatus =
   | 'completed'
@@ -53,12 +54,13 @@ export type Scan = {
   appointmentId: string;
   title: string;
   notes: string;
-  modality: {
-    id: string;
-    name: string;
-  };
+  modality: PriceLookup;
   scanURLs: string[];
   createdAt: string;
+};
+
+export type Prescription = PatientMedication & {
+  appointmentId: string;
 };
 
 export type Treatment = {
