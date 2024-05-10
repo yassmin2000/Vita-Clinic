@@ -33,7 +33,7 @@ import type { PriceLookup } from '@/types/settings.type';
 
 const ActionsCell = ({ row }: { row: Row<PriceLookup> }) => {
   const accessToken = useAccessToken();
-  const { isSuperAdmin } = useUserRole();
+  const { role, isSuperAdmin } = useUserRole();
   const { openForm, setCurrentPriceLookup } = useSettingsStore();
 
   const type = row.original.type as string;
@@ -78,6 +78,10 @@ const ActionsCell = ({ row }: { row: Row<PriceLookup> }) => {
       });
     },
   });
+
+  if (role !== 'admin') {
+    return null;
+  }
 
   return (
     <>

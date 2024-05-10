@@ -35,10 +35,6 @@ const ActionsCell = ({ row }: { row: Row<LaboratoryTest> }) => {
   const { role, isSuperAdmin } = useUserRole();
   const { openForm, setCurrentLaboratoryTest } = useSettingsStore();
 
-  if (role !== 'admin') {
-    return null;
-  }
-
   const [isDeleting, setIsDeleting] = useState(false);
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -77,6 +73,10 @@ const ActionsCell = ({ row }: { row: Row<LaboratoryTest> }) => {
       });
     },
   });
+
+  if (role !== 'admin') {
+    return null;
+  }
 
   return (
     <>
