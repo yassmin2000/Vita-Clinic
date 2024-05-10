@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 
 import { PrismaService } from 'src/prisma.service';
 import { CreateModalityDto, UpdateModalityDto } from './dto/modalities.dto';
@@ -41,7 +45,7 @@ export class ModalitiesService {
 
     return createdModality;
   }
-  
+
   async update(
     userId: string,
     id: string,
@@ -78,6 +82,28 @@ export class ModalitiesService {
 
     if (!existingModality) {
       throw new NotFoundException('Modality not found');
+    }
+
+    const isModalityUsed =
+      (await this.prisma.appointmentServices.findFirst({
+        where: {
+          scans: {
+            some: {
+              id,
+            },
+          },
+        },
+      })) ||
+      (await this.prisma.scan.findFirst({
+        where: {
+          modalityId: id,
+        },
+      }));
+
+    if (isModalityUsed) {
+      throw new ConflictException(
+        'Modality is being used in a scan and cannot be deleted.',
+      );
     }
 
     const deletedModality = await this.prisma.modality.delete({

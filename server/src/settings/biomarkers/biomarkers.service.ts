@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 
 import { PrismaService } from 'src/prisma.service';
 import { CreateBiomarkerDto, UpdateBiomarkerDto } from './dto/biomarkers.dto';
@@ -78,6 +82,22 @@ export class BiomarkersService {
 
     if (!existingBiomarker) {
       throw new NotFoundException('Biomarker not found');
+    }
+
+    const isBiomarkerUsed = await this.prisma.laboratoryTest.findFirst({
+      where: {
+        biomarkers: {
+          some: {
+            id,
+          },
+        },
+      },
+    });
+
+    if (isBiomarkerUsed) {
+      throw new ConflictException(
+        'Biomarker is being used in a laboratory test and cannot be deleted.',
+      );
     }
 
     const deletedBiomarker = await this.prisma.biomarker.delete({

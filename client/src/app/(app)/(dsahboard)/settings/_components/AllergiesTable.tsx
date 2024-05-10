@@ -40,7 +40,16 @@ export default function AllergiesTable() {
     <>
       <DataTable
         columns={columns}
-        data={allergies || []}
+        data={
+          allergies
+            ? allergies.map((allergy) => ({
+                ...allergy,
+                type: 'allergy',
+                queryKey: 'allergies',
+                endpoint: 'settings/allergies',
+              }))
+            : []
+        }
         isLoading={isLoading}
         pagination
         filtering

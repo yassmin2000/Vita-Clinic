@@ -19,11 +19,12 @@ import { Icons } from '@/components/Icons';
 import { capitalize } from '@/lib/utils';
 import { dosageForms } from '@/lib/constants';
 
+import type { PatientMedication } from '@/types/emr.type';
 import type { PatientMedicationField } from './PatientMedications';
 import DeleteAlert from '@/components/DeleteAlert';
 
 interface PatientMedicationItemProps {
-  medication: PatientMedicationField;
+  medication: PatientMedication | PatientMedicationField;
   isEditDisabled?: boolean;
   onEdit: () => void;
   isDeleteDisabled?: boolean;

@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 
 import { PrismaService } from 'src/prisma.service';
 import {
@@ -84,18 +88,24 @@ export class ManufacturersService {
       throw new NotFoundException('Manufacturer not found');
     }
 
-    const deletedManufacturers = await this.prisma.manufacturer.delete({
-      where: { id },
-    });
+    try {
+      const deletedManufacturers = await this.prisma.manufacturer.delete({
+        where: { id },
+      });
 
-    await this.logService.create({
-      userId,
-      targetId: deletedManufacturers.id,
-      targetName: deletedManufacturers.name,
-      type: 'manufacturer',
-      action: 'delete',
-    });
+      await this.logService.create({
+        userId,
+        targetId: deletedManufacturers.id,
+        targetName: deletedManufacturers.name,
+        type: 'manufacturer',
+        action: 'delete',
+      });
 
-    return deletedManufacturers;
+      return deletedManufacturers;
+    } catch {
+      throw new ConflictException(
+        'Manufacturer is being used in a device and cannot be deleted.',
+      );
+    }
   }
 }

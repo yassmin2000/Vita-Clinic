@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 
 import { PrismaService } from 'src/prisma.service';
 import { CreateAllergyDto, UpdateAllergyDto } from './dto/allergies.dto';
@@ -68,7 +72,7 @@ export class AllergiesService {
     return updatedAllergy;
   }
 
-  async delete(id: string, userId: string) {
+  async delete(userId: string, id: string) {
     const existingAllergy = await this.prisma.allergy.findUnique({
       where: { id },
     });
@@ -77,18 +81,24 @@ export class AllergiesService {
       throw new NotFoundException('Allergy not found');
     }
 
-    const deletedAllergy = await this.prisma.allergy.delete({
-      where: { id },
-    });
+    try {
+      const deletedAllergy = await this.prisma.allergy.delete({
+        where: { id },
+      });
 
-    await this.logService.create({
-      userId,
-      targetId: deletedAllergy.id,
-      targetName: deletedAllergy.name,
-      type: 'allergy',
-      action: 'delete',
-    });
+      await this.logService.create({
+        userId,
+        targetId: deletedAllergy.id,
+        targetName: deletedAllergy.name,
+        type: 'allergy',
+        action: 'delete',
+      });
 
-    return deletedAllergy;
+      return deletedAllergy;
+    } catch {
+      throw new ConflictException(
+        'Allergy is being used in an EMR and cannot be deleted.',
+      );
+    }
   }
 }

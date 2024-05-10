@@ -17,7 +17,7 @@ import type { Lookup } from '@/types/settings.type';
 export default function ManufacturersTable() {
   const accessToken = useAccessToken();
 
-  const { data: allergies, isLoading } = useQuery({
+  const { data: manufacturers, isLoading } = useQuery({
     queryKey: ['manufacturers'],
     queryFn: async () => {
       const response = await axios.get(
@@ -40,7 +40,16 @@ export default function ManufacturersTable() {
     <>
       <DataTable
         columns={columns}
-        data={allergies || []}
+        data={
+          manufacturers
+            ? manufacturers.map((manufacturer) => ({
+                ...manufacturer,
+                type: 'manufacturer',
+                queryKey: 'manufacturers',
+                endpoint: 'settings/manufacturers',
+              }))
+            : []
+        }
         isLoading={isLoading}
         pagination
         filtering

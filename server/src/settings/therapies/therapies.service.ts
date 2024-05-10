@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 
 import { PrismaService } from 'src/prisma.service';
 import { CreateTherapyDto, UpdateTherapyDto } from './dto/therapies.dto';
@@ -75,6 +79,24 @@ export class TherapiesService {
 
     if (!existingTherapy) {
       throw new NotFoundException('Therapy not found');
+    }
+
+    const isTherapyUsed =
+      (await this.prisma.appointmentServices.findFirst({
+        where: {
+          therapyId: id,
+        },
+      })) ||
+      (await this.prisma.treatment.findFirst({
+        where: {
+          therapyId: id,
+        },
+      }));
+
+    if (isTherapyUsed) {
+      throw new ConflictException(
+        'Therapy is being used in a treatment and cannot be deleted.',
+      );
     }
 
     const deletedTherapy = await this.prisma.therapy.delete({

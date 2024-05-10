@@ -17,7 +17,7 @@ import type { Lookup } from '@/types/settings.type';
 export default function SpecialitiesTable() {
   const accessToken = useAccessToken();
 
-  const { data: allergies, isLoading } = useQuery({
+  const { data: specialities, isLoading } = useQuery({
     queryKey: ['specialities'],
     queryFn: async () => {
       const response = await axios.get(
@@ -40,7 +40,16 @@ export default function SpecialitiesTable() {
     <>
       <DataTable
         columns={columns}
-        data={allergies || []}
+        data={
+          specialities
+            ? specialities.map((speciality) => ({
+                ...speciality,
+                type: 'speciality',
+                queryKey: 'specialities',
+                endpoint: 'settings/specialities',
+              }))
+            : []
+        }
         isLoading={isLoading}
         pagination
         filtering

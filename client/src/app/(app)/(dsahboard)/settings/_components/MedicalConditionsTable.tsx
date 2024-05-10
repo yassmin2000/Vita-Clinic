@@ -44,7 +44,16 @@ export default function MedicalConditionsTable() {
     <>
       <DataTable
         columns={columns}
-        data={medicalConditions || []}
+        data={
+          medicalConditions
+            ? medicalConditions.map((medicalCondition) => ({
+                ...medicalCondition,
+                type: 'medical-condition',
+                queryKey: 'medical-conditions',
+                endpoint: 'settings/medical-conditions',
+              }))
+            : []
+        }
         isLoading={isLoading}
         pagination
         filtering

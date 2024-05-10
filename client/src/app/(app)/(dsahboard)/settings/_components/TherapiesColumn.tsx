@@ -23,8 +23,15 @@ import useUserRole from '@/hooks/useUserRole';
 import useSettingsStore from '@/hooks/useSettingsStore';
 
 import type { Therapy } from '@/types/settings.type';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useToast } from '@/components/ui/use-toast';
+import { useState } from 'react';
+import useAccessToken from '@/hooks/useAccessToken';
+import axios, { AxiosError } from 'axios';
+import DeleteAlert from '@/components/DeleteAlert';
 
 const ActionsCell = ({ row }: { row: Row<Therapy> }) => {
+  const accessToken = useAccessToken();
   const { role, isSuperAdmin } = useUserRole();
   const { openForm, setCurrentTherapy } = useSettingsStore();
 
@@ -32,31 +39,81 @@ const ActionsCell = ({ row }: { row: Row<Therapy> }) => {
     return null;
   }
 
+  const [isDeleting, setIsDeleting] = useState(false);
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  const { mutate: deleteTherapy, isPending } = useMutation({
+    mutationFn: async () => {
+      return await axios.delete(
+        `${process.env.NEXT_PUBLIC_API_URL}/settings/therapies/${row.original.id}`,
+        {
+          headers: {
+            authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+    },
+    onError: (error) => {
+      const axiosError = error as AxiosError<any, any>;
+
+      return toast({
+        title: 'Failed to delete therapy',
+        description:
+          axiosError?.response?.data.message ||
+          'Therapy could not be deleted, please try again.',
+        variant: 'destructive',
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['therapies'],
+      });
+      setIsDeleting(false);
+
+      return toast({
+        title: 'Therapy deleted successfully',
+        description: 'Therapy has been deleted successfully.',
+      });
+    },
+  });
+
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="h-8 w-8 p-0">
-          <span className="sr-only">Open menu</span>
-          <MoreHorizontal className="h-4 w-4" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-        <DropdownMenuItem
-          onClick={() => {
-            setCurrentTherapy(row.original);
-            openForm();
-          }}
-        >
-          <Pencil className="mr-2 h-4 w-4" /> Edit
-        </DropdownMenuItem>
-        {isSuperAdmin && (
-          <DropdownMenuItem>
-            <Trash className="mr-2 h-4 w-4" /> Delete
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" className="h-8 w-8 p-0">
+            <span className="sr-only">Open menu</span>
+            <MoreHorizontal className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+          <DropdownMenuItem
+            onClick={() => {
+              setCurrentTherapy(row.original);
+              openForm();
+            }}
+          >
+            <Pencil className="mr-2 h-4 w-4" /> Edit
           </DropdownMenuItem>
-        )}
-      </DropdownMenuContent>
-    </DropdownMenu>
+          {isSuperAdmin && (
+            <DropdownMenuItem onClick={() => setIsDeleting(true)}>
+              <Trash className="mr-2 h-4 w-4" /> Delete
+            </DropdownMenuItem>
+          )}
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <DeleteAlert
+        title={`Delete ${row.original.name}`}
+        description={`Are you sure you want to delete ${row.original.name}?`}
+        isOpen={isDeleting}
+        onClose={() => setIsDeleting(false)}
+        onDelete={deleteTherapy}
+        disabled={isPending}
+      />
+    </>
   );
 };
 

@@ -42,7 +42,16 @@ export default function ModalitiesTable() {
     <>
       <DataTable
         columns={columns}
-        data={modalities || []}
+        data={
+          modalities
+            ? modalities.map((modality) => ({
+                ...modality,
+                type: 'modality',
+                queryKey: 'modalities',
+                endpoint: 'settings/modalities',
+              }))
+            : []
+        }
         isLoading={isLoading}
         pagination
         filtering

@@ -40,7 +40,16 @@ export default function SurgeriesTable() {
     <>
       <DataTable
         columns={columns}
-        data={surgeries || []}
+        data={
+          surgeries
+            ? surgeries.map((surgery) => ({
+                ...surgery,
+                type: 'surgery',
+                queryKey: 'surgeries',
+                endpoint: 'settings/surgeries',
+              }))
+            : []
+        }
         isLoading={isLoading}
         pagination
         filtering

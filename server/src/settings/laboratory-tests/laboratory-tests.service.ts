@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 
 import { PrismaService } from 'src/prisma.service';
 import { BiomarkersService } from '../biomarkers/biomarkers.service';
@@ -115,6 +119,23 @@ export class LaboratoryTestsService {
 
   async delete(userId: string, id: string) {
     await this.findById(id);
+
+    const isLaboratoryTestUsed =
+      await this.prisma.appointmentServices.findFirst({
+        where: {
+          labWorks: {
+            some: {
+              id,
+            },
+          },
+        },
+      });
+
+    if (isLaboratoryTestUsed) {
+      throw new ConflictException(
+        'Laboratory test is being used and cannot be deleted.',
+      );
+    }
 
     const deletedLaboratoryTest = await this.prisma.laboratoryTest.delete({
       where: { id },

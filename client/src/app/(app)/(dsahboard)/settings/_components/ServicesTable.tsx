@@ -42,7 +42,16 @@ export default function ServicesTable() {
     <>
       <DataTable
         columns={columns}
-        data={services || []}
+        data={
+          services
+            ? services.map((service) => ({
+                ...service,
+                type: 'service',
+                queryKey: 'services',
+                endpoint: 'settings/services',
+              }))
+            : []
+        }
         isLoading={isLoading}
         pagination
         filtering

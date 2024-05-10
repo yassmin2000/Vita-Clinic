@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import {
   UpdateSpecialityDto,
@@ -81,6 +85,18 @@ export class SpecialitiesService {
 
     if (!existingSpeciality) {
       throw new NotFoundException('Speciality not found');
+    }
+
+    const isSpecialityUsed = await this.prisma.user.findFirst({
+      where: {
+        specialityId: id,
+      },
+    });
+
+    if (isSpecialityUsed) {
+      throw new ConflictException(
+        'Speciality is being used by a doctor and cannot be deleted.',
+      );
     }
 
     const deletedSpeciality = await this.prisma.speciality.delete({

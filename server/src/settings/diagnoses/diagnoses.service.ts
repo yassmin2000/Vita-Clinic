@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 
 import { PrismaService } from 'src/prisma.service';
 import { CreateDiagnosisDto, UpdateDiagnosisDto } from './dto/diagnoses.dto';
@@ -80,18 +84,24 @@ export class DiagnosesService {
       throw new NotFoundException('Diagnosis not found');
     }
 
-    const deleteDiagnosis = await this.prisma.diagnosis.delete({
-      where: { id },
-    });
+    try {
+      const deleteDiagnosis = await this.prisma.diagnosis.delete({
+        where: { id },
+      });
 
-    await this.logService.create({
-      userId,
-      targetId: deleteDiagnosis.id,
-      targetName: deleteDiagnosis.name,
-      type: 'diagnosis',
-      action: 'delete',
-    });
+      await this.logService.create({
+        userId,
+        targetId: deleteDiagnosis.id,
+        targetName: deleteDiagnosis.name,
+        type: 'diagnosis',
+        action: 'delete',
+      });
 
-    return deleteDiagnosis;
+      return deleteDiagnosis;
+    } catch {
+      throw new ConflictException(
+        'Diagnosis is being used in an EMR and cannot be deleted.',
+      );
+    }
   }
 }

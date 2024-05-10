@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 
 import { PrismaService } from 'src/prisma.service';
 import { CreateServiceDto, UpdateServiceDto } from './dto/services.dto';
@@ -43,7 +47,7 @@ export class ServicesService {
     return createdService;
   }
 
-  async update(userId:string,id: string, updateServiceDto: UpdateServiceDto) {
+  async update(userId: string, id: string, updateServiceDto: UpdateServiceDto) {
     const existingService = await this.prisma.service.findUnique({
       where: { id },
     });
@@ -75,6 +79,18 @@ export class ServicesService {
 
     if (!existingService) {
       throw new NotFoundException('Service not found');
+    }
+
+    const isServiceUsed = await this.prisma.appointmentServices.findFirst({
+      where: {
+        serviceId: id,
+      },
+    });
+
+    if (isServiceUsed) {
+      throw new ConflictException(
+        'Service is being used by a patient in an appointment and cannot be deleted.',
+      );
     }
 
     const deletedService = await this.prisma.service.delete({
