@@ -21,6 +21,8 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 
+import { useAuthStore } from '@/hooks/useAuthStore';
+
 const formSchema = z.object({
   email: z.string({ required_error: 'Email is required' }).email().min(1, {
     message: 'Email is required.',
@@ -36,8 +38,9 @@ export default function SignIn() {
   });
   const isLoading = form.formState.isSubmitting;
 
-  const { toast } = useToast();
   const router = useRouter();
+  const { setIsVerifying, setEmail } = useAuthStore();
+  const { toast } = useToast();
 
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
@@ -51,6 +54,15 @@ export default function SignIn() {
 
       if (response && !response.ok) {
         if (response) {
+          if (
+            response.error?.replace('Error: ', '') ===
+            'Your email is not verified'
+          ) {
+            setEmail(form.watch('email'));
+            setIsVerifying(true);
+            router.push('/sign-up');
+          }
+
           return toast({
             title: 'An error occurred',
             description: response.error?.replace('Error: ', ''),

@@ -2,6 +2,7 @@ import { Request } from 'express';
 import {
   Body,
   Controller,
+  Patch,
   Post,
   Put,
   Req,
@@ -50,7 +51,7 @@ export class AuthController {
     return this.userService.create(createUserDto, 'patient');
   }
 
-  @Put('verify/email')
+  @Patch('verify/email')
   async verifyUserEmail(
     @Body(ValidationPipe) verifyUserEmailDto: VerifyUserEmailDto,
   ) {
@@ -66,7 +67,7 @@ export class AuthController {
   }
 
   @UseGuards(JwtGuard)
-  @Put('verify/phone')
+  @Patch('verify/phone')
   async verifyUserPhone(
     @Body(ValidationPipe) verifyUserPhoneDto: VerifyUserPhoneDto,
     @Req() request: Request,
@@ -82,7 +83,7 @@ export class AuthController {
 
     return this.userService.verifyPhone(verifyUserPhoneDto);
   }
-  
+
   @UseGuards(JwtGuard)
   @Post('/resend/phone')
   async resendPhoneVerification(

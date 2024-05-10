@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { LoginDto } from './dto/auth.dto';
 import { UsersService } from 'src/users/users.service';
 import { compare } from 'bcrypt';
@@ -61,7 +65,7 @@ export class AuthService {
     }
 
     if (!user.isEmailVerified) {
-      throw new UnauthorizedException('Your email is not verified');
+      throw new ConflictException('Your email is not verified');
     }
 
     const { password, isEmailVerified, isPhoneVerified, isActive, ...result } =
