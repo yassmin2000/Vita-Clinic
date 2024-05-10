@@ -5,9 +5,6 @@ export type Lookup = {
   name: string;
   description?: string;
   createdAt: string;
-  type?: string;
-  queryKey?: string;
-  endpoint?: string;
 };
 
 export type DosageForm = (typeof dosageForms)[number]['value'];
@@ -41,9 +38,6 @@ export type PriceLookup = {
   price: number;
   description?: string;
   createdAt: string;
-  type?: string;
-  queryKey?: string;
-  endpoint?: string;
 };
 
 export type Therapy = PriceLookup & {

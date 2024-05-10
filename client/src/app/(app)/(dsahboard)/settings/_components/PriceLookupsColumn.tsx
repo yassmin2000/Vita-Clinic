@@ -31,7 +31,13 @@ import useSettingsStore from '@/hooks/useSettingsStore';
 import { capitalize } from '@/lib/utils';
 import type { PriceLookup } from '@/types/settings.type';
 
-const ActionsCell = ({ row }: { row: Row<PriceLookup> }) => {
+type PriceLookupColumn = PriceLookup & {
+  type: string;
+  queryKey: string;
+  endpoint: string;
+};
+
+const ActionsCell = ({ row }: { row: Row<PriceLookupColumn> }) => {
   const accessToken = useAccessToken();
   const { role, isSuperAdmin } = useUserRole();
   const { openForm, setCurrentPriceLookup } = useSettingsStore();
@@ -122,7 +128,7 @@ const ActionsCell = ({ row }: { row: Row<PriceLookup> }) => {
   );
 };
 
-export const columns: ColumnDef<PriceLookup>[] = [
+export const columns: ColumnDef<PriceLookupColumn>[] = [
   {
     id: 'name',
     accessorKey: 'name',

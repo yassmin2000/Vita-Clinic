@@ -31,7 +31,13 @@ import useSettingsStore from '@/hooks/useSettingsStore';
 import { capitalize } from '@/lib/utils';
 import type { Lookup } from '@/types/settings.type';
 
-const ActionsCell = ({ row }: { row: Row<Lookup> }) => {
+type LookupColumn = Lookup & {
+  type: string;
+  queryKey: string;
+  endpoint: string;
+};
+
+const ActionsCell = ({ row }: { row: Row<LookupColumn> }) => {
   const accessToken = useAccessToken();
   const { isSuperAdmin } = useUserRole();
   const { openForm, setCurrentLookup } = useSettingsStore();
@@ -118,7 +124,7 @@ const ActionsCell = ({ row }: { row: Row<Lookup> }) => {
   );
 };
 
-export const columns: ColumnDef<Lookup>[] = [
+export const columns: ColumnDef<LookupColumn>[] = [
   {
     id: 'name',
     accessorKey: 'name',
