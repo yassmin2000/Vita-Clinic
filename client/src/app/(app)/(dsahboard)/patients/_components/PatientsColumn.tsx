@@ -15,6 +15,9 @@ import {
 import {
   Ban,
   Eye,
+  File,
+  FileScan,
+  FileStack,
   MoreHorizontal,
   Pencil,
   ShieldMinus,
@@ -39,6 +42,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { Icons } from '@/components/Icons';
 import { useToast } from '@/components/ui/use-toast';
 
 import useAccessToken from '@/hooks/useAccessToken';
@@ -158,7 +162,7 @@ const ActionsCell = ({ row }: { row: Row<Patient> }) => {
           <Link href={`/patients/${userId}/emr`}>
             <DropdownMenuItem asChild>
               <div className="flex items-center gap-2">
-                <Eye className="h-4 w-4" /> View EMR
+                <FileStack className="h-4 w-4" /> View EMR
               </div>
             </DropdownMenuItem>
           </Link>
@@ -174,14 +178,21 @@ const ActionsCell = ({ row }: { row: Row<Patient> }) => {
           <Link href={`/patients/${userId}/reports`}>
             <DropdownMenuItem asChild>
               <div className="flex items-center gap-2">
-                <Eye className="h-4 w-4" /> View Patient Reports
+                <File className="h-4 w-4" /> View Patient Reports
               </div>
             </DropdownMenuItem>
           </Link>
           <Link href={`/patients/${userId}/scans`}>
             <DropdownMenuItem asChild>
               <div className="flex items-center gap-2">
-                <Eye className="h-4 w-4" /> View Patient Scans
+                <FileScan className="h-4 w-4" /> View Patient Scans
+              </div>
+            </DropdownMenuItem>
+          </Link>
+          <Link href={`/patients/${userId}/treatments`}>
+            <DropdownMenuItem asChild>
+              <div className="flex items-center gap-2">
+                <Icons.treatment className="h-4 w-4" /> View Patient Treatments
               </div>
             </DropdownMenuItem>
           </Link>

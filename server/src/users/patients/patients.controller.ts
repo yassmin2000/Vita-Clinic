@@ -102,23 +102,6 @@ export class PatientsController {
   }
 
   @UseGuards(JwtGuard)
-  @Get(':id/treatments')
-  async getPatientTreatmentsById(
-    @Param('id') id: string,
-    @Req() request: Request,
-    @Query(new ValidationPipe({ transform: true }))
-    query: GetPatientTreatmentsQuery,
-  ) {
-    const user: Payload = request['user'];
-
-    if (user.role === 'patient') {
-      throw new UnauthorizedException();
-    }
-
-    return this.treatmentService.findAllByPatientId(id, query);
-  }
-
-  @UseGuards(JwtGuard)
   @Get('/scans')
   async getPatientScans(
     @Req() request: Request,
@@ -149,5 +132,38 @@ export class PatientsController {
     }
 
     return this.scansService.findAllByPatientId(id, query);
+  }
+
+  @UseGuards(JwtGuard)
+  @Get('treatments')
+  async getPatientTreatments(
+    @Req() request: Request,
+    @Query(new ValidationPipe({ transform: true }))
+    query: GetPatientTreatmentsQuery,
+  ) {
+    const user: Payload = request['user'];
+
+    if (user.role !== 'patient') {
+      throw new UnauthorizedException();
+    }
+
+    return this.treatmentService.findAllByPatientId(user.id, query);
+  }
+
+  @UseGuards(JwtGuard)
+  @Get(':id/treatments')
+  async getPatientTreatmentsById(
+    @Param('id') id: string,
+    @Req() request: Request,
+    @Query(new ValidationPipe({ transform: true }))
+    query: GetPatientTreatmentsQuery,
+  ) {
+    const user: Payload = request['user'];
+
+    if (user.role === 'patient') {
+      throw new UnauthorizedException();
+    }
+
+    return this.treatmentService.findAllByPatientId(id, query);
   }
 }

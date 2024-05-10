@@ -36,6 +36,9 @@ export class TreatmentService {
         appointment: { patientId },
         name: { contains: value, mode: 'insensitive' },
       },
+      include: {
+        therapy: true,
+      },
       skip: (page - 1) * limit,
       take: limit,
       orderBy: [

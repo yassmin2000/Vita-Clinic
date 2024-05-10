@@ -19,6 +19,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from './ui/tooltip';
+import { Icons } from './Icons';
+
 import { cn } from '@/lib/utils';
 
 const routes = [
@@ -57,6 +59,11 @@ const routes = [
     icon: TestTubes,
     href: '/results',
     label: 'Laboratory Test Results',
+  },
+  {
+    icon: Icons.treatment,
+    href: '/treatments',
+    label: 'Treatments',
   },
 ];
 
