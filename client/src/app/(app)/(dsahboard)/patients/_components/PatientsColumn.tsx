@@ -68,7 +68,7 @@ const ActionsCell = ({ row }: { row: Row<Patient> }) => {
     countPerPage,
   } = useTableOptions();
 
-  const { mutate: activateUser } = useMutation({
+  const { mutate: activateUser, isPending: isActivatingPending } = useMutation({
     mutationFn: async () => {
       return await axios.patch(
         `${process.env.NEXT_PUBLIC_API_URL}/users/${userId}/activate`,
@@ -93,6 +93,7 @@ const ActionsCell = ({ row }: { row: Row<Patient> }) => {
           `patients_page_${currentPage}_count_${countPerPage}_sex_${currentGender}_status_${currentStatus}_sort_${sortBy}_search_${searchValue}`,
         ],
       });
+      setIsActivating(false);
 
       return toast({
         title: `User activated successfully`,
@@ -101,32 +102,40 @@ const ActionsCell = ({ row }: { row: Row<Patient> }) => {
     },
   });
 
-  const { mutate: deactivateUser } = useMutation({
-    mutationFn: async () => {
-      return await axios.patch(
-        `${process.env.NEXT_PUBLIC_API_URL}/users/${userId}/deactivate`,
-        {},
-        {
-          headers: {
-            authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
-    },
-    onError: () => {
-      return toast({
-        title: `Failed to deactivate user`,
-        description: 'Please try again later.',
-        variant: 'destructive',
-      });
-    },
-    onSuccess: () => {
-      return toast({
-        title: `User deactivated successfully`,
-        description: 'User can no longer log in and access the system.',
-      });
-    },
-  });
+  const { mutate: deactivateUser, isPending: isDeactivatingPending } =
+    useMutation({
+      mutationFn: async () => {
+        return await axios.patch(
+          `${process.env.NEXT_PUBLIC_API_URL}/users/${userId}/deactivate`,
+          {},
+          {
+            headers: {
+              authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
+      },
+      onError: () => {
+        return toast({
+          title: `Failed to deactivate user`,
+          description: 'Please try again later.',
+          variant: 'destructive',
+        });
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: [
+            `patients_page_${currentPage}_count_${countPerPage}_sex_${currentGender}_status_${currentStatus}_sort_${sortBy}_search_${searchValue}`,
+          ],
+        });
+        setIsDeactivating(false);
+
+        return toast({
+          title: `User deactivated successfully`,
+          description: 'User can no longer log in and access the system.',
+        });
+      },
+    });
 
   return (
     <>
@@ -203,6 +212,7 @@ const ActionsCell = ({ row }: { row: Row<Patient> }) => {
         isOpen={isActivating}
         onClose={() => setIsActivating(false)}
         onDelete={activateUser}
+        disabled={isActivatingPending}
       />
 
       <DeleteAlert
@@ -212,6 +222,7 @@ const ActionsCell = ({ row }: { row: Row<Patient> }) => {
         isOpen={isDeactivating}
         onClose={() => setIsDeactivating(false)}
         onDelete={deactivateUser}
+        disabled={isDeactivatingPending}
       />
     </>
   );

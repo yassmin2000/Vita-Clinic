@@ -13,6 +13,7 @@ interface DeleteAlertProps {
   title: string;
   description?: string;
   deleteText?: string;
+  disabled?: boolean;
   isOpen: boolean;
   onClose: () => void;
   onDelete: () => void;
@@ -22,12 +23,13 @@ export default function DeleteAlert({
   title,
   description,
   deleteText = 'Delete',
+  disabled = true,
   isOpen,
   onClose,
   onDelete,
 }: DeleteAlertProps) {
   return (
-    <AlertDialog open={isOpen} onOpenChange={onClose}>
+    <AlertDialog open={isOpen} onOpenChange={disabled ? undefined : onClose}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>{title}</AlertDialogTitle>
@@ -36,8 +38,16 @@ export default function DeleteAlert({
           )}
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={onDelete}>{deleteText}</AlertDialogAction>
+          <AlertDialogCancel disabled={disabled}>Cancel</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={(e) => {
+              e.preventDefault();
+              onDelete();
+            }}
+            disabled={disabled}
+          >
+            {deleteText}
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
