@@ -392,7 +392,8 @@ export default function UserForm() {
                     <PopoverTrigger asChild>
                       <FormControl>
                         <Button
-                          variant={'outline'}
+                          variant="outline"
+                          disabled={isPending}
                           className={cn(
                             'flex h-10 w-full pl-3 text-left font-normal',
                             !field.value && 'text-muted-foreground'
@@ -761,6 +762,7 @@ export default function UserForm() {
                           <FormControl>
                             <Button
                               variant="outline"
+                              disabled={isPending}
                               className={cn(
                                 'flex h-10 w-full pl-3 text-left font-normal',
                                 !field.value && 'text-muted-foreground'
@@ -803,6 +805,7 @@ export default function UserForm() {
                           <FormControl>
                             <Button
                               variant="outline"
+                              disabled={isPending}
                               className={cn(
                                 'flex h-10 w-full pl-3 text-left font-normal',
                                 !field.value && 'text-muted-foreground'

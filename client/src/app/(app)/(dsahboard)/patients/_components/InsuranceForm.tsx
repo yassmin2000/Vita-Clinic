@@ -94,11 +94,6 @@ export default function InsuranceForm({
         });
       },
       onSuccess: () => {
-        // queryClient.invalidateQueries({
-        //   queryKey: [
-        //     `patients_page_${currentPage}_count_${countPerPage}_sex_${currentGender}_status_${currentStatus}_sort_${sortBy}_search_${searchValue}`,
-        //   ],
-        // });
         onClose();
         return toast({
           title: `Insurance created successfully`,
@@ -133,11 +128,6 @@ export default function InsuranceForm({
         });
       },
       onSuccess: () => {
-        // queryClient.invalidateQueries({
-        //   queryKey: [
-        //     `patients_page_${currentPage}_count_${countPerPage}_sex_${currentGender}_status_${currentStatus}_sort_${sortBy}_search_${searchValue}`,
-        //   ],
-        // });
         onClose();
         return toast({
           title: `Insurance updated successfully`,
@@ -166,11 +156,6 @@ export default function InsuranceForm({
         });
       },
       onSuccess: () => {
-        // queryClient.invalidateQueries({
-        //   queryKey: [
-        //     `patients_page_${currentPage}_count_${countPerPage}_sex_${currentGender}_status_${currentStatus}_sort_${sortBy}_search_${searchValue}`,
-        //   ],
-        // });
         onClose();
         return toast({
           title: `Insurance deleted successfully`,

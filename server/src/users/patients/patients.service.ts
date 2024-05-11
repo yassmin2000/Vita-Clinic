@@ -16,6 +16,7 @@ export class PatientsService {
     const patient = await this.prisma.user.findUnique({
       where: {
         id,
+        role: 'patient',
       },
       select: {
         id: true,
@@ -48,6 +49,7 @@ export class PatientsService {
     const patient = await this.prisma.user.findUnique({
       where: {
         id,
+        role: 'patient',
       },
       select: {
         id: true,
@@ -85,6 +87,7 @@ export class PatientsService {
     const patient = await this.prisma.user.findUnique({
       where: {
         id,
+        role: 'patient',
       },
       select: {
         id: true,
@@ -122,6 +125,7 @@ export class PatientsService {
     const patient = await this.prisma.user.findUnique({
       where: {
         id,
+        role: 'patient',
       },
       select: {
         id: true,

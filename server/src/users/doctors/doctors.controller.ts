@@ -1,7 +1,10 @@
 import { Request } from 'express';
 import {
+  Body,
   Controller,
   Get,
+  Param,
+  Patch,
   Query,
   Req,
   UnauthorizedException,
@@ -10,14 +13,19 @@ import {
 } from '@nestjs/common';
 
 import { UsersService } from '../users.service';
+import { DoctorsService } from './doctors.service';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
 
+import { UpdateSpecialityDto } from './dto/doctors.dto';
 import { GetAllUsersQuery } from '../dto/users.dto';
 import type { Payload } from 'src/types/payload.type';
 
 @Controller('/users/doctors')
 export class DoctorsController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly doctorsService: DoctorsService,
+  ) {}
 
   @UseGuards(JwtGuard)
   @Get()
@@ -47,5 +55,22 @@ export class DoctorsController {
     }
 
     return this.usersService.findAllList('doctor');
+  }
+
+  @UseGuards(JwtGuard)
+  @Patch(':id/speciality')
+  async updateSpeciality(
+    @Param('id') id: string,
+    @Req() request: Request,
+    @Body(new ValidationPipe())
+    dto: UpdateSpecialityDto,
+  ) {
+    const user: Payload = request['user'];
+
+    if (user.role !== 'admin') {
+      throw new UnauthorizedException();
+    }
+
+    return this.doctorsService.updateSpeciality(id, dto.specialityId);
   }
 }

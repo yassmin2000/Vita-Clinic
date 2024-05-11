@@ -16,6 +16,7 @@ import {
   Ban,
   Eye,
   MoreHorizontal,
+  Pencil,
   ShieldMinus,
   ShieldPlus,
 } from 'lucide-react';
@@ -45,15 +46,18 @@ import useUserRole from '@/hooks/useUserRole';
 import { useTableOptions } from '@/hooks/useTableOptions';
 
 import type { Doctor } from '@/types/users.type';
+import Modal from '@/components/Modal';
+import SpecialityForm from './SpecialityForm';
 
 const ActionsCell = ({ row }: { row: Row<Doctor> }) => {
   const accessToken = useAccessToken();
-  const { isSuperAdmin } = useUserRole();
+  const { role, isSuperAdmin } = useUserRole();
 
   const userId = row.original.id;
   const isActive = row.original.isActive;
   const [isActivating, setIsActivating] = useState(false);
   const [isDeactivating, setIsDeactivating] = useState(false);
+  const [isChangingSpeciality, setIsChangingSpeciality] = useState(false);
 
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -153,6 +157,13 @@ const ActionsCell = ({ row }: { row: Row<Doctor> }) => {
               </div>
             </DropdownMenuItem>
           </Link>
+          {role === 'admin' && (
+            <DropdownMenuItem onClick={() => setIsChangingSpeciality(true)}>
+              <div className="flex items-center gap-2">
+                <Pencil className="h-4 w-4" /> Change Speciality
+              </div>
+            </DropdownMenuItem>
+          )}
           {isSuperAdmin && (
             <>
               <DropdownMenuSeparator />
@@ -173,6 +184,7 @@ const ActionsCell = ({ row }: { row: Row<Doctor> }) => {
           )}
         </DropdownMenuContent>
       </DropdownMenu>
+
       <DeleteAlert
         title={`Activate ${row.original.firstName} ${row.original.lastName} account`}
         description={`Are you sure you want to activate ${row.original.firstName} ${row.original.lastName} account? This means they will be able to log in and access the system as a doctor.`}
@@ -192,6 +204,26 @@ const ActionsCell = ({ row }: { row: Row<Doctor> }) => {
         onDelete={deactivateUser}
         disabled={isDeactivatingPending}
       />
+
+      <Modal
+        isOpen={isChangingSpeciality}
+        onClose={() => setIsChangingSpeciality(false)}
+        className="h-fit"
+      >
+        <SpecialityForm
+          doctorId={userId}
+          doctorName={`${row.original.firstName} ${row.original.lastName}`}
+          doctorSpeciality={row.original.speciality?.id || ''}
+          onClose={() => {
+            queryClient.invalidateQueries({
+              queryKey: [
+                `doctors_page_${currentPage}_count_${countPerPage}_sex_${currentGender}_status_${currentStatus}_sort_${sortBy}_search_${searchValue}`,
+              ],
+            });
+            setIsChangingSpeciality(false);
+          }}
+        />
+      </Modal>
     </>
   );
 };
