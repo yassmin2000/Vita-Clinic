@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
+import { ScheduleModule } from '@nestjs/schedule';
 
 import { AppointmentsModule } from './appointments/appointments.module';
 import { AuthModule } from './auth/auth.module';
@@ -15,11 +16,13 @@ import { AppService } from './app.service';
 import { EmailOtpModule } from './email-otp/email-otp.module';
 import { PhoneOtpModule } from './phone-otp/phone-otp.module';
 import { LogModule } from './log/log.module';
+import { TasksService } from './tasks.service';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
     JwtModule.register({}),
+    ScheduleModule.forRoot(),
     AppointmentsModule,
     AuthModule,
     DevicesModule,
@@ -31,6 +34,6 @@ import { LogModule } from './log/log.module';
     LogModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, TasksService],
 })
 export class AppModule {}
