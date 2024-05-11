@@ -103,3 +103,7 @@ body,
 .scrolling-touch {
   -webkit-overflow-scrolling: touch;
 }
+
+.rdp-vhidden {
+  @apply hidden;
+}
