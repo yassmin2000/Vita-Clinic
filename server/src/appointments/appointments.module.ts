@@ -18,6 +18,7 @@ import { ScansService } from './scans/scans.service';
 import { VitalsModule } from './vitals/vitals.module';
 import { TreatmentsModule } from './treatments/treatments.module';
 import { TreatmentService } from './treatments/treatments.service';
+import { PrescriptionsService } from './prescriptions/prescriptions.service';
 
 @Module({
   imports: [ReportsModule, ScansModule, VitalsModule, TreatmentsModule],
@@ -36,6 +37,7 @@ import { TreatmentService } from './treatments/treatments.service';
     ServicesService,
     TherapiesService,
     TreatmentService,
+    PrescriptionsService,
   ],
 })
 export class AppointmentsModule {}

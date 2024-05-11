@@ -114,7 +114,7 @@ export default function PrescriptionForm({
 
   const { mutate: mutatePrescriptions, isPending } = useMutation({
     mutationFn: async (values: z.infer<typeof formSchema>) => {
-      const response = await axios.patch(
+      const response = await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/prescriptions`,
         {
           appointmentId,

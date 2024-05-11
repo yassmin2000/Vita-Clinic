@@ -32,6 +32,8 @@ import { GetPatientReportsQuery } from 'src/appointments/reports/dto/reports.dto
 import { GetPatientTreatmentsQuery } from 'src/appointments/treatments/dto/treatments.dto';
 import { GetPatientScansQuery } from 'src/appointments/scans/dto/scans.dto';
 import type { Payload } from 'src/types/payload.type';
+import { PrescriptionsService } from 'src/appointments/prescriptions/prescriptions.service';
+import { GetPatientPrescriptionsQuery } from 'src/appointments/prescriptions/dto/prescriptions.dto';
 
 @Controller('/users/patients')
 export class PatientsController {
@@ -42,6 +44,7 @@ export class PatientsController {
     private readonly reportsService: ReportsService,
     private readonly scansService: ScansService,
     private readonly treatmentService: TreatmentService,
+    private readonly prescriptionsService: PrescriptionsService,
   ) {}
 
   @UseGuards(JwtGuard)
@@ -236,5 +239,38 @@ export class PatientsController {
     }
 
     return this.treatmentService.findAllByPatientId(id, query);
+  }
+
+  @UseGuards(JwtGuard)
+  @Get('prescriptions')
+  async getPatientPrescriptions(
+    @Req() request: Request,
+    @Query(new ValidationPipe({ transform: true }))
+    query: GetPatientPrescriptionsQuery,
+  ) {
+    const user: Payload = request['user'];
+
+    if (user.role !== 'patient') {
+      throw new UnauthorizedException();
+    }
+
+    return this.prescriptionsService.findAllByPatientId(user.id, query);
+  }
+
+  @UseGuards(JwtGuard)
+  @Get(':id/prescriptions')
+  async getPatientPrescriptionsById(
+    @Param('id') id: string,
+    @Req() request: Request,
+    @Query(new ValidationPipe({ transform: true }))
+    query: GetPatientPrescriptionsQuery,
+  ) {
+    const user: Payload = request['user'];
+
+    if (user.role === 'patient') {
+      throw new UnauthorizedException();
+    }
+
+    return this.prescriptionsService.findAllByPatientId(id, query);
   }
 }

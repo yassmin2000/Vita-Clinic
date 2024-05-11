@@ -27,6 +27,7 @@ import {
   GetAllAppointmentsQuery,
 } from './dto/appointments.dto';
 import type { Payload } from 'src/types/payload.type';
+import { PrescriptionsService } from './prescriptions/prescriptions.service';
 
 @Controller('appointments')
 export class AppointmentsController {
@@ -35,6 +36,7 @@ export class AppointmentsController {
     private readonly reportsService: ReportsService,
     private readonly scansService: ScansService,
     private readonly treatmentService: TreatmentService,
+    private readonly prescriptionsService: PrescriptionsService,
   ) {}
 
   @UseGuards(JwtGuard)
@@ -196,5 +198,24 @@ export class AppointmentsController {
     }
 
     return this.appointmentsService.cancel(id);
+  }
+
+  @UseGuards(JwtGuard)
+  @Get(':id/prescriptions')
+  async getAppointmentPrescriptionsById(
+    @Param('id') id: string,
+    @Req() request: Request,
+  ) {
+    const user: Payload = request['user'];
+
+    const treatments = await this.prescriptionsService.findAllByAppointmentId(id);
+
+    if (user.role === 'patient') {
+      return treatments.filter(
+        (treatment) => treatment.appointment.patientId === user.id,
+      );
+    }
+
+    return treatments;
   }
 }

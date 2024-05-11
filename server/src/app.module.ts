@@ -17,6 +17,7 @@ import { EmailOtpModule } from './email-otp/email-otp.module';
 import { PhoneOtpModule } from './phone-otp/phone-otp.module';
 import { LogModule } from './log/log.module';
 import { TasksService } from './tasks.service';
+import { PrescriptionsModule } from './appointments/prescriptions/prescriptions.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { TasksService } from './tasks.service';
     EmailOtpModule,
     PhoneOtpModule,
     LogModule,
+    PrescriptionsModule,
   ],
   controllers: [AppController],
   providers: [AppService, TasksService],
