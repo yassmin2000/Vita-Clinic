@@ -21,7 +21,7 @@ import {
 } from '@/components/ui/form';
 import ImageUpload from '@/components/ImageUpload';
 import { Input } from '@/components/ui/input';
-import { PhoneInput } from './ui/phone-input';
+import { PhoneInput } from '../ui/phone-input';
 import {
   Select,
   SelectContent,
@@ -29,7 +29,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Combobox } from './ui/combobox';
+import { Combobox } from '../ui/combobox';
 import {
   Popover,
   PopoverContent,
@@ -38,7 +38,7 @@ import {
 import { Calendar } from '@/components/ui/calendar';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
-import { useToast } from './ui/use-toast';
+import { useToast } from '../ui/use-toast';
 
 import useAccessToken from '@/hooks/useAccessToken';
 import useUserRole from '@/hooks/useUserRole';
@@ -52,7 +52,7 @@ import {
   drugStatus,
   smokingStatus,
 } from '@/lib/constants';
-import { Checkbox } from './ui/checkbox';
+import { Checkbox } from '../ui/checkbox';
 
 const formSchema = z.object({
   firstName: z.string().min(1, {

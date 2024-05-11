@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 
-import ReportsList from '@/components/ScansList';
+import ReportsList from '@/components/lists/ScansList';
 import { getUserRole } from '@/lib/auth';
 
 export default async function ScansPage() {

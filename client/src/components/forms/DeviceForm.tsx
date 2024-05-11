@@ -20,7 +20,7 @@ import {
 } from '@/components/ui/form';
 import ImageUpload from '@/components/ImageUpload';
 import { Input } from '@/components/ui/input';
-import { Textarea } from './ui/textarea';
+import { Textarea } from '../ui/textarea';
 import {
   Select,
   SelectContent,
@@ -28,7 +28,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Combobox } from './ui/combobox';
+import { Combobox } from '../ui/combobox';
 import {
   Popover,
   PopoverContent,
@@ -37,7 +37,7 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
-import { useToast } from './ui/use-toast';
+import { useToast } from '../ui/use-toast';
 
 import { useUploadThing } from '@/lib/uploadthing';
 import useAccessToken from '@/hooks/useAccessToken';

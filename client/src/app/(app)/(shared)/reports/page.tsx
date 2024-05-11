@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 
-import ReportsList from '@/components/ReportsList';
+import ReportsList from '@/components/lists/ReportsList';
 
 import { getUserRole } from '@/lib/auth';
 

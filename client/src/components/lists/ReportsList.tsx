@@ -5,38 +5,38 @@ import axios from 'axios';
 import { useQuery } from '@tanstack/react-query';
 
 import FiltersBar from '@/components/FiltersBar';
-import ScanItem from '@/components/ScanItem';
+import ReportItem from '@/components/lists/ReportItem';
 import Pagination from '@/components/Pagination';
-import ScanItemSkeleton from '@/components/ScanItemSkeleton';
+import ReportItemSkeleton from '@/components/skeletons/ReportItemSkeleton';
 
 import useAccessToken from '@/hooks/useAccessToken';
 import { useTableOptions } from '@/hooks/useTableOptions';
 
-import type { Scan } from '@/types/appointments.type';
+import type { Report } from '@/types/appointments.type';
 
-interface ScansListProps {
+interface ReportsListProps {
   patientId?: string;
 }
 
-export default function ScansList({ patientId }: ScansListProps) {
+export default function ReportsList({ patientId }: ReportsListProps) {
   const { currentPage, countPerPage, reset, setSortBy, searchValue, sortBy } =
     useTableOptions();
   const accessToken = useAccessToken();
 
   const {
-    data: scans,
+    data: reports,
     refetch,
     isLoading,
   } = useQuery({
     queryKey: [
-      `scans_page_${currentPage}_count_${countPerPage}_sort_${sortBy}_search_${searchValue}`,
+      `reports_page_${currentPage}_count_${countPerPage}_sort_${sortBy}_search_${searchValue}`,
     ],
     queryFn: async () => {
       let url;
       if (patientId) {
-        url = `${process.env.NEXT_PUBLIC_API_URL}/users/patients/${patientId}/scans?page=${currentPage}&limit=${countPerPage}&value=${searchValue}&sort=${sortBy}`;
+        url = `${process.env.NEXT_PUBLIC_API_URL}/users/patients/${patientId}/reports?page=${currentPage}&limit=${countPerPage}&value=${searchValue}&sort=${sortBy}`;
       } else {
-        url = `${process.env.NEXT_PUBLIC_API_URL}/users/patients/scans?page=${currentPage}&limit=${countPerPage}&value=${searchValue}&sort=${sortBy}`;
+        url = `${process.env.NEXT_PUBLIC_API_URL}/users/patients/reports?page=${currentPage}&limit=${countPerPage}&value=${searchValue}&sort=${sortBy}`;
       }
 
       const response = await axios.get(url, {
@@ -45,7 +45,7 @@ export default function ScansList({ patientId }: ScansListProps) {
         },
       });
 
-      return response.data as Scan[];
+      return response.data as Report[];
     },
     enabled: !!accessToken,
   });
@@ -60,7 +60,7 @@ export default function ScansList({ patientId }: ScansListProps) {
       <FiltersBar
         refetch={refetch}
         searchFilter
-        searchPlaceholder="Search by scan title"
+        searchPlaceholder="Search by report title"
         sortingEnabled
         sortByNameEnabled
         sortByDateEnabled
@@ -70,16 +70,18 @@ export default function ScansList({ patientId }: ScansListProps) {
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         {isLoading &&
           Array.from({ length: 5 }).map((_, index) => (
-            <ScanItemSkeleton key={index} />
+            <ReportItemSkeleton key={index} />
           ))}
-        {scans &&
-          scans.length > 0 &&
-          scans.map((scan) => <ScanItem key={scan.id} scan={scan} />)}
+        {reports &&
+          reports.length > 0 &&
+          reports.map((report) => (
+            <ReportItem key={report.id} report={report} />
+          ))}
       </div>
 
       <Pagination
         previousDisabled={currentPage === 1 || isLoading}
-        nextDisabled={(scans && scans.length < countPerPage) || isLoading}
+        nextDisabled={(reports && reports.length < countPerPage) || isLoading}
       />
     </>
   );

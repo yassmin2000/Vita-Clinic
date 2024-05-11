@@ -8,13 +8,13 @@ import { Info, Pencil, Plus } from 'lucide-react';
 import NewPrescriptionButton from './NewPrescriptionButton';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import ReportItemSkeleton from '@/components/ReportItemSkeleton';
+import ReportItemSkeleton from '@/components/skeletons/ReportItemSkeleton';
 
 import useAccessToken from '@/hooks/useAccessToken';
 import useUserRole from '@/hooks/useUserRole';
 
 import type { Prescription } from '@/types/appointments.type';
-import PrescriptionItem from '@/components/PrescriptionItem';
+import PrescriptionItem from '@/components/lists/PrescriptionItem';
 
 interface AppointmentPrescriptionsProps {
   appointmentId: string;

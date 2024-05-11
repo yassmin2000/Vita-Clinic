@@ -4,8 +4,8 @@ import axios from 'axios';
 import { useQuery } from '@tanstack/react-query';
 
 import NewTreatmentButton from './NewTreatmentButton';
-import TreatmentItem from '@/components/TreatmentItem';
-import ReportItemSkeleton from '@/components/ReportItemSkeleton';
+import TreatmentItem from '@/components/lists/TreatmentItem';
+import ReportItemSkeleton from '@/components/skeletons/ReportItemSkeleton';
 
 import useAccessToken from '@/hooks/useAccessToken';
 import useUserRole from '@/hooks/useUserRole';

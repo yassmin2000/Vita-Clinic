@@ -1,4 +1,4 @@
-import TreatmentsList from '@/components/TreatmentsList';
+import TreatmentsList from '@/components/lists/TreatmentsList';
 
 interface PatientTreatmentsProps {
   params: {

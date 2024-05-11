@@ -1,8 +1,8 @@
 import { redirect } from 'next/navigation';
 
-import StaffSidebar from '@/components/StaffSidebar';
-import PatientsSidebar from '@/components/PatientsSidebar';
-import Navbar from '@/components/Navbar';
+import StaffSidebar from '@/components/layout/StaffSidebar';
+import PatientsSidebar from '@/components/layout/PatientsSidebar';
+import Navbar from '@/components/layout/Navbar';
 import { getAuthSession, getUserRole } from '@/lib/auth';
 
 export default async function AppLayout({

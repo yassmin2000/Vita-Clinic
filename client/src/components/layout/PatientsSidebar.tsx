@@ -18,8 +18,8 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from './ui/tooltip';
-import { Icons } from './Icons';
+} from '../ui/tooltip';
+import { Icons } from '../Icons';
 
 import { cn } from '@/lib/utils';
 

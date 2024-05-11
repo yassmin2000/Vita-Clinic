@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 
-import UserForm from '@/components/UserForm';
+import UserForm from '@/components/forms/UserForm';
 import { getUserRole } from '@/lib/auth';
 
 export default async function CreateUserPage() {

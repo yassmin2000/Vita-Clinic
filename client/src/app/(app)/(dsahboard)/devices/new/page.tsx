@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 
-import DeviceForm from '@/components/DeviceForm';
+import DeviceForm from '@/components/forms/DeviceForm';
 import { getUserRole } from '@/lib/auth';
 
 export default async function CreateDevicePage() {

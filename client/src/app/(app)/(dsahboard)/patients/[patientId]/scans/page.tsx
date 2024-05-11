@@ -1,4 +1,4 @@
-import ScansList from '@/components/ScansList';
+import ScansList from '@/components/lists/ScansList';
 
 interface PatientScansProps {
   params: {

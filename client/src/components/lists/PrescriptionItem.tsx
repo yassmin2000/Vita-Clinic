@@ -4,10 +4,10 @@ import { useState } from 'react';
 import { format } from 'date-fns';
 import { Info, Pencil, Plus } from 'lucide-react';
 
-import { Card } from './ui/card';
-import { Button } from './ui/button';
-import Modal from './Modal';
-import { Separator } from './ui/separator';
+import { Card } from '../ui/card';
+import { Button } from '../ui/button';
+import Modal from '../Modal';
+import { Separator } from '../ui/separator';
 
 import useUserRole from '@/hooks/useUserRole';
 import { capitalize } from '@/lib/utils';

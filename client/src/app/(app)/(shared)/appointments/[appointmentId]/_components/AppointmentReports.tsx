@@ -3,9 +3,9 @@
 import axios from 'axios';
 import { useQuery } from '@tanstack/react-query';
 
-import ReportItem from '@/components/ReportItem';
+import ReportItem from '@/components/lists/ReportItem';
 import NewReportButton from './NewReportButton';
-import ReportItemSkeleton from '@/components/ReportItemSkeleton';
+import ReportItemSkeleton from '@/components/skeletons/ReportItemSkeleton';
 
 import useAccessToken from '@/hooks/useAccessToken';
 import useUserRole from '@/hooks/useUserRole';

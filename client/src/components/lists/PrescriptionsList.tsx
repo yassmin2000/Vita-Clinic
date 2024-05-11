@@ -7,7 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 import FiltersBar from '@/components/FiltersBar';
 import PrescriptionItem from './PrescriptionItem';
 import Pagination from '@/components/Pagination';
-import ReportItemSkeleton from '@/components/ReportItemSkeleton';
+import ReportItemSkeleton from '@/components/skeletons/ReportItemSkeleton';
 
 import useAccessToken from '@/hooks/useAccessToken';
 import { useTableOptions } from '@/hooks/useTableOptions';

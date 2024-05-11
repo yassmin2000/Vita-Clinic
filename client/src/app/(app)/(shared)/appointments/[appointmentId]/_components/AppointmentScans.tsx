@@ -3,9 +3,9 @@
 import axios from 'axios';
 import { useQuery } from '@tanstack/react-query';
 
-import ScanItem from '@/components/ScanItem';
+import ScanItem from '@/components/lists/ScanItem';
 import NewScanButton from './NewScanButton';
-import ScanItemSkeleton from '@/components/ScanItemSkeleton';
+import ScanItemSkeleton from '@/components/skeletons/ScanItemSkeleton';
 
 import useAccessToken from '@/hooks/useAccessToken';
 import useUserRole from '@/hooks/useUserRole';

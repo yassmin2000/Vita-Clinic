@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 
-import Navbar from '@/components/Navbar';
+import Navbar from '@/components/layout/Navbar';
 import { getAuthSession } from '@/lib/auth';
 
 export default async function AuthLayout({

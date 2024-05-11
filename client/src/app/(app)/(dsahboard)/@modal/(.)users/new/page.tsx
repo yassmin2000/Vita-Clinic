@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 
 import Modal from '@/components/Modal';
-import UserForm from '@/components/UserForm';
+import UserForm from '@/components/forms/UserForm';
 
 import { getUserRole } from '@/lib/auth';
 

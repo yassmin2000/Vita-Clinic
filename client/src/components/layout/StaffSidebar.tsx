@@ -18,7 +18,7 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from './ui/tooltip';
+} from '../ui/tooltip';
 import { cn } from '@/lib/utils';
 
 const routes = [
