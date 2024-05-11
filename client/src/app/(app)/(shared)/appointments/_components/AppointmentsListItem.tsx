@@ -19,6 +19,7 @@ import useUserRole from '@/hooks/useUserRole';
 import { cn } from '@/lib/utils';
 
 import type { AppointmentStatus } from '@/types/appointments.type';
+import type { Insurance } from '@/types/emr.type';
 
 interface AppointmentsListItemProps {
   id: string;
@@ -29,6 +30,7 @@ interface AppointmentsListItemProps {
   bookedAt: string;
   appointmentDate: string;
   cancelledAt: string;
+  insurance?: Insurance;
   queryKey?: string;
 }
 
@@ -69,6 +71,7 @@ export default function AppointmentsListItem({
   bookedAt,
   appointmentDate,
   cancelledAt,
+  insurance,
   queryKey,
 }: AppointmentsListItemProps) {
   const { role } = useUserRole();
@@ -139,6 +142,11 @@ export default function AppointmentsListItem({
             id={id}
             appointmentNumber={appointmentNumber}
             status={status}
+            hasInsurance={
+              insurance
+                ? new Date(insurance.policyEndDate) >= new Date()
+                : false
+            }
             queryKey={queryKey}
           />
         )}

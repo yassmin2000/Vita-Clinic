@@ -360,8 +360,8 @@ model Appointment {
   patient   User   @relation("patientAppointments", fields: [patientId], references: [id])
   patientId String
 
-  ElectronicMedicalRecord   ElectronicMedicalRecord? @relation(fields: [electronicMedicalRecordId], references: [id])
-  electronicMedicalRecordId String?
+  emr   ElectronicMedicalRecord? @relation(fields: [emrId], references: [id])
+  emrId String?
 
   status                AppointmentStatus
   services              AppointmentServices @relation(fields: [appointmentServicesId], references: [id])

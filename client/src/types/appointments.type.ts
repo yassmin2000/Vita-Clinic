@@ -1,5 +1,5 @@
 import type { LaboratoryTest, PriceLookup, Therapy } from './settings.type';
-import type { PatientMedication } from './emr.type';
+import type { Insurance, PatientMedication } from './emr.type';
 
 export type AppointmentStatus =
   | 'completed'
@@ -25,6 +25,9 @@ export type Appointment = {
     id: string;
     firstName: string;
     lastName: string;
+  };
+  emr?: {
+    insurance?: Insurance;
   };
   createdAt: string;
   updatedAt: string;

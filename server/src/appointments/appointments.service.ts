@@ -101,6 +101,11 @@ export class AppointmentsService {
             lastName: true,
           },
         },
+        emr: {
+          select: {
+            insurance: true,
+          },
+        },
       },
       skip: (page - 1) * limit,
       take: limit,
@@ -145,6 +150,11 @@ export class AppointmentsService {
             id: true,
             firstName: true,
             lastName: true,
+          },
+        },
+        emr: {
+          select: {
+            insurance: true,
           },
         },
       },
@@ -239,7 +249,7 @@ export class AppointmentsService {
         date,
         status: 'pending',
         patientId,
-        electronicMedicalRecordId: emr.id,
+        emrId: emr.id,
         appointmentServicesId: appointmentServices.id,
         billingId: billing.id,
         vitalsId: vitals.id,
@@ -333,6 +343,15 @@ export class AppointmentsService {
   async complete(appointmentId: string, billingStatus: BillingStatus) {
     const appointment = await this.prisma.appointment.findUnique({
       where: { id: appointmentId },
+      select: {
+        billingId: true,
+        status: true,
+        emr: {
+          select: {
+            insurance: true,
+          },
+        },
+      },
     });
 
     if (!appointment) {
@@ -343,19 +362,16 @@ export class AppointmentsService {
       throw new ConflictException('Appointment is not approved');
     }
 
-    const patient = await this.prisma.user.findUnique({
-      where: { id: appointment.patientId, role: 'patient' },
-      include: {
-        emr: {
-          select: {
-            insurance: true,
-          },
-        },
-      },
-    });
-
-    if (billingStatus === 'insurance' && !patient.emr.insurance) {
+    if (billingStatus === 'insurance' && !appointment.emr.insurance) {
       throw new ConflictException('Patient does not have insurance');
+    }
+
+    if (
+      billingStatus === 'insurance' &&
+      appointment.emr.insurance &&
+      new Date(appointment.emr.insurance.policyEndDate) < new Date()
+    ) {
+      throw new ConflictException('Insurance policy has expired');
     }
 
     await this.prisma.billing.update({

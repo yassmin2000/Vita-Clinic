@@ -51,6 +51,12 @@ export default function AppointmentDetailsCard({
                 id={appointment.id}
                 appointmentNumber={appointment.number}
                 status={status}
+                hasInsurance={
+                  appointment.emr?.insurance
+                    ? new Date(appointment.emr.insurance.policyEndDate) >=
+                      new Date()
+                    : false
+                }
                 viewOption={false}
                 queryKey={`appointment_${appointment.id}`}
               />

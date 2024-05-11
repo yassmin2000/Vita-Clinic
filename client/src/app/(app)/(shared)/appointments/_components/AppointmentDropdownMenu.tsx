@@ -33,12 +33,15 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/components/ui/use-toast';
 
 import useAccessToken from '@/hooks/useAccessToken';
+import { cn } from '@/lib/utils';
+
 import type { AppointmentStatus } from '@/types/appointments.type';
 
 interface AppointmentDropdownMenuProps {
   id: string;
   appointmentNumber: number;
   status: AppointmentStatus;
+  hasInsurance?: boolean;
   viewOption?: boolean;
   queryKey?: string;
 }
@@ -47,6 +50,7 @@ export default function AppointmentDropdownMenu({
   id,
   appointmentNumber,
   status,
+  hasInsurance = false,
   viewOption = true,
   queryKey,
 }: AppointmentDropdownMenuProps) {
@@ -401,8 +405,17 @@ export default function AppointmentDropdownMenu({
                 <Label htmlFor="paid">Paid in cash</Label>
               </div>
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="insurance" id="insurance" />
-                <Label htmlFor="insurance">Covered by insurance</Label>
+                <RadioGroupItem
+                  value="insurance"
+                  id="insurance"
+                  disabled={!hasInsurance}
+                />
+                <Label
+                  htmlFor="insurance"
+                  className={cn(!hasInsurance && 'opacity-70')}
+                >
+                  Covered by insurance
+                </Label>
               </div>
             </RadioGroup>
 

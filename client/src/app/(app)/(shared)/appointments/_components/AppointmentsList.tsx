@@ -107,6 +107,7 @@ export default function AppointmentsList() {
               bookedAt={appointment.createdAt}
               cancelledAt={appointment.updatedAt}
               status={appointment.status}
+              insurance={appointment.emr?.insurance}
               queryKey={`appointments_page_${currentPage}_count_${countPerPage}_status_${currentAppointmentStatus}_sort_${sortBy}_search_${searchValue}`}
             />
           ))}
