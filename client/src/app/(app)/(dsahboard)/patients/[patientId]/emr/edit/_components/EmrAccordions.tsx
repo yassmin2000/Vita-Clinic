@@ -146,28 +146,81 @@ export default function EmrAccordions({
               </AvatarFallback>
             )}
           </Avatar>
-          <div className="flex flex-1 flex-col gap-1">
-            <h2 className="text-base font-semibold text-primary">
-              Patient Basic Information
-            </h2>
-            <p>
-              <span className="font-medium text-primary">Patient Name:</span>{' '}
-              {`${data.patient.firstName} ${data.patient.lastName}`}
-            </p>
 
-            <p className="flex items-center gap-0.5">
-              <span className="font-medium text-primary">Age:</span>{' '}
-              {differenceInYears(new Date(), parseISO(data.patient.birthDate))}{' '}
-              years old.{' '}
-              <span className="text-sm text-muted-foreground">
-                ({format(parseISO(data.patient.birthDate), 'MMM dd, yyyy')})
-              </span>
-            </p>
+          <div className="flex flex-col justify-center gap-2">
+            <div className="flex flex-col gap-1">
+              <h2 className="text-base font-semibold text-primary">
+                Patient Basic Information
+              </h2>
+              <div className="grid grid-cols-1 gap-1 md:grid-cols-2">
+                <p>
+                  <span className="font-medium text-primary">
+                    Patient Name:
+                  </span>{' '}
+                  {`${data.patient.firstName} ${data.patient.lastName}`}
+                </p>
 
-            <p>
-              <span className="font-medium text-primary">Sex:</span>{' '}
-              {capitalize(data.patient.sex)}
-            </p>
+                <p className="flex items-center gap-0.5">
+                  <span className="font-medium text-primary">Age:</span>{' '}
+                  {differenceInYears(
+                    new Date(),
+                    parseISO(data.patient.birthDate)
+                  )}{' '}
+                  years old.{' '}
+                  <span className="text-sm text-muted-foreground">
+                    ({format(parseISO(data.patient.birthDate), 'MMM dd, yyyy')})
+                  </span>
+                </p>
+
+                <p>
+                  <span className="font-medium text-primary">Sex:</span>{' '}
+                  {capitalize(data.patient.sex)}
+                </p>
+              </div>
+            </div>
+
+            {data.insurance && (
+              <div className="flex w-full flex-1 flex-col gap-1">
+                <h2 className="text-base font-semibold text-primary">
+                  Patient Insurance Information
+                </h2>
+                <div className="grid grid-cols-1 gap-1 md:grid-cols-2">
+                  <p>
+                    <span className="font-medium text-primary">
+                      Insurance Provider:
+                    </span>{' '}
+                    {data.insurance.provider}
+                  </p>
+
+                  <p className="flex items-center gap-0.5">
+                    <span className="font-medium text-primary">
+                      Insurance Policy Number:
+                    </span>{' '}
+                    {data.insurance.policyNumber}
+                  </p>
+
+                  <p>
+                    <span className="font-medium text-primary">
+                      Insurance Policy Start Date:
+                    </span>{' '}
+                    {format(
+                      parseISO(data.insurance.policyStartDate),
+                      'MMM dd, yyyy'
+                    )}
+                  </p>
+
+                  <p>
+                    <span className="font-medium text-primary">
+                      Insurance Policy Start Date:
+                    </span>{' '}
+                    {format(
+                      parseISO(data.insurance.policyEndDate),
+                      'MMM dd, yyyy'
+                    )}
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
         </Card>
       )}

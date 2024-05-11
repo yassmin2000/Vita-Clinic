@@ -202,7 +202,16 @@ export class UsersService {
       throw new ConflictException('Phone number already exists');
     }
 
-    const { weight, height, bloodType, ...userDto } = dto;
+    const {
+      weight,
+      height,
+      bloodType,
+      smokingStatus,
+      alcoholStatus,
+      drugsUsage,
+      insurance,
+      ...userDto
+    } = dto;
 
     if (role === 'doctor' && !dto.specialityId) {
       throw new UnprocessableEntityException(
@@ -234,14 +243,26 @@ export class UsersService {
     });
 
     if (role === 'patient') {
-      await this.prisma.electronicMedicalRecord.create({
+      const emr = await this.prisma.electronicMedicalRecord.create({
         data: {
           patientId: newUser.id,
           height,
           weight,
           bloodType,
+          smokingStatus,
+          alcoholStatus,
+          drugsUsage,
         },
       });
+
+      if (insurance) {
+        await this.prisma.insurance.create({
+          data: {
+            ...insurance,
+            emrId: emr.id,
+          },
+        });
+      }
     }
 
     if (!verified) {

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -44,8 +44,15 @@ import useAccessToken from '@/hooks/useAccessToken';
 import useUserRole from '@/hooks/useUserRole';
 import { useUploadThing } from '@/lib/uploadthing';
 
-import { cn } from '@/lib/utils';
+import { capitalize, cn } from '@/lib/utils';
 import type { Lookup } from '@/types/settings.type';
+import {
+  alcoholStatus,
+  bloodTypes,
+  drugStatus,
+  smokingStatus,
+} from '@/lib/constants';
+import { Checkbox } from './ui/checkbox';
 
 const formSchema = z.object({
   firstName: z.string().min(1, {
@@ -78,9 +85,47 @@ const formSchema = z.object({
   phone: z
     .string({ required_error: 'Phone number is required.' })
     .refine(isValidPhoneNumber, { message: 'Invalid phone number.' }),
-  address: z.string({ required_error: 'Address is required.' }),
+  address: z.string().min(1, {
+    message: 'Address is required.',
+  }),
   speciality: z.string().optional(),
   avatar: z.any().optional(),
+  weight: z
+    .number()
+    .min(0, {
+      message: 'Weight must be a positive number',
+    })
+    .optional(),
+  height: z
+    .number()
+    .min(0, {
+      message: 'Height must be a positive number',
+    })
+    .optional(),
+  bloodType: z
+    .enum([
+      'a_positive',
+      'a_negative',
+      'b_positive',
+      'b_negative',
+      'ab_positive',
+      'ab_negative',
+      'o_positive',
+      'o_negative',
+    ])
+    .optional(),
+  smokingStatus: z.enum(['never', 'former', 'current']).optional(),
+  alcoholStatus: z.enum(['never', 'former', 'current']).optional(),
+  drugsUsage: z.enum(['never', 'former', 'current']).optional(),
+  hasInsurance: z.boolean(),
+  insurance: z
+    .object({
+      insuranceProvider: z.string().optional(),
+      insurancePolicyNumber: z.string().optional(),
+      insurancePolicyStartDate: z.date().optional(),
+      insurancePolicyEndDate: z.date().optional(),
+    })
+    .optional(),
 });
 
 export default function UserForm() {
@@ -103,6 +148,7 @@ export default function UserForm() {
         role === 'doctor'
           ? role
           : undefined,
+      hasInsurance: false,
     },
   });
 
@@ -143,18 +189,39 @@ export default function UserForm() {
         }
       }
 
+      let insurance = undefined;
+      if (values.hasInsurance) {
+        insurance = {
+          provider: values.insurance?.insuranceProvider,
+          policyNumber: values.insurance?.insurancePolicyNumber,
+          policyStartDate: values.insurance?.insurancePolicyStartDate
+            ? values.insurance?.insurancePolicyStartDate.toISOString()
+            : undefined,
+          policyEndDate: values.insurance?.insurancePolicyEndDate
+            ? values.insurance?.insurancePolicyEndDate.toISOString()
+            : undefined,
+        };
+      }
+
       const body = {
         firstName: values.firstName,
         lastName: values.lastName,
         email: values.email,
         password: values.password,
-        avatarURL: url,
+        avatarURL: url || undefined,
         birthDate: values.birthDate.toISOString(),
         phoneNumber: values.phone,
         address: values.address,
         sex: values.sex,
         role: values.role,
         specialityId: values.speciality,
+        weight: values.weight,
+        height: values.height,
+        bloodType: values.bloodType,
+        smokingStatus: values.smokingStatus,
+        alcoholStatus: values.alcoholStatus,
+        drugsUsage: values.drugsUsage,
+        insurance,
       };
 
       const response = await axios.post(
@@ -174,19 +241,20 @@ export default function UserForm() {
       return router.back();
     },
     onError: (error) => {
-      // @ts-ignore
-      const message = error.response?.data?.message || 'Failed to create user';
+      const axiosError = error as AxiosError<any, any>;
 
       return toast({
-        title: `Failed to create user`,
-        description: message,
+        title: `Failed to create ${form.watch('role')}`,
+        description:
+          axiosError?.response?.data.message ||
+          `${capitalize(form.watch('role'))} could not be created, please try again.`,
         variant: 'destructive',
       });
     },
     onSuccess: () => {
       return toast({
-        title: 'Created user successfully',
-        description: `Device has been created successfully.`,
+        title: `Created ${form.watch('role')} successfully`,
+        description: `${capitalize(form.watch('role'))} has been created successfully.`,
       });
     },
   });
@@ -411,6 +479,361 @@ export default function UserForm() {
               />
             )}
           </div>
+
+          {form.watch('role') === 'patient' && (
+            <>
+              <div className="w-full space-y-2">
+                <div>
+                  <h3 className="text-lg font-medium">
+                    Patient General Information
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    General information about the patient
+                  </p>
+                </div>
+                <Separator className="bg-primary/10" />
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <FormField
+                  name="weight"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <FormLabel>Weight (kg)</FormLabel>
+                      <FormControl>
+                        <Input
+                          disabled={isPending}
+                          type="number"
+                          placeholder="90"
+                          {...field}
+                          value={field.value || undefined}
+                          onChange={(event) =>
+                            field.onChange(+event.target.value)
+                          }
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  name="height"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <FormLabel>Height (cm)</FormLabel>
+                      <FormControl>
+                        <Input
+                          disabled={isPending}
+                          type="number"
+                          placeholder="75"
+                          {...field}
+                          value={field.value || undefined}
+                          onChange={(event) =>
+                            field.onChange(+event.target.value)
+                          }
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  name="bloodType"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <FormLabel>Blood Type</FormLabel>
+                      <Select
+                        disabled={isPending}
+                        onValueChange={field.onChange}
+                        value={field.value || undefined}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="bg-background">
+                            <SelectValue
+                              defaultValue={field.value}
+                              placeholder="Select patient's blood type"
+                            />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {bloodTypes.map((item) => (
+                            <SelectItem key={item.value} value={item.value}>
+                              {item.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  name="smokingStatus"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <FormLabel>Smoking Status</FormLabel>
+                      <Select
+                        disabled={isPending}
+                        onValueChange={field.onChange}
+                        value={field.value || undefined}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="bg-background">
+                            <SelectValue
+                              defaultValue={field.value}
+                              placeholder="Select patient's smoking status"
+                            />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {smokingStatus.map((item) => (
+                            <SelectItem key={item.value} value={item.value}>
+                              {item.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  name="alcoholStatus"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <FormLabel>Alcohol Status</FormLabel>
+                      <Select
+                        disabled={isPending}
+                        onValueChange={field.onChange}
+                        value={field.value || undefined}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="bg-background">
+                            <SelectValue
+                              defaultValue={field.value}
+                              placeholder="Select patient's alcohol status"
+                            />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {alcoholStatus.map((item) => (
+                            <SelectItem key={item.value} value={item.value}>
+                              {item.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  name="drugsUsage"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <FormLabel>Drugs Usage</FormLabel>
+                      <Select
+                        disabled={isPending}
+                        onValueChange={field.onChange}
+                        value={field.value || undefined}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="bg-background">
+                            <SelectValue
+                              defaultValue={field.value}
+                              placeholder="Select patient's drugs usage"
+                            />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {drugStatus.map((item) => (
+                            <SelectItem key={item.value} value={item.value}>
+                              {item.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  name="hasInsurance"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItem className="flex w-full flex-col gap-2">
+                      <FormControl>
+                        <div className="flex items-center gap-2">
+                          <Checkbox
+                            id="hasInsurance"
+                            checked={field.value}
+                            onClick={() => {
+                              field.onChange(!field.value);
+                            }}
+                          />
+                          <label
+                            htmlFor="hasInsurance"
+                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                          >
+                            This patient has health insurance
+                          </label>
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </>
+          )}
+
+          {form.watch('hasInsurance') && (
+            <>
+              <div className="w-full space-y-2">
+                <div>
+                  <h3 className="text-lg font-medium">Insurance Information</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Information about the patient&apos;s insurance
+                  </p>
+                </div>
+                <Separator className="bg-primary/10" />
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <FormField
+                  name="insurance.insuranceProvider"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItem className="col-span-2 md:col-span-1">
+                      <FormLabel required>Insurance Provider</FormLabel>
+                      <FormControl>
+                        <Input
+                          disabled={isPending}
+                          placeholder="ABC Health"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  name="insurance.insurancePolicyNumber"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItem className="col-span-2 md:col-span-1">
+                      <FormLabel required>Insurance Policy Number</FormLabel>
+                      <FormControl>
+                        <Input
+                          disabled={isPending}
+                          placeholder="XXYYZZ123"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="insurance.insurancePolicyStartDate"
+                  render={({ field }) => (
+                    <FormItem className="col-span-2 md:col-span-1">
+                      <FormLabel required>
+                        Insurance Policy Start Date
+                      </FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              className={cn(
+                                'flex h-10 w-full pl-3 text-left font-normal',
+                                !field.value && 'text-muted-foreground'
+                              )}
+                            >
+                              {field.value ? (
+                                format(field.value, 'PPP')
+                              ) : (
+                                <span>Pick the start date</span>
+                              )}
+                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={field.value}
+                            onSelect={field.onChange}
+                            disabled={(date) =>
+                              date > new Date() || date < new Date('1900-01-01')
+                            }
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="insurance.insurancePolicyEndDate"
+                  render={({ field }) => (
+                    <FormItem className="col-span-2 md:col-span-1">
+                      <FormLabel required>Insurance Policy End Date</FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              className={cn(
+                                'flex h-10 w-full pl-3 text-left font-normal',
+                                !field.value && 'text-muted-foreground'
+                              )}
+                            >
+                              {field.value ? (
+                                format(field.value, 'PPP')
+                              ) : (
+                                <span>Pick the end date</span>
+                              )}
+                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={field.value}
+                            onSelect={field.onChange}
+                            disabled={(date) => date < new Date()}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </>
+          )}
 
           <div className="w-full space-y-2">
             <div>

@@ -7,9 +7,33 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  ValidateNested,
 } from 'class-validator';
-import { Transform } from 'class-transformer';
-import type { BloodType, Role, Sex } from '@prisma/client';
+import { Transform, Type } from 'class-transformer';
+import type {
+  AlcoholStatus,
+  BloodType,
+  DrugsUsage,
+  Role,
+  Sex,
+  SmokingStatus,
+} from '@prisma/client';
+
+class InsuranceDto {
+  @IsNotEmpty()
+  @IsString()
+  provider: string;
+
+  @IsNotEmpty()
+  @IsString()
+  policyNumber: string;
+
+  @IsDateString()
+  policyStartDate: Date;
+
+  @IsDateString()
+  policyEndDate: Date;
+}
 
 export class CreateUserDto {
   @IsNotEmpty()
@@ -73,6 +97,23 @@ export class CreateUserDto {
     'o_negative',
   ])
   bloodType?: BloodType;
+
+  @IsOptional()
+  @IsIn(['never', 'former', 'current'])
+  smokingStatus?: SmokingStatus;
+
+  @IsOptional()
+  @IsIn(['never', 'former', 'current'])
+  alcoholStatus?: AlcoholStatus;
+
+  @IsOptional()
+  @IsIn(['never', 'former', 'current'])
+  drugsUsage?: DrugsUsage;
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => InsuranceDto)
+  insurance?: InsuranceDto;
 }
 
 export class VerifyUserEmailDto {

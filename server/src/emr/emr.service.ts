@@ -66,6 +66,7 @@ export class EmrService {
             avatarURL: true,
           },
         },
+        insurance: true,
         allergies: {
           include: {
             allergy: {

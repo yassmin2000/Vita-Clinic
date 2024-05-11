@@ -339,6 +339,9 @@ model Insurance {
   provider     String
   policyNumber String
 
+  policyStartDate DateTime
+  policyEndDate   DateTime
+
   emr   ElectronicMedicalRecord @relation(fields: [emrId], references: [id])
   emrId String                  @unique
 

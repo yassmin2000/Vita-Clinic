@@ -12,6 +12,16 @@ export type BloodType =
 
 export type Frequency = 'daily' | 'weekly' | 'monthly' | 'yearly';
 
+export type Insurance = {
+  id: string;
+  provider: string;
+  policyNumber: string;
+  policyStartDate: string;
+  policyEndDate: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type PatientAllergy = {
   id: string;
   allergyId: string;
@@ -100,6 +110,7 @@ export type EMR = {
   smokingStatus?: 'never' | 'former' | 'current';
   alcoholStatus?: 'never' | 'former' | 'current';
   drugsUsage?: 'never' | 'former' | 'current';
+  insurance?: Insurance;
   createdAt: string;
   updatedAt: string;
   allergies: PatientAllergy[];
