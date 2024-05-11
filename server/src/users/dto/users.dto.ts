@@ -1,3 +1,4 @@
+import { PartialType } from '@nestjs/mapped-types';
 import {
   IsDateString,
   IsEmail,
@@ -10,6 +11,7 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
+
 import type {
   AlcoholStatus,
   BloodType,
@@ -19,7 +21,7 @@ import type {
   SmokingStatus,
 } from '@prisma/client';
 
-class InsuranceDto {
+export class InsuranceDto {
   @IsNotEmpty()
   @IsString()
   provider: string;
@@ -34,6 +36,8 @@ class InsuranceDto {
   @IsDateString()
   policyEndDate: Date;
 }
+
+export class UpdateInsuranceDto extends PartialType(InsuranceDto) {}
 
 export class CreateUserDto {
   @IsNotEmpty()

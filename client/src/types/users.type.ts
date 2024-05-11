@@ -1,4 +1,4 @@
-import type { BloodType } from './emr.type';
+import type { BloodType, Insurance } from './emr.type';
 
 type User = {
   id: string;
@@ -27,5 +27,6 @@ export type Patient = User & {
   emr?: {
     id: string;
     bloodType?: BloodType;
+    insurance?: Insurance;
   };
 };

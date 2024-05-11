@@ -36,6 +36,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import Modal from '@/components/Modal';
+import InsuranceForm from './InsuranceForm';
 import DeleteAlert from '@/components/DeleteAlert';
 import {
   Tooltip,
@@ -59,8 +61,10 @@ const ActionsCell = ({ row }: { row: Row<Patient> }) => {
 
   const userId = row.original.id;
   const isActive = row.original.isActive;
+  const insurance = row.original.emr?.insurance;
   const [isActivating, setIsActivating] = useState(false);
   const [isDeactivating, setIsDeactivating] = useState(false);
+  const [isEditingInsurance, setIsEditingInsurance] = useState(false);
 
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -160,6 +164,13 @@ const ActionsCell = ({ row }: { row: Row<Patient> }) => {
               </div>
             </DropdownMenuItem>
           </Link>
+          {role === 'admin' && (
+            <DropdownMenuItem onClick={() => setIsEditingInsurance(true)}>
+              <div className="flex items-center gap-2">
+                <Pencil className="h-4 w-4" /> Edit Insurance
+              </div>
+            </DropdownMenuItem>
+          )}
           <Link href={`/patients/${userId}/emr`}>
             <DropdownMenuItem asChild>
               <div className="flex items-center gap-2">
@@ -224,6 +235,7 @@ const ActionsCell = ({ row }: { row: Row<Patient> }) => {
           )}
         </DropdownMenuContent>
       </DropdownMenu>
+
       <DeleteAlert
         title={`Activate ${row.original.firstName} ${row.original.lastName} account`}
         description={`Are you sure you want to activate ${row.original.firstName} ${row.original.lastName} account? This means they will be able to log in and access the system.`}
@@ -243,6 +255,36 @@ const ActionsCell = ({ row }: { row: Row<Patient> }) => {
         onDelete={deactivateUser}
         disabled={isDeactivatingPending}
       />
+
+      <Modal
+        isOpen={isEditingInsurance}
+        onClose={() => setIsEditingInsurance(false)}
+        className="h-fit"
+      >
+        <InsuranceForm
+          patientId={userId}
+          isInsuranceExisting={Boolean(insurance)}
+          patientName={`${row.original.firstName} ${row.original.lastName}`}
+          defaultValues={
+            insurance
+              ? {
+                  insurancePolicyNumber: insurance.policyNumber,
+                  insuranceProvider: insurance.provider,
+                  insurancePolicyStartDate: new Date(insurance.policyStartDate),
+                  insurancePolicyEndDate: new Date(insurance.policyEndDate),
+                }
+              : undefined
+          }
+          onClose={() => {
+            queryClient.invalidateQueries({
+              queryKey: [
+                `patients_page_${currentPage}_count_${countPerPage}_sex_${currentGender}_status_${currentStatus}_sort_${sortBy}_search_${searchValue}`,
+              ],
+            });
+            setIsEditingInsurance(false);
+          }}
+        />
+      </Modal>
     </>
   );
 };

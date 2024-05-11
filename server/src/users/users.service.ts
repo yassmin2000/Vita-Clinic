@@ -61,6 +61,7 @@ export class UsersService {
       where: {
         role,
         sex: sex === 'all' ? undefined : sex,
+        isEmailVerified: true,
         isActive: isSuperAdmin
           ? status === 'all'
             ? undefined
@@ -97,6 +98,7 @@ export class UsersService {
           select: {
             id: true,
             bloodType: true,
+            insurance: true,
           },
         },
         address: true,
@@ -129,6 +131,8 @@ export class UsersService {
     return this.prisma.user.findMany({
       where: {
         role,
+        isEmailVerified: true,
+        isActive: true,
       },
       select: {
         id: true,

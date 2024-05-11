@@ -4,6 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import { PatientsController } from './patients.controller';
 
 import { UsersService } from '../users.service';
+import { PatientsService } from './patients.service';
 import { PrismaService } from 'src/prisma.service';
 import { LogService } from 'src/log/log.service';
 import { AppointmentsService } from 'src/appointments/appointments.service';
@@ -23,6 +24,7 @@ import { TreatmentService } from 'src/appointments/treatments/treatments.service
   controllers: [PatientsController],
   providers: [
     UsersService,
+    PatientsService,
     PrismaService,
     JwtService,
     LogService,
