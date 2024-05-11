@@ -20,6 +20,8 @@ import { EmailOtpService } from 'src/email-otp/email-otp.service';
 import { PhoneOtpService } from 'src/phone-otp/phone-otp.service';
 import { TreatmentService } from 'src/appointments/treatments/treatments.service';
 
+import { PrescriptionsService } from 'src/appointments/prescriptions/prescriptions.service';
+
 @Module({
   controllers: [PatientsController],
   providers: [
@@ -42,6 +44,7 @@ import { TreatmentService } from 'src/appointments/treatments/treatments.service
     OtpService,
     EmailOtpService,
     PhoneOtpService,
+    PrescriptionsService,
   ],
 })
 export class PatientsModule {}
