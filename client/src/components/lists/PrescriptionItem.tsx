@@ -4,15 +4,23 @@ import { useState } from 'react';
 import { format } from 'date-fns';
 import { Info, Pencil, Plus } from 'lucide-react';
 
-import { Card } from '../ui/card';
-import { Button } from '../ui/button';
-import Modal from '../Modal';
-import { Separator } from '../ui/separator';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import Modal from '@/components/Modal';
+import { Separator } from '@/components/ui/separator';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+import { Icons } from '@/components/Icons';
 
 import useUserRole from '@/hooks/useUserRole';
 import { capitalize } from '@/lib/utils';
+import { dosageForms } from '@/lib/constants';
 
-import { Prescription } from '@/types/appointments.type';
+import type { Prescription } from '@/types/appointments.type';
 
 interface PrescriptionItemProps {
   prescription: Prescription;
@@ -24,29 +32,52 @@ export default function PrescriptionItem({
   const { role } = useUserRole();
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
+  const Icon = dosageForms.find(
+    (form) => form.value === prescription.medication.dosageForm
+  )?.icon;
+
   return (
-    <Card className="col-span-1 divide-y divide-accent rounded-lg transition-all hover:shadow-lg dark:shadow-white/10">
-      <div className="truncate px-4 pt-6">
-        <div className="flex flex-col gap-0.5">
-          <h3 className="truncate text-lg font-medium">
-            {prescription.medication.name}
-          </h3>
-          <span className="mt-0.5 truncate">
-            Dosage: {prescription.dosage} {prescription.medication.unit}{' '}
-            {prescription.frequency} (
-            {prescription.required ? 'Required' : 'Optional'})
-          </span>
-          <div className="flex items-center gap-1">
-            {prescription.startDate && (
-              <span className="mt-0.5 truncate">
-                {format(new Date(prescription.startDate), 'dd MMM yyyy')}
-              </span>
-            )}
-            {prescription.endDate && (
-              <span className="mt-0.5 truncate">
-                - {format(new Date(prescription.endDate), 'dd MMM yyyy')}
-              </span>
-            )}
+    <Card className="col-span-1 rounded-lg transition-all">
+      <div className="flex w-full items-center gap-4 px-4 pt-6">
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger>
+              <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border">
+                {Icon ? (
+                  <Icon className="h-6 w-6" />
+                ) : (
+                  <Icons.tablet className="h-6 w-6" />
+                )}
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              {capitalize(prescription.medication.dosageForm)} medicine taken by{' '}
+              {prescription.medication.routeOfAdministration}
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+        <div className="flex-1 truncate">
+          <div className="flex flex-col gap-0.5">
+            <h3 className="truncate text-lg font-medium">
+              {prescription.medication.name}
+            </h3>
+            <span className="mt-0.5 truncate">
+              Dosage: {prescription.dosage} {prescription.medication.unit}{' '}
+              {prescription.frequency} (
+              {prescription.required ? 'Required' : 'Optional'})
+            </span>
+            <div className="flex items-center gap-1">
+              {prescription.startDate && (
+                <span className="mt-0.5 truncate">
+                  {format(new Date(prescription.startDate), 'dd MMM yyyy')}
+                </span>
+              )}
+              {prescription.endDate && (
+                <span className="mt-0.5 truncate">
+                  - {format(new Date(prescription.endDate), 'dd MMM yyyy')}
+                </span>
+              )}
+            </div>
           </div>
         </div>
       </div>

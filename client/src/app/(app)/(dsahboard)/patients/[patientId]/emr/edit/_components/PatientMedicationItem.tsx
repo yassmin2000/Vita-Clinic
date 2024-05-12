@@ -6,6 +6,7 @@ import { Edit, Info, Plus, Trash } from 'lucide-react';
 
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import DeleteAlert from '@/components/DeleteAlert';
 import Modal from '@/components/Modal';
 import { Separator } from '@/components/ui/separator';
 import {
@@ -19,12 +20,10 @@ import { Icons } from '@/components/Icons';
 import { capitalize } from '@/lib/utils';
 import { dosageForms } from '@/lib/constants';
 
-import type { PatientMedication } from '@/types/emr.type';
 import type { PatientMedicationField } from './PatientMedications';
-import DeleteAlert from '@/components/DeleteAlert';
 
 interface PatientMedicationItemProps {
-  medication: PatientMedication | PatientMedicationField;
+  medication: PatientMedicationField;
   isEditDisabled?: boolean;
   onEdit: () => void;
   isDeleteDisabled?: boolean;
