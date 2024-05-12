@@ -79,7 +79,7 @@ export type Treatment = {
   createdAt: string;
 };
 
-export type BillingStatus = 'initial' | 'paid' | 'insurance';
+export type BillingStatus = 'initial' | 'cancelled' | 'paid' | 'insurance';
 
 export type Billing = {
   id: string;

@@ -248,7 +248,8 @@ export default function AppointmentDetailsCard({
                 })}{' '}
                 <Badge
                   variant={
-                    appointment.billing.status === 'initial'
+                    appointment.billing.status === 'initial' ||
+                    appointment.billing.status === 'cancelled'
                       ? 'cancelled'
                       : 'completed'
                   }
@@ -256,9 +257,11 @@ export default function AppointmentDetailsCard({
                 >
                   {appointment.billing.status === 'initial'
                     ? 'Not Paid'
-                    : appointment.billing.status === 'paid'
-                      ? 'Paid'
-                      : 'Covered By Insurance'}
+                    : appointment.billing.status === 'cancelled'
+                      ? 'Cancelled'
+                      : appointment.billing.status === 'paid'
+                        ? 'Paid'
+                        : 'Covered By Insurance'}
                 </Badge>
               </span>
             </div>

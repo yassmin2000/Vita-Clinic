@@ -110,6 +110,7 @@ enum AppointmentStatus {
 
 enum BillingStatus {
   initial
+  cancelled
   paid
   insurance
 }

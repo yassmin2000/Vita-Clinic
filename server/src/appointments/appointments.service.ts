@@ -332,6 +332,15 @@ export class AppointmentsService {
       throw new ConflictException('Appointment is not approved');
     }
 
+    await this.prisma.billing.update({
+      where: {
+        id: appointment.billingId,
+      },
+      data: {
+        status: 'cancelled',
+      },
+    });
+
     return this.prisma.appointment.update({
       where: { id: appointmentId },
       data: {
