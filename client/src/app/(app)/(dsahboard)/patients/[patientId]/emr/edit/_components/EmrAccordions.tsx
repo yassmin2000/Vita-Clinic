@@ -66,7 +66,7 @@ export default function EmrAccordions({
           description: 'The EMR you are looking for does not exist.',
           variant: 'destructive',
         });
-        return router.push('/');
+        return router.push('/dashboard');
       }
 
       return response.data as EMR;

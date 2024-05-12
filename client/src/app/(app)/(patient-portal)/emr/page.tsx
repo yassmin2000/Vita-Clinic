@@ -7,7 +7,7 @@ export default async function PatientEmrPage() {
   const session = await getAuthSession();
 
   if (!session) {
-    return redirect('/');
+    return redirect('/dashboard');
   }
 
   return (

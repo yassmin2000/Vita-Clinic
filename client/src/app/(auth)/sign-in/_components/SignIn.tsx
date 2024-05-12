@@ -70,7 +70,7 @@ export default function SignIn() {
           });
         }
       } else {
-        router.push('/');
+        router.push('/dashboard');
       }
     } catch (error) {
       toast({

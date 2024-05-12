@@ -15,7 +15,7 @@ export default async function PatientPortalLayout({
   }
 
   if (role !== 'patient') {
-    return redirect('/');
+    return redirect('/dashboard');
   }
 
   return <>{children}</>;

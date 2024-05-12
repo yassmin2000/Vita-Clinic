@@ -24,7 +24,7 @@ import { cn } from '@/lib/utils';
 const routes = [
   {
     icon: Home,
-    href: '/',
+    href: '/dashboard',
     label: 'Home',
   },
   {

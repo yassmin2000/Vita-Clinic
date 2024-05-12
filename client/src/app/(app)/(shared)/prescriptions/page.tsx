@@ -8,7 +8,7 @@ export default async function PrescriptionsPage() {
   const { role } = await getUserRole();
 
   if (role !== 'patient') {
-    return redirect('/');
+    return redirect('/dashboard');
   }
 
   return (

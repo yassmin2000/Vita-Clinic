@@ -9,13 +9,14 @@ import { DevicesModule } from './devices/devices.module';
 import { EmrModule } from './emr/emr.module';
 import { SettingsModule } from './settings/settings.module';
 import { UsersModule } from './users/users.module';
+import { LogModule } from './log/log.module';
+import { DashboardsModule } from './dashboards/dashboards.module';
 
 import { AppController } from './app.controller';
 
 import { AppService } from './app.service';
 import { EmailOtpModule } from './email-otp/email-otp.module';
 import { PhoneOtpModule } from './phone-otp/phone-otp.module';
-import { LogModule } from './log/log.module';
 import { TasksService } from './tasks.service';
 
 @Module({
@@ -32,6 +33,7 @@ import { TasksService } from './tasks.service';
     EmailOtpModule,
     PhoneOtpModule,
     LogModule,
+    DashboardsModule,
   ],
   controllers: [AppController],
   providers: [AppService, TasksService],

@@ -49,6 +49,6 @@ export default async function ReportPage({
       </div>
     );
   } catch (error) {
-    return redirect('/');
+    return redirect('/dashboard');
   }
 }
