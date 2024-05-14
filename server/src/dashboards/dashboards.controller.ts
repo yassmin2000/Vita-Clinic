@@ -90,4 +90,20 @@ export class DashboardsController {
 
     return this.dashboardsService.getDoctorsSexData();
   }
+
+  @UseGuards(JwtGuard)
+  @Get('doctors/appointments')
+  async getDoctorsCompletedAppointmentDistribution(
+    @Req() request: Request,
+    @Query(new ValidationPipe())
+    query: GetInvoicesDataQuery,
+  ) {
+    const user: Payload = request['user'];
+
+    if (user.role !== 'admin') {
+      throw new UnauthorizedException();
+    }
+
+    return this.dashboardsService.getDoctorsAppointmentsData(query);
+  }
 }

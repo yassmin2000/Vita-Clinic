@@ -1,8 +1,10 @@
 import AdminStatistics from './_components/AdminStatistics';
+import DoctorStatistics from './_components/DoctorStatistics';
 import InvoicesChart from './_components/InvoicesChart';
 import PatientsAgeSexDistributionChart from './_components/PatientsAgeSexDistributionChart';
 import AppointmentsCalendarChart from './_components/AppointmentsCalendarChart';
 import DoctorsSexChart from './_components/DoctorsSexChart';
+import DoctorsCompletedAppointmentsChart from './_components/DoctorsCompletedAppointmentsChart';
 
 import { getUserRole } from '@/lib/auth';
 
@@ -12,29 +14,23 @@ export default async function Home() {
   return (
     <section className="container mx-auto px-2 py-8 md:px-4">
       <div className="flex flex-col gap-4">
-        <AdminStatistics />
+        {role === 'admin' ? <AdminStatistics /> : <DoctorStatistics />}
 
-        {role === 'admin' && (
-          <div>
-            <InvoicesChart />
-          </div>
-        )}
+        {role === 'admin' && <InvoicesChart />}
 
-        <div>
-          <PatientsAgeSexDistributionChart />
-        </div>
+        <PatientsAgeSexDistributionChart />
 
         {role === 'admin' && (
           <>
-            <div>
-              <AppointmentsCalendarChart />
-            </div>
+            <AppointmentsCalendarChart />
 
-            <div className="flex w-full flex-col items-start justify-start gap-8 md:flex-row">
-              <div className="w-[47%]">
+            <div className="flex w-full flex-col gap-4 md:grid md:grid-cols-2">
+              <div>
                 <DoctorsSexChart />
               </div>
-              <div className="w-[47%]"></div>
+              <div>
+                <DoctorsCompletedAppointmentsChart />
+              </div>
             </div>
           </>
         )}

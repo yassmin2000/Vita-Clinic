@@ -95,6 +95,11 @@ export class DashboardsService {
       new Date().getTime() + 7 * 24 * 60 * 60 * 1000,
     ).toISOString(),
   }: GetInvoicesDataQuery) {
+    const startDateObj = new Date(startDate);
+    startDateObj.setHours(0, 0, 0, 0);
+    const endDateObj = new Date(endDate);
+    endDateObj.setHours(23, 59, 59, 999);
+
     const rawCompletedBillings = await this.prisma.billing.groupBy({
       by: ['date'],
       where: {
@@ -105,8 +110,8 @@ export class DashboardsService {
           { status: 'insurance' },
         ],
         date: {
-          gte: startDate,
-          lte: endDate,
+          gte: startDateObj,
+          lte: endDateObj,
         },
       },
       _sum: {
@@ -122,8 +127,8 @@ export class DashboardsService {
       where: {
         status: 'initial',
         date: {
-          gte: startDate,
-          lte: endDate,
+          gte: startDateObj,
+          lte: endDateObj,
         },
       },
       _sum: {
@@ -139,8 +144,8 @@ export class DashboardsService {
       where: {
         status: 'cancelled',
         date: {
-          gte: startDate,
-          lte: endDate,
+          gte: startDateObj,
+          lte: endDateObj,
         },
       },
       _sum: {
@@ -235,5 +240,58 @@ export class DashboardsService {
       id: item.sex,
       value: item._count,
     }));
+  }
+
+  async getDoctorsAppointmentsData({
+    startDate = new Date().toISOString(),
+    endDate = new Date(
+      new Date().getTime() + 7 * 24 * 60 * 60 * 1000,
+    ).toISOString(),
+  }: GetInvoicesDataQuery) {
+    const startDateObj = new Date(startDate);
+    startDateObj.setHours(0, 0, 0, 0);
+    const endDateObj = new Date(endDate);
+    endDateObj.setHours(23, 59, 59, 999);
+
+    const rawData = await this.prisma.user.findMany({
+      where: {
+        role: 'doctor',
+      },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        _count: {
+          select: {
+            doctorAppointments: {
+              where: {
+                status: 'completed',
+                date: {
+                  gte: startDateObj,
+                  lte: endDateObj,
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const data = rawData
+      .map((doctor) => ({
+        id: `Dr. ${doctor.firstName} ${doctor.lastName}`,
+        label: `Dr. ${doctor.firstName} ${doctor.lastName}`,
+        value: doctor._count.doctorAppointments,
+      }))
+      .sort((a, b) => b.value - a.value);
+
+    const topDoctors = data.slice(0, 4);
+    const others = data.slice(4).reduce((acc, doctor) => acc + doctor.value, 0);
+    const result = [
+      ...topDoctors,
+      { id: 'Others', label: 'Others', value: others },
+    ];
+
+    return result;
   }
 }

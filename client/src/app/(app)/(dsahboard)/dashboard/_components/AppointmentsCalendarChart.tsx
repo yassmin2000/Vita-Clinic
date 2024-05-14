@@ -23,7 +23,7 @@ export default function AppointmentsCalendarChart() {
   const { resolvedTheme } = useTheme();
 
   const accessToken = useAccessToken();
-  const { data: chartsData } = useQuery({
+  const { data: chartData } = useQuery({
     queryKey: [`appointments_year_${year}_status_${status}`],
     queryFn: async () => {
       const response = await axios.get(
@@ -43,15 +43,15 @@ export default function AppointmentsCalendarChart() {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    if (chartsData) {
-      setData(chartsData);
+    if (chartData) {
+      setData(chartData);
     }
-  }, [chartsData]);
+  }, [chartData]);
 
   return (
-    <Card className="py-2">
-      <div className="px-4 py-2">
-        <h2 className="mb-2 text-center text-xl font-bold">
+    <Card>
+      <div className="px-4 pt-4">
+        <h2 className="mb-4 text-center text-xl font-bold">
           Appointments Per Day
         </h2>
         <div className="flex items-center gap-2">

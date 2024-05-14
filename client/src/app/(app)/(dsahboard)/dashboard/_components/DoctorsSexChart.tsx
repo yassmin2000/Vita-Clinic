@@ -10,18 +10,18 @@ import axios from 'axios';
 import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
 
+type ChartData = {
+  id: string;
+  label: string;
+  value: number;
+};
+
 export default function DoctorsSexChart() {
-  const [data, setData] = useState<
-    {
-      id: string;
-      label: string;
-      value: number;
-    }[]
-  >([]);
+  const [data, setData] = useState<ChartData[]>([]);
   const { resolvedTheme } = useTheme();
 
   const accessToken = useAccessToken();
-  const { data: chartsData } = useQuery({
+  const { data: chartData } = useQuery({
     queryKey: [`doctors_sex`],
     queryFn: async () => {
       const response = await axios.get(
@@ -39,32 +39,23 @@ export default function DoctorsSexChart() {
   });
 
   useEffect(() => {
-    if (chartsData) {
+    if (chartData) {
       setData(
-        chartsData.map((item) => ({
+        chartData.map((item) => ({
           id: capitalize(item.id),
           label: capitalize(item.id),
           value: item.value,
         }))
       );
     }
-  }, [chartsData]);
+  }, [chartData]);
 
   return (
-    <Card className="py-2">
-      <div className="px-4 py-2">
-        <h1 className="text-center text-xl font-bold">
+    <Card className="flex h-full flex-col items-center justify-center">
+      <div className="px-4 py-4">
+        <h2 className="text-center text-xl font-bold">
           Doctors Sex Distribution
-        </h1>
-        <div className="pointer-events-none flex items-center gap-2 opacity-0">
-          <Tabs defaultValue="week">
-            <TabsList className="flex h-full w-fit flex-wrap justify-start gap-0.5">
-              <TabsTrigger value="week">Last Week</TabsTrigger>
-              <TabsTrigger value="month">Last Month</TabsTrigger>
-              <TabsTrigger value="threeMonths">Last 3 Months</TabsTrigger>
-            </TabsList>
-          </Tabs>
-        </div>
+        </h2>
       </div>
       <div className="h-[350px]">
         <ResponsivePie
@@ -76,8 +67,8 @@ export default function DoctorsSexChart() {
               : ['#3b83f6', '#f472b6']
           }
           innerRadius={0.5}
-          padAngle={0.7}
-          cornerRadius={3}
+          padAngle={0.2}
+          cornerRadius={0}
           borderWidth={1}
           borderColor={{ from: 'color', modifiers: [['darker', 0.2]] }}
           sortByValue

@@ -19,7 +19,7 @@ export default function PatientsAgeSexDistributionChart() {
   const { resolvedTheme } = useTheme();
 
   const accessToken = useAccessToken();
-  const { data: chartsData } = useQuery({
+  const { data: chartData } = useQuery({
     queryKey: [`patients_age_sex`],
     queryFn: async () => {
       const response = await axios.get(
@@ -37,10 +37,10 @@ export default function PatientsAgeSexDistributionChart() {
   });
 
   useEffect(() => {
-    if (chartsData) {
-      setData(chartsData);
+    if (chartData) {
+      setData(chartData);
     }
-  }, [chartsData]);
+  }, [chartData]);
 
   return (
     <Card className="py-2">

@@ -13,7 +13,7 @@ import { DateRangePicker } from '@/components/ui/date-range-picker';
 
 import useAccessToken from '@/hooks/useAccessToken';
 
-type ChartsData = {
+type ChartData = {
   id: string;
   data: {
     x: string;
@@ -28,12 +28,12 @@ export default function InvoicesChart() {
     from: new Date(new Date().setDate(new Date().getDate() - 7)),
     to: new Date(),
   });
-  const [data, setDate] = useState<ChartsData[]>([]);
+  const [data, setDate] = useState<ChartData[]>([]);
 
   const { resolvedTheme } = useTheme();
 
   const accessToken = useAccessToken();
-  const { data: chartsData } = useQuery({
+  const { data: chartData } = useQuery({
     queryKey: [
       `invoices_start_${dateRange?.from?.toISOString()}_end_${dateRange?.to?.toISOString()}_`,
     ],
@@ -47,16 +47,16 @@ export default function InvoicesChart() {
         }
       );
 
-      return response.data as ChartsData[];
+      return response.data as ChartData[];
     },
     enabled: !!accessToken,
   });
 
   useEffect(() => {
-    if (chartsData && chartsData.length > 0) {
-      setDate(chartsData);
+    if (chartData && chartData.length > 0) {
+      setDate(chartData);
     }
-  }, [chartsData]);
+  }, [chartData]);
 
   const daysCount =
     dateRange && dateRange.from && dateRange.to
@@ -67,64 +67,71 @@ export default function InvoicesChart() {
       : 5;
 
   return (
-    <Card className="py-2">
-      <div className="px-4 py-2">
-        <h2 className="mb-2 text-center text-xl font-bold">Invoices Chart</h2>
-        <div className="flex items-center gap-2">
-          <Tabs defaultValue="area">
-            <TabsList className="flex h-full w-fit flex-wrap justify-start gap-0.5">
-              <TabsTrigger value="line" onClick={() => setIsArea(false)}>
-                Line
-              </TabsTrigger>
-              <TabsTrigger value="area" onClick={() => setIsArea(true)}>
-                Area
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
+    <Card>
+      <div className="px-4 pb-2 pt-4">
+        <h2 className="mb-4 text-center text-xl font-bold">
+          Invoices Per Day Distribution
+        </h2>
+        <div className="flex flex-col gap-2 md:flex-row md:items-center">
+          <div className="flex items-center gap-2">
+            <Tabs defaultValue="area">
+              <TabsList className="flex h-full w-fit flex-wrap justify-start gap-0.5">
+                <TabsTrigger value="line" onClick={() => setIsArea(false)}>
+                  Line
+                </TabsTrigger>
+                <TabsTrigger value="area" onClick={() => setIsArea(true)}>
+                  Area
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
 
-          <Tabs value={currentTab} onValueChange={(tab) => setCurrentTab(tab)}>
-            <TabsList className="flex h-full w-fit flex-wrap justify-start gap-0.5">
-              <TabsTrigger
-                value="week"
-                onClick={() => {
-                  setDateRange({
-                    from: new Date(
-                      new Date().setDate(new Date().getDate() - 7)
-                    ),
-                    to: new Date(),
-                  });
-                }}
-              >
-                Last Week
-              </TabsTrigger>
-              <TabsTrigger
-                value="month"
-                onClick={() => {
-                  setDateRange({
-                    from: new Date(
-                      new Date().setMonth(new Date().getMonth() - 1)
-                    ),
-                    to: new Date(),
-                  });
-                }}
-              >
-                Last Month
-              </TabsTrigger>
-              <TabsTrigger
-                value="threeMonths"
-                onClick={() => {
-                  setDateRange({
-                    from: new Date(
-                      new Date().setMonth(new Date().getMonth() - 3)
-                    ),
-                    to: new Date(),
-                  });
-                }}
-              >
-                Last 3 Months
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
+            <Tabs
+              value={currentTab}
+              onValueChange={(tab) => setCurrentTab(tab)}
+            >
+              <TabsList className="flex h-full w-fit flex-wrap justify-start gap-0.5">
+                <TabsTrigger
+                  value="week"
+                  onClick={() => {
+                    setDateRange({
+                      from: new Date(
+                        new Date().setDate(new Date().getDate() - 7)
+                      ),
+                      to: new Date(),
+                    });
+                  }}
+                >
+                  Last Week
+                </TabsTrigger>
+                <TabsTrigger
+                  value="month"
+                  onClick={() => {
+                    setDateRange({
+                      from: new Date(
+                        new Date().setMonth(new Date().getMonth() - 1)
+                      ),
+                      to: new Date(),
+                    });
+                  }}
+                >
+                  Last Month
+                </TabsTrigger>
+                <TabsTrigger
+                  value="threeMonths"
+                  onClick={() => {
+                    setDateRange({
+                      from: new Date(
+                        new Date().setMonth(new Date().getMonth() - 3)
+                      ),
+                      to: new Date(),
+                    });
+                  }}
+                >
+                  Last 3 Months
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </div>
 
           <DateRangePicker
             values={dateRange}
