@@ -76,7 +76,6 @@ export function processPatientsData(data: { sex: Sex; birthDate: Date }[]) {
   const processedData = data
     .reduce((acc, item) => {
       const birthDate = item.birthDate.toISOString();
-      console.log(birthDate);
       const age = differenceInYears(new Date(), parseISO(birthDate));
       let ageGroup = ageGroups.find((group) => {
         const [min, max] = group.split('-').map(Number);

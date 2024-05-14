@@ -24,6 +24,18 @@ export class DashboardsController {
   constructor(private readonly dashboardsService: DashboardsService) {}
 
   @UseGuards(JwtGuard)
+  @Get('general')
+  async getGeneralStatistics(@Req() request: Request) {
+    const user: Payload = request['user'];
+
+    if (user.role === 'patient') {
+      throw new UnauthorizedException();
+    }
+
+    return this.dashboardsService.getStatistics(user.id, user.role);
+  }
+
+  @UseGuards(JwtGuard)
   @Get('invoices')
   async getInvoicesChartData(
     @Req() request: Request,

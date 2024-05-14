@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 
 import { PrismaService } from 'src/prisma.service';
 
@@ -12,10 +12,82 @@ import {
   GetAppointmentsDataQuery,
   GetInvoicesDataQuery,
 } from './dto/dashboards.dto';
+import { Role } from '@prisma/client';
 
 @Injectable()
 export class DashboardsService {
   constructor(private prisma: PrismaService) {}
+
+  async getStatistics(userId: string, role: Role) {
+    const patientsCount = await this.prisma.user.count({
+      where: {
+        role: 'patient',
+        isActive: true,
+      },
+    });
+
+    const devicesCount = await this.prisma.device.count();
+
+    if (role === 'admin') {
+      const doctorsCount = await this.prisma.user.count({
+        where: {
+          role: 'doctor',
+          isActive: true,
+        },
+      });
+
+      const appointmentsCountByStatus = await this.prisma.appointment.groupBy({
+        by: 'status',
+        _count: true,
+      });
+
+      const appointmentsCount = {
+        all: appointmentsCountByStatus.reduce((acc, item) => {
+          acc += item._count;
+          return acc;
+        }, 0),
+        completed:
+          appointmentsCountByStatus.find(
+            (count) => count.status === 'completed',
+          )?._count || 0,
+        approved:
+          appointmentsCountByStatus.find((count) => count.status === 'approved')
+            ?._count || 0,
+        pending:
+          appointmentsCountByStatus.find((count) => count.status === 'pending')
+            ?._count || 0,
+        cancelled:
+          appointmentsCountByStatus.find(
+            (count) => count.status === 'cancelled',
+          )?._count || 0,
+        rejected:
+          appointmentsCountByStatus.find((count) => count.status === 'rejected')
+            ?._count || 0,
+      };
+
+      return {
+        patientsCount,
+        doctorsCount,
+        appointmentsCount,
+        devicesCount,
+      };
+    } else if (role === 'doctor') {
+      const doctorAppointmentsCount = await this.prisma.appointment.count({
+        where: {
+          status: 'approved',
+          doctorId: userId,
+        },
+      });
+
+      return {
+        patientsCount,
+        appointmentsCount: doctorAppointmentsCount,
+        devicesCount,
+      };
+    }
+
+    throw new UnauthorizedException();
+  }
 
   async getInvoicesData({
     startDate = new Date().toISOString(),
@@ -138,6 +210,7 @@ export class DashboardsService {
     const rawData = await this.prisma.user.findMany({
       where: {
         role: 'patient',
+        isActive: true,
       },
       select: {
         birthDate: true,

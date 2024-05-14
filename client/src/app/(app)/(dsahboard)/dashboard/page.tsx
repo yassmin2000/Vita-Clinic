@@ -1,3 +1,4 @@
+import AdminStatistics from './_components/AdminStatistics';
 import InvoicesChart from './_components/InvoicesChart';
 import PatientsAgeSexDistributionChart from './_components/PatientsAgeSexDistributionChart';
 import AppointmentsCalendarChart from './_components/AppointmentsCalendarChart';
@@ -11,6 +12,8 @@ export default async function Home() {
   return (
     <section className="container mx-auto px-2 py-8 md:px-4">
       <div className="flex flex-col gap-4">
+        <AdminStatistics />
+
         {role === 'admin' && (
           <div>
             <InvoicesChart />
