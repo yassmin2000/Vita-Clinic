@@ -51,8 +51,8 @@ export default function DoctorsSexChart() {
   }, [chartData]);
 
   return (
-    <Card className="flex h-full flex-col items-center justify-center">
-      <div className="px-4 py-4">
+    <Card className="flex h-full flex-col justify-center gap-4">
+      <div className="px-4">
         <h2 className="text-center text-xl font-bold">
           Doctors Sex Distribution
         </h2>

@@ -30,7 +30,7 @@ export default function DoctorsCompletedAppointmentsChart() {
   const accessToken = useAccessToken();
   const { data: chartData } = useQuery({
     queryKey: [
-      `invoices_start_${dateRange?.from?.toISOString()}_end_${dateRange?.to?.toISOString()}_`,
+      `doctors_appointments_chart_${dateRange?.from?.toISOString()}_end_${dateRange?.to?.toISOString()}_`,
     ],
     queryFn: async () => {
       const response = await axios.get(
