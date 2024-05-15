@@ -52,7 +52,7 @@ export class AppointmentsController {
       throw new UnauthorizedException();
     }
 
-    return this.appointmentsService.findAll(query);
+    return this.appointmentsService.findAll(query, undefined, user.id);
   }
 
   @UseGuards(JwtGuard)
@@ -208,7 +208,8 @@ export class AppointmentsController {
   ) {
     const user: Payload = request['user'];
 
-    const treatments = await this.prescriptionsService.findAllByAppointmentId(id);
+    const treatments =
+      await this.prescriptionsService.findAllByAppointmentId(id);
 
     if (user.role === 'patient') {
       return treatments.filter(

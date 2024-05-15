@@ -31,11 +31,13 @@ export class AppointmentsService {
     {
       page = 1,
       limit = 10,
+      doctor = false,
       status = 'all',
       value = '',
       sort = 'date-desc',
     }: GetAllAppointmentsQuery,
     patientId?: string,
+    doctorId?: string,
   ) {
     const names = value.trim().split(' ');
     const mode = 'insensitive' as 'insensitive';
@@ -84,6 +86,7 @@ export class AppointmentsService {
       where: {
         status: status === 'all' ? undefined : status,
         patientId: patientId || undefined,
+        doctorId: doctor && doctorId ? doctorId : undefined,
         OR: nameConditions,
       },
       include: {

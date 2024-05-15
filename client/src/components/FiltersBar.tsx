@@ -19,21 +19,14 @@ import {
 } from './ui/select';
 import { Tabs, TabsList, TabsTrigger } from './ui/tabs';
 import { buttonVariants } from './ui/button';
-import { useTableOptions } from '@/hooks/useTableOptions';
 
-const specialties = [
-  'Neuroradiology',
-  'Pediatric Radiology',
-  'Breast Imaging',
-  'Vascular & Interventional Radiology',
-  'Musculoskeletal Radiology',
-  'Nuclear Radiology',
-  'Emergency Radiology',
-];
+import { useTableOptions } from '@/hooks/useTableOptions';
+import { cn } from '@/lib/utils';
 
 interface FiltersBarProps {
   genderFilter?: boolean;
   statusFilter?: boolean;
+  appointmentsVisibleFilter?: boolean;
   appointmentStatusFilter?: boolean;
   searchFilter?: boolean;
   sortingEnabled?: boolean;
@@ -57,6 +50,7 @@ interface FiltersBarProps {
 export default function FiltersBar({
   genderFilter = false,
   statusFilter = false,
+  appointmentsVisibleFilter = false,
   appointmentStatusFilter = false,
   searchFilter = false,
   sortingEnabled = false,
@@ -88,6 +82,8 @@ export default function FiltersBar({
     setCurrentStatus,
     currentAppointmentStatus,
     setCurrentAppointmentStatus,
+    currentVisibleAppointments,
+    setCurrentVisibleAppointments,
   } = useTableOptions();
 
   const request = debounce(async () => {
@@ -99,78 +95,115 @@ export default function FiltersBar({
   }, []);
 
   return (
-    <div className="flex flex-col justify-between gap-8 md:flex-row">
+    <div className="flex flex-col justify-between gap-8 md:flex-row md:flex-wrap">
       <div className="flex flex-col gap-2 sm:flex-row">
-        {genderFilter && (
-          <Tabs
-            value={currentGender}
-            onValueChange={(value) => {
-              if (value === 'all' || value === 'male' || value === 'female') {
-                setCurrentPage(1);
-                setCurrentGender(value);
-              }
-            }}
-            className="w-[200px]"
-          >
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="all">All</TabsTrigger>
-              <TabsTrigger value="male">Male</TabsTrigger>
-              <TabsTrigger value="female">Female</TabsTrigger>
-            </TabsList>
-          </Tabs>
-        )}
+        <div className="flex flex-wrap gap-2">
+          {genderFilter && (
+            <Tabs
+              value={currentGender}
+              onValueChange={(value) => {
+                if (value === 'all' || value === 'male' || value === 'female') {
+                  setCurrentPage(1);
+                  setCurrentGender(value);
+                }
+              }}
+              className="w-[200px]"
+            >
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="all">All</TabsTrigger>
+                <TabsTrigger value="male">Male</TabsTrigger>
+                <TabsTrigger value="female">Female</TabsTrigger>
+              </TabsList>
+            </Tabs>
+          )}
 
-        {statusFilter && (
-          <Tabs
-            value={currentStatus}
-            onValueChange={(value) => {
-              if (
-                value === 'all' ||
-                value === 'active' ||
-                value === 'inactive'
-              ) {
-                setCurrentPage(1);
-                setCurrentStatus(value);
-              }
-            }}
-            className="w-[200px]"
-          >
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="all">All</TabsTrigger>
-              <TabsTrigger value="active">Active</TabsTrigger>
-              <TabsTrigger value="inactive">Inactive</TabsTrigger>
-            </TabsList>
-          </Tabs>
-        )}
+          {statusFilter && (
+            <Tabs
+              value={currentStatus}
+              onValueChange={(value) => {
+                if (
+                  value === 'all' ||
+                  value === 'active' ||
+                  value === 'inactive'
+                ) {
+                  setCurrentPage(1);
+                  setCurrentStatus(value);
+                }
+              }}
+              className="w-[200px]"
+            >
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="all">All</TabsTrigger>
+                <TabsTrigger value="active">Active</TabsTrigger>
+                <TabsTrigger value="inactive">Inactive</TabsTrigger>
+              </TabsList>
+            </Tabs>
+          )}
+        </div>
 
-        {appointmentStatusFilter && (
-          <Tabs
-            value={currentAppointmentStatus}
-            onValueChange={(value) => {
-              if (
-                value === 'all' ||
-                value === 'completed' ||
-                value === 'pending' ||
-                value === 'cancelled' ||
-                value === 'rejected' ||
-                value === 'approved'
-              ) {
-                setCurrentPage(1);
-                setCurrentAppointmentStatus(value);
-              }
-            }}
-            className="w-[500px]"
-          >
-            <TabsList className="grid w-full grid-cols-6">
-              <TabsTrigger value="all">All</TabsTrigger>
-              <TabsTrigger value="approved">Approved</TabsTrigger>
-              <TabsTrigger value="completed">Completed</TabsTrigger>
-              <TabsTrigger value="pending">Pending</TabsTrigger>
-              <TabsTrigger value="rejected">Rejected</TabsTrigger>
-              <TabsTrigger value="cancelled">Cancelled</TabsTrigger>
-            </TabsList>
-          </Tabs>
-        )}
+        <div className="flex flex-wrap gap-2">
+          {appointmentsVisibleFilter && (
+            <Tabs
+              value={currentVisibleAppointments}
+              onValueChange={(value) => {
+                if (value === 'all' || value === 'yours') {
+                  setCurrentPage(1);
+                  setCurrentVisibleAppointments(value);
+                }
+              }}
+              className="w-[200px]"
+            >
+              <TabsList className="w-full">
+                <TabsTrigger value="all">All</TabsTrigger>
+                <TabsTrigger value="yours">Your Appointments</TabsTrigger>
+              </TabsList>
+            </Tabs>
+          )}
+
+          {appointmentStatusFilter && (
+            <Tabs
+              value={currentAppointmentStatus}
+              onValueChange={(value) => {
+                if (
+                  value === 'all' ||
+                  value === 'completed' ||
+                  value === 'pending' ||
+                  value === 'cancelled' ||
+                  value === 'rejected' ||
+                  value === 'approved'
+                ) {
+                  setCurrentPage(1);
+                  setCurrentAppointmentStatus(value);
+                }
+              }}
+              className={cn(
+                currentVisibleAppointments === 'yours'
+                  ? 'w-[350px]'
+                  : 'w-[500px]'
+              )}
+            >
+              <TabsList
+                className={cn(
+                  'grid w-full',
+                  currentVisibleAppointments === 'yours'
+                    ? 'grid-cols-4'
+                    : 'grid-cols-6'
+                )}
+              >
+                <TabsTrigger value="all">All</TabsTrigger>
+                <TabsTrigger value="approved">Approved</TabsTrigger>
+                <TabsTrigger value="completed">Completed</TabsTrigger>
+                {currentVisibleAppointments === 'all' && (
+                  <>
+                    <TabsTrigger value="pending">Pending</TabsTrigger>
+                    <TabsTrigger value="rejected">Rejected</TabsTrigger>
+                  </>
+                )}
+                <TabsTrigger value="cancelled">Cancelled</TabsTrigger>
+              </TabsList>
+            </Tabs>
+          )}
+        </div>
 
         {sortingEnabled && (
           <Select value={sortBy} onValueChange={(value) => setSortBy(value)}>

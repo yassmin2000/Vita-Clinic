@@ -6,6 +6,7 @@ import {
   IsIn,
   IsInt,
   ArrayUnique,
+  IsBoolean,
 } from 'class-validator';
 import { Transform } from 'class-transformer';
 
@@ -52,6 +53,11 @@ export class GetAllAppointmentsQuery {
   @IsIn(['all', 'pending', 'rejected', 'approved', 'completed', 'cancelled'])
   @Transform(({ value }) => value.toLowerCase(), { toClassOnly: true })
   status?: 'all' | AppointmentStatus;
+
+  @IsOptional()
+  @IsBoolean()
+  @Transform(({ value }) => value === 'true', { toClassOnly: true })
+  doctor?: boolean;
 
   @IsOptional()
   @IsString()

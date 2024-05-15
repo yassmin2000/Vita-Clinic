@@ -17,6 +17,8 @@ type UseTableOptions = {
   setCurrentStatus: (status: 'all' | 'active' | 'inactive') => void;
   currentAppointmentStatus: 'all' | AppointmentStatus;
   setCurrentAppointmentStatus: (status: 'all' | AppointmentStatus) => void;
+  currentVisibleAppointments: 'all' | 'yours';
+  setCurrentVisibleAppointments: (status: 'all' | 'yours') => void;
   reset: () => void;
 };
 
@@ -36,6 +38,9 @@ export const useTableOptions = create<UseTableOptions>((set) => ({
   currentAppointmentStatus: 'all',
   setCurrentAppointmentStatus: (status) =>
     set({ currentAppointmentStatus: status }),
+  currentVisibleAppointments: 'all',
+  setCurrentVisibleAppointments: (status) =>
+    set({ currentVisibleAppointments: status }),
   reset: () =>
     set({
       currentPage: 1,
@@ -45,5 +50,6 @@ export const useTableOptions = create<UseTableOptions>((set) => ({
       currentGender: 'all',
       currentStatus: 'all',
       currentAppointmentStatus: 'all',
+      currentVisibleAppointments: 'all',
     }),
 }));

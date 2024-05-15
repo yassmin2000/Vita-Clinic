@@ -26,6 +26,8 @@ export default function AppointmentsList() {
     currentPage,
     countPerPage,
     currentAppointmentStatus,
+    currentVisibleAppointments,
+    setCurrentVisibleAppointments,
     reset,
   } = useTableOptions();
 
@@ -35,14 +37,14 @@ export default function AppointmentsList() {
     isLoading,
   } = useQuery({
     queryKey: [
-      `appointments_page_${currentPage}_count_${countPerPage}_status_${currentAppointmentStatus}_sort_${sortBy}_search_${searchValue}`,
+      `appointments_page_${currentPage}_count_${countPerPage}_status_${currentAppointmentStatus}_show_${currentVisibleAppointments}_sort_${sortBy}_search_${searchValue}`,
     ],
     queryFn: async () => {
       let url = '';
       if (role === 'patient') {
         url = `${process.env.NEXT_PUBLIC_API_URL}/users/patients/appointments?page=${currentPage}&limit=${countPerPage}&status=${currentAppointmentStatus}&value=${searchValue}&sort=${sortBy}`;
       } else {
-        url = `${process.env.NEXT_PUBLIC_API_URL}/appointments?page=${currentPage}&limit=${countPerPage}&status=${currentAppointmentStatus}&value=${searchValue}&sort=${sortBy}`;
+        url = `${process.env.NEXT_PUBLIC_API_URL}/appointments?page=${currentPage}&limit=${countPerPage}&status=${currentAppointmentStatus}&doctor=${currentVisibleAppointments === 'yours' ? true : false}&value=${searchValue}&sort=${sortBy}`;
       }
 
       const response = await axios.get(url, {
@@ -59,12 +61,16 @@ export default function AppointmentsList() {
   useEffect(() => {
     reset();
     setSortBy('date-desc');
-  }, []);
+    if (role === 'doctor') {
+      setCurrentVisibleAppointments('yours');
+    }
+  }, [role]);
 
   return (
     <>
       <FiltersBar
         refetch={refetch}
+        appointmentsVisibleFilter={role === 'doctor'}
         appointmentStatusFilter
         searchFilter
         searchPlaceholder={
