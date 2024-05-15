@@ -5,6 +5,8 @@ import PatientsAgeSexDistributionChart from './_components/PatientsAgeSexDistrib
 import AppointmentsCalendarChart from './_components/AppointmentsCalendarChart';
 import DoctorsSexChart from './_components/DoctorsSexChart';
 import DoctorsCompletedAppointmentsChart from './_components/DoctorsCompletedAppointmentsChart';
+import MedicalServicesInsights from './_components/MedicalServicesInsights';
+import MedicalInsights from './_components/MedicalInsights';
 
 import { getUserRole } from '@/lib/auth';
 
@@ -25,15 +27,13 @@ export default async function Home() {
             <AppointmentsCalendarChart />
 
             <div className="flex w-full flex-col gap-4 md:grid md:grid-cols-2">
-              <div>
-                <DoctorsSexChart />
-              </div>
-              <div>
-                <DoctorsCompletedAppointmentsChart />
-              </div>
+              <DoctorsSexChart />
+              <DoctorsCompletedAppointmentsChart />
             </div>
           </>
         )}
+
+        {role === 'admin' ? <MedicalServicesInsights /> : <MedicalInsights />}
       </div>
     </section>
   );

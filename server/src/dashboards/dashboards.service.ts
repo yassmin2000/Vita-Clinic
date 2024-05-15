@@ -294,4 +294,232 @@ export class DashboardsService {
 
     return result;
   }
+
+  async getDiagnosesData() {
+    const data = await this.prisma.diagnosis.findMany({
+      select: {
+        name: true,
+        _count: {
+          select: {
+            patientDiagnosis: true,
+          },
+        },
+      },
+      orderBy: {
+        patientDiagnosis: {
+          _count: 'desc',
+        },
+      },
+      take: 5,
+    });
+
+    return data.map((item) => ({
+      name: item.name,
+      count: item._count.patientDiagnosis,
+    }));
+  }
+
+  async getMedicationsData() {
+    const data = await this.prisma.medication.findMany({
+      select: {
+        name: true,
+        _count: {
+          select: {
+            patientMedication: true,
+            prescriptions: true,
+          },
+        },
+      },
+      orderBy: [
+        {
+          patientMedication: {
+            _count: 'desc',
+          },
+        },
+        {
+          prescriptions: {
+            _count: 'desc',
+          },
+        },
+      ],
+      take: 5,
+    });
+
+    return data.map((item) => ({
+      name: item.name,
+      count: item._count.patientMedication + item._count.prescriptions,
+    }));
+  }
+
+  async getSurgeriesData() {
+    const data = await this.prisma.surgery.findMany({
+      select: {
+        name: true,
+        _count: {
+          select: {
+            patientSurgery: true,
+          },
+        },
+      },
+      orderBy: {
+        patientSurgery: {
+          _count: 'desc',
+        },
+      },
+      take: 5,
+    });
+
+    return data.map((item) => ({
+      name: item.name,
+      count: item._count.patientSurgery,
+    }));
+  }
+
+  async getAllergiesData() {
+    const data = await this.prisma.allergy.findMany({
+      select: {
+        name: true,
+        _count: {
+          select: {
+            patientAllergy: true,
+          },
+        },
+      },
+      orderBy: {
+        patientAllergy: {
+          _count: 'desc',
+        },
+      },
+      take: 5,
+    });
+
+    return data.map((item) => ({
+      name: item.name,
+      count: item._count.patientAllergy,
+    }));
+  }
+
+  async getMedicalInsights() {
+    const diagnoses = await this.getDiagnosesData();
+    const medications = await this.getMedicationsData();
+    const surgeries = await this.getSurgeriesData();
+    const allergies = await this.getAllergiesData();
+
+    return {
+      diagnoses,
+      medications,
+      surgeries,
+      allergies,
+    };
+  }
+
+  async getServicesData() {
+    const data = await this.prisma.service.findMany({
+      select: {
+        name: true,
+        _count: {
+          select: {
+            appointmentServices: true,
+          },
+        },
+      },
+      orderBy: {
+        appointmentServices: {
+          _count: 'desc',
+        },
+      },
+      take: 5,
+    });
+
+    return data.map((item) => ({
+      name: item.name,
+      count: item._count.appointmentServices,
+    }));
+  }
+
+  async getTherapiesData() {
+    const data = await this.prisma.therapy.findMany({
+      select: {
+        name: true,
+        _count: {
+          select: {
+            appointmentServices: true,
+          },
+        },
+      },
+      orderBy: {
+        appointmentServices: {
+          _count: 'desc',
+        },
+      },
+      take: 5,
+    });
+
+    return data.map((item) => ({
+      name: item.name,
+      count: item._count.appointmentServices,
+    }));
+  }
+
+  async getScansData() {
+    const data = await this.prisma.modality.findMany({
+      select: {
+        name: true,
+        _count: {
+          select: {
+            appointmentServices: true,
+          },
+        },
+      },
+      orderBy: {
+        appointmentServices: {
+          _count: 'desc',
+        },
+      },
+      take: 5,
+    });
+
+    return data.map((item) => ({
+      name: item.name,
+      count: item._count.appointmentServices,
+    }));
+  }
+
+  async getLaboratoryTestsData() {
+    const data = await this.prisma.laboratoryTest.findMany({
+      select: {
+        name: true,
+        _count: {
+          select: {
+            appointmentServices: true,
+          },
+        },
+      },
+      orderBy: {
+        appointmentServices: {
+          _count: 'desc',
+        },
+      },
+      take: 5,
+    });
+
+    return data.map((item) => ({
+      name: item.name,
+      count: item._count.appointmentServices,
+    }));
+  }
+
+  async getMedicalServicesInsights() {
+    const services = await this.getServicesData();
+    const therapies = await this.getTherapiesData();
+    const scans = await this.getScansData();
+    const laboratoryTests = await this.getLaboratoryTestsData();
+
+    return {
+      services,
+      therapies,
+      scans,
+      laboratoryTests,
+    };
+  }
 }

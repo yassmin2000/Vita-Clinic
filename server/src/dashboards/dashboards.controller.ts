@@ -106,4 +106,28 @@ export class DashboardsController {
 
     return this.dashboardsService.getDoctorsAppointmentsData(query);
   }
+
+  @UseGuards(JwtGuard)
+  @Get('insights/medical')
+  async getMedicalInsightsData(@Req() request: Request) {
+    const user: Payload = request['user'];
+
+    if (user.role !== 'doctor') {
+      throw new UnauthorizedException();
+    }
+
+    return this.dashboardsService.getMedicalInsights();
+  }
+
+  @UseGuards(JwtGuard)
+  @Get('insights/services')
+  async getServicesInsightsData(@Req() request: Request) {
+    const user: Payload = request['user'];
+
+    if (user.role !== 'admin') {
+      throw new UnauthorizedException();
+    }
+
+    return this.dashboardsService.getMedicalServicesInsights();
+  }
 }

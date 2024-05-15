@@ -38,7 +38,7 @@ export default function Navbar({ role }: NavbarProps) {
     <div className="fixed z-50 flex h-16 w-full items-center justify-between border-b border-primary/10 bg-secondary px-4 py-2">
       <div className="flex items-center">
         {session && <MobileSidebar role={role} />}
-        <Link href="/">
+        <Link href={role === 'patient' ? '/portal' : '/dashboard'}>
           <p
             className={cn(
               'text-3xl font-bold text-zinc-900 dark:text-gray-100',

@@ -125,7 +125,7 @@ export default function PatientsAgeSexDistributionChart() {
             axis: {
               ticks: {
                 line: {
-                  stroke: resolvedTheme === 'dark' ? '#ddd' : '#333',
+                  stroke: resolvedTheme === 'dark' ? '#fff' : '#333',
                 },
               },
               domain: {
