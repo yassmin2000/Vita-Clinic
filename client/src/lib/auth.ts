@@ -15,10 +15,7 @@ async function refreshToken(token: JWT): Promise<JWT> {
       }
     );
 
-    return {
-      ...token,
-      backendTokens: response.data,
-    };
+    return response.data;
   } catch (error) {
     return {
       ...token,
@@ -73,7 +70,11 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
+      if (trigger === 'update') {
+        return await refreshToken(token);
+      }
+
       if (user) {
         return { ...token, ...user };
       }

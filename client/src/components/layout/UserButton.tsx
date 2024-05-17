@@ -66,7 +66,7 @@ export default function UserButton({ user }: UserButtonProps) {
         </DropdownMenuItem>
 
         <DropdownMenuItem asChild>
-          <Link href="/settings">Settings</Link>
+          <Link href="/profile/settings">Settings</Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
 

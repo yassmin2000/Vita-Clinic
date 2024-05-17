@@ -4,7 +4,7 @@ import {
   NotFoundException,
   UnprocessableEntityException,
 } from '@nestjs/common';
-import { hash } from 'bcrypt';
+import { compare, hash } from 'bcrypt';
 import type { Role } from '@prisma/client';
 
 import { PrismaService } from 'src/prisma.service';
@@ -15,6 +15,8 @@ import {
   GetAllUsersQuery,
   ResendEmailVerificationDto,
   ResendPhoneVerificationDto,
+  UpdateAvatarDto,
+  UpdatePasswordDto,
   VerifyUserEmailDto,
   VerifyUserPhoneDto,
 } from './dto/users.dto';
@@ -417,5 +419,51 @@ export class UsersService {
     );
 
     return { message: 'OTP sent successfully' };
+  }
+
+  async updateAvatar(userId: string, updateAvatarDto: UpdateAvatarDto) {
+    const user = await this.findById(userId);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        avatarURL: updateAvatarDto.avatarURL,
+      },
+      select: {
+        id: true,
+        avatarURL: true,
+      },
+    });
+  }
+
+  async updatePassword(userId: string, updatePasswordDto: UpdatePasswordDto) {
+    const user = await this.findById(userId);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const isSamePassword = await compare(
+      updatePasswordDto.currentPassword,
+      user.password,
+    );
+
+    if (!isSamePassword) {
+      throw new ConflictException('Current password is incorrect');
+    }
+
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        password: await hash(updatePasswordDto.newPassword, 10),
+      },
+      select: {
+        id: true,
+      },
+    });
   }
 }

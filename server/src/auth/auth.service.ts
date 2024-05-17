@@ -73,7 +73,9 @@ export class AuthService {
     return result;
   }
 
-  async refreshToken(user: Payload) {
+  async refreshToken(userId: string) {
+    const user = await this.userService.findById(userId);
+
     const payload: Payload = {
       id: user.id,
       email: user.email,
@@ -82,21 +84,24 @@ export class AuthService {
       phoneNumber: user.phoneNumber,
       role: user.role,
       isSuperAdmin: user.isSuperAdmin,
-      avatar: user.avatar,
+      avatar: user.avatarURL,
     };
 
     const EXPIRE_TIME = 5 * 60 * 60 * 1000;
 
     return {
-      accessToken: await this.jwtService.signAsync(payload, {
-        expiresIn: '5h',
-        secret: process.env.JWT_SECRET_KEY,
-      }),
-      refreshToken: await this.jwtService.signAsync(payload, {
-        expiresIn: '7d',
-        secret: process.env.JWT_REFRESH_TOKEN_KEY,
-      }),
-      expiresIn: new Date().setTime(new Date().getTime() + EXPIRE_TIME),
+      user,
+      backendTokens: {
+        accessToken: await this.jwtService.signAsync(payload, {
+          expiresIn: '5h',
+          secret: process.env.JWT_SECRET_KEY,
+        }),
+        refreshToken: await this.jwtService.signAsync(payload, {
+          expiresIn: '7d',
+          secret: process.env.JWT_REFRESH_TOKEN_KEY,
+        }),
+        expiresIn: new Date().setTime(new Date().getTime() + EXPIRE_TIME),
+      },
     };
   }
 }

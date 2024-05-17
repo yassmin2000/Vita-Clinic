@@ -14,7 +14,11 @@ import {
 import { UsersService } from './users.service';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
 
-import { CreateUserDto } from './dto/users.dto';
+import {
+  CreateUserDto,
+  UpdateAvatarDto,
+  UpdatePasswordDto,
+} from './dto/users.dto';
 import type { Payload } from 'src/types/payload.type';
 
 @Controller('users')
@@ -62,5 +66,27 @@ export class UsersController {
     }
 
     return this.userService.activate(id);
+  }
+
+  @UseGuards(JwtGuard)
+  @Patch('avatar')
+  async updateUserAvatar(
+    @Req() request: Request,
+    @Body(ValidationPipe) dto: UpdateAvatarDto,
+  ) {
+    const user: Payload = request['user'];
+
+    return this.userService.updateAvatar(user.id, dto);
+  }
+
+  @UseGuards(JwtGuard)
+  @Patch('password')
+  async updateUserPassword(
+    @Req() request: Request,
+    @Body(ValidationPipe) dto: UpdatePasswordDto,
+  ) {
+    const user: Payload = request['user'];
+
+    return this.userService.updatePassword(user.id, dto);
   }
 }

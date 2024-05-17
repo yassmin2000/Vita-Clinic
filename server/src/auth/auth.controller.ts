@@ -43,7 +43,7 @@ export class AuthController {
   @Post('refresh')
   async refreshToken(@Req() request: Request) {
     const user: Payload = request['user'];
-    return this.authService.refreshToken(user);
+    return this.authService.refreshToken(user.id);
   }
 
   @Post('register')

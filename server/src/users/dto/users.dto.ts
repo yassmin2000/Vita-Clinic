@@ -198,3 +198,19 @@ export class GetAllUsersQuery {
     | 'isActive-desc'
     | 'isActive-asc';
 }
+
+export class UpdateAvatarDto {
+  @IsOptional()
+  @IsString()
+  avatarURL?: string;
+}
+
+export class UpdatePasswordDto {
+  @IsNotEmpty()
+  @IsString()
+  currentPassword: string;
+
+  @IsNotEmpty()
+  @IsString()
+  newPassword: string;
+}
