@@ -57,7 +57,7 @@ const routes = [
   },
   {
     icon: TestTubes,
-    href: '/results',
+    href: '/test-results',
     label: 'Laboratory Test Results',
   },
   {

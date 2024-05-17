@@ -43,7 +43,7 @@ export default function AppointmentTestResults({
     <div className="flex flex-col gap-4 px-6">
       <div className="flex items-center justify-between">
         <span className="text-xl font-semibold text-primary">
-          Appointment Laboard Test Results
+          Appointment Laboratory Test Results
         </span>
 
         {role === 'doctor' && (

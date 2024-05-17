@@ -1,16 +1,6 @@
-import { redirect } from 'next/navigation';
-
 import PrescriptionsList from '@/components/lists/PrescriptionsList';
 
-import { getUserRole } from '@/lib/auth';
-
 export default async function PrescriptionsPage() {
-  const { role } = await getUserRole();
-
-  if (role !== 'patient') {
-    return redirect('/dashboard');
-  }
-
   return (
     <section className="container mx-auto px-2 py-8 md:px-4">
       <div className="flex flex-col gap-4">

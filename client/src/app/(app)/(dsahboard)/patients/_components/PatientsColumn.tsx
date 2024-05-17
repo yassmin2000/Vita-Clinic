@@ -23,6 +23,7 @@ import {
   Pill,
   ShieldMinus,
   ShieldPlus,
+  TestTubes,
 } from 'lucide-react';
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -198,6 +199,13 @@ const ActionsCell = ({ row }: { row: Row<Patient> }) => {
             <DropdownMenuItem asChild>
               <div className="flex items-center gap-2">
                 <FileScan className="h-4 w-4" /> View Patient Scans
+              </div>
+            </DropdownMenuItem>
+          </Link>
+          <Link href={`/patients/${userId}/test-results`}>
+            <DropdownMenuItem asChild>
+              <div className="flex items-center gap-2">
+                <TestTubes className="h-4 w-4" /> View Patient Test Results
               </div>
             </DropdownMenuItem>
           </Link>
