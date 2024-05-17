@@ -17,9 +17,10 @@ import { AppointmentsService } from './appointments.service';
 import { ReportsService } from './reports/reports.service';
 import { ScansService } from './scans/scans.service';
 import { TreatmentService } from './treatments/treatments.service';
+import { PrescriptionsService } from './prescriptions/prescriptions.service';
+import { TestResultsService } from './test-results/test-results.service';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
-import { VitalsService } from './vitals/vitals.service';
-import { CreateVitalsDto, UpdateVitalsDto } from './vitals/dto/vitals.dto';
+
 import {
   ApproveAppointmentDto,
   CompleteAppointmentDto,
@@ -27,7 +28,6 @@ import {
   GetAllAppointmentsQuery,
 } from './dto/appointments.dto';
 import type { Payload } from 'src/types/payload.type';
-import { PrescriptionsService } from './prescriptions/prescriptions.service';
 
 @Controller('appointments')
 export class AppointmentsController {
@@ -37,6 +37,7 @@ export class AppointmentsController {
     private readonly scansService: ScansService,
     private readonly treatmentService: TreatmentService,
     private readonly prescriptionsService: PrescriptionsService,
+    private readonly testResultsService: TestResultsService,
   ) {}
 
   @UseGuards(JwtGuard)
@@ -89,6 +90,23 @@ export class AppointmentsController {
   }
 
   @UseGuards(JwtGuard)
+  @Get(':id/scans')
+  async getAppointmentScansById(
+    @Param('id') id: string,
+    @Req() request: Request,
+  ) {
+    const user: Payload = request['user'];
+
+    const scans = await this.scansService.findAllByAppointmentId(id);
+
+    if (user.role === 'patient') {
+      return scans.filter((scan) => scan.appointment.patientId === user.id);
+    }
+
+    return scans;
+  }
+
+  @UseGuards(JwtGuard)
   @Get(':id/treatments')
   async getAppointmentTreatmentsById(
     @Param('id') id: string,
@@ -108,20 +126,43 @@ export class AppointmentsController {
   }
 
   @UseGuards(JwtGuard)
-  @Get(':id/scans')
-  async getAppointmentScansById(
+  @Get(':id/prescriptions')
+  async getAppointmentPrescriptionsById(
     @Param('id') id: string,
     @Req() request: Request,
   ) {
     const user: Payload = request['user'];
 
-    const scans = await this.scansService.findAllByAppointmentId(id);
+    const treatments =
+      await this.prescriptionsService.findAllByAppointmentId(id);
 
     if (user.role === 'patient') {
-      return scans.filter((scan) => scan.appointment.patientId === user.id);
+      return treatments.filter(
+        (treatment) => treatment.appointment.patientId === user.id,
+      );
     }
 
-    return scans;
+    return treatments;
+  }
+
+  @UseGuards(JwtGuard)
+  @Get(':id/test-results')
+  async getAppointmentTestResultsById(
+    @Param('id') id: string,
+    @Req() request: Request,
+  ) {
+    const user: Payload = request['user'];
+
+    const testResults =
+      await this.testResultsService.findAllByAppointmentId(id);
+
+    if (user.role === 'patient') {
+      return testResults.filter(
+        (testResult) => testResult.appointment.patientId === user.id,
+      );
+    }
+
+    return testResults;
   }
 
   @UseGuards(JwtGuard)
@@ -198,25 +239,5 @@ export class AppointmentsController {
     }
 
     return this.appointmentsService.cancel(id);
-  }
-
-  @UseGuards(JwtGuard)
-  @Get(':id/prescriptions')
-  async getAppointmentPrescriptionsById(
-    @Param('id') id: string,
-    @Req() request: Request,
-  ) {
-    const user: Payload = request['user'];
-
-    const treatments =
-      await this.prescriptionsService.findAllByAppointmentId(id);
-
-    if (user.role === 'patient') {
-      return treatments.filter(
-        (treatment) => treatment.appointment.patientId === user.id,
-      );
-    }
-
-    return treatments;
   }
 }

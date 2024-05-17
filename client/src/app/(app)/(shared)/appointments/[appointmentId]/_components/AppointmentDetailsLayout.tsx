@@ -9,10 +9,11 @@ import AppointmentScans from './AppointmentScans';
 import AppointmentPrescriptions from './AppointmentPrescriptions';
 import { Separator } from '@/components/ui/separator';
 import AppointmentDetailsCardSkeleton from './AppointmentDetailsCardSkeleton';
+import AppointmentTreatments from './AppointmentTreatments';
+import AppointmentTestResults from './AppointmentTestResults';
 
 import useAccessToken from '@/hooks/useAccessToken';
 import type { AppointmentDetails } from '@/types/appointments.type';
-import AppointmentTreatments from './AppointmentTreatments';
 
 interface AppointmentDetailsLayoutProps {
   appointmentId: string;
@@ -59,6 +60,8 @@ export default function AppointmentDetailsLayout({
             <AppointmentPrescriptions appointmentId={appointmentId} />
             <Separator className="my-1" />
             <AppointmentTreatments appointmentId={appointmentId} />
+            <Separator className="my-1" />
+            <AppointmentTestResults appointmentId={appointmentId} />
           </>
         )}
     </div>

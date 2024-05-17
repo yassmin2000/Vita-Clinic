@@ -1,11 +1,13 @@
 'use client';
 
 import { useState } from 'react';
+import axios from 'axios';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Dropzone from 'react-dropzone';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ArrowLeft, ArrowRight, Cloud, File, Files } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Cloud, File } from 'lucide-react';
 
 import {
   Form,
@@ -16,19 +18,18 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { Combobox } from '@/components/ui/combobox';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
+import { useToast } from '@/components/ui/use-toast';
 
 import { useUploadThing } from '@/lib/uploadthing';
-import { cn } from '@/lib/utils';
-import { Combobox } from '@/components/ui/combobox';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import axios from 'axios';
 import useAccessToken from '@/hooks/useAccessToken';
-import { useToast } from '@/components/ui/use-toast';
-import { PriceLookup } from '@/types/settings.type';
+import { cn } from '@/lib/utils';
+
+import type { PriceLookup } from '@/types/settings.type';
 
 const formSchema = z.object({
   title: z
@@ -84,7 +85,7 @@ export default function CreateScanForm({
       const data = response.data as PriceLookup[];
 
       return data.map((modality) => ({
-        label: `${modality.name} (${modality.price}$)`,
+        label: `${modality.name}`,
         value: modality.id,
       }));
     },

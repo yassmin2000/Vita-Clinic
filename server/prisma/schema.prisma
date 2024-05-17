@@ -397,9 +397,8 @@ model AppointmentServices {
 }
 
 model Vitals {
-  id                     String  @id @default(uuid())
+  id                     String @id @default(uuid())
   temperature            Float?
-  bloodPressure          String?
   systolicBloodPressure  Int?
   diastolicBloodPressure Int?
   heartRate              Int?
@@ -522,6 +521,7 @@ model Biomarker {
   unit         String
 
   laboratoryTest LaboratoryTest[]
+  values         BiomarkerValue[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -541,15 +541,29 @@ model LaboratoryTest {
   updatedAt DateTime @updatedAt
 }
 
+model BiomarkerValue {
+  id    String @id @default(uuid())
+  value Float
+
+  biomarker   Biomarker @relation(fields: [biomarkerId], references: [id])
+  biomarkerId String
+
+  laboratoryTestResult   LaboratoryTestResult @relation(fields: [laboratoryTestResultId], references: [id])
+  laboratoryTestResultId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model LaboratoryTestResult {
-  id     String   @id @default(uuid())
-  result String
-  date   DateTime
+  id    String  @id @default(uuid())
+  title String
+  notes String?
 
   laboratoryTest   LaboratoryTest @relation(fields: [laboratoryTestId], references: [id])
   laboratoryTestId String
 
-  results Float[]
+  values BiomarkerValue[]
 
   appointment   Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
   appointmentId String

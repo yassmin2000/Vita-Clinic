@@ -1,4 +1,9 @@
-import type { LaboratoryTest, PriceLookup, Therapy } from './settings.type';
+import type {
+  Biomarker,
+  LaboratoryTest,
+  PriceLookup,
+  Therapy,
+} from './settings.type';
 import type { Insurance, PatientMedication } from './emr.type';
 
 export type AppointmentStatus =
@@ -76,6 +81,21 @@ export type Treatment = {
   response?: string;
   sideEffect?: string;
   notes?: string;
+  createdAt: string;
+};
+
+export type TestResult = {
+  id: string;
+  appointmentId: string;
+  title: string;
+  notes?: string;
+  laboratoryTestId: string;
+  laboratoryTest: LaboratoryTest;
+  values: {
+    id: string;
+    value: number;
+    biomarker: Biomarker;
+  }[];
   createdAt: string;
 };
 

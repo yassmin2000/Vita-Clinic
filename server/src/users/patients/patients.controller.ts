@@ -20,6 +20,8 @@ import { AppointmentsService } from 'src/appointments/appointments.service';
 import { ReportsService } from 'src/appointments/reports/reports.service';
 import { ScansService } from 'src/appointments/scans/scans.service';
 import { TreatmentService } from 'src/appointments/treatments/treatments.service';
+import { PrescriptionsService } from 'src/appointments/prescriptions/prescriptions.service';
+import { TestResultsService } from 'src/appointments/test-results/test-results.service';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
 
 import {
@@ -31,9 +33,9 @@ import { GetAllAppointmentsQuery } from 'src/appointments/dto/appointments.dto';
 import { GetPatientReportsQuery } from 'src/appointments/reports/dto/reports.dto';
 import { GetPatientTreatmentsQuery } from 'src/appointments/treatments/dto/treatments.dto';
 import { GetPatientScansQuery } from 'src/appointments/scans/dto/scans.dto';
-import type { Payload } from 'src/types/payload.type';
-import { PrescriptionsService } from 'src/appointments/prescriptions/prescriptions.service';
 import { GetPatientPrescriptionsQuery } from 'src/appointments/prescriptions/dto/prescriptions.dto';
+import { GetPatientTestResultsQuery } from 'src/appointments/test-results/dto/test-results.dto';
+import type { Payload } from 'src/types/payload.type';
 
 @Controller('/users/patients')
 export class PatientsController {
@@ -45,6 +47,7 @@ export class PatientsController {
     private readonly scansService: ScansService,
     private readonly treatmentService: TreatmentService,
     private readonly prescriptionsService: PrescriptionsService,
+    private readonly testResultsService: TestResultsService,
   ) {}
 
   @UseGuards(JwtGuard)
@@ -272,5 +275,38 @@ export class PatientsController {
     }
 
     return this.prescriptionsService.findAllByPatientId(id, query);
+  }
+
+  @UseGuards(JwtGuard)
+  @Get('test-results')
+  async getPatientTestResults(
+    @Req() request: Request,
+    @Query(new ValidationPipe({ transform: true }))
+    query: GetPatientTestResultsQuery,
+  ) {
+    const user: Payload = request['user'];
+
+    if (user.role !== 'patient') {
+      throw new UnauthorizedException();
+    }
+
+    return this.testResultsService.findAllByPatientId(user.id, query);
+  }
+
+  @UseGuards(JwtGuard)
+  @Get(':id/test-results')
+  async getPatientTestResultsById(
+    @Param('id') id: string,
+    @Req() request: Request,
+    @Query(new ValidationPipe({ transform: true }))
+    query: GetPatientTestResultsQuery,
+  ) {
+    const user: Payload = request['user'];
+
+    if (user.role === 'patient') {
+      throw new UnauthorizedException();
+    }
+
+    return this.testResultsService.findAllByPatientId(id, query);
   }
 }

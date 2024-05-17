@@ -21,6 +21,8 @@ import { ScansService } from './scans/scans.service';
 import { VitalsModule } from './vitals/vitals.module';
 import { TreatmentService } from './treatments/treatments.service';
 import { PrescriptionsService } from './prescriptions/prescriptions.service';
+import { TestResultsModule } from './test-results/test-results.module';
+import { TestResultsService } from './test-results/test-results.service';
 
 @Module({
   imports: [
@@ -29,6 +31,7 @@ import { PrescriptionsService } from './prescriptions/prescriptions.service';
     VitalsModule,
     TreatmentsModule,
     PrescriptionsModule,
+    TestResultsModule,
   ],
   controllers: [AppointmentsController],
   providers: [
@@ -36,8 +39,8 @@ import { PrescriptionsService } from './prescriptions/prescriptions.service';
     PrismaService,
     JwtService,
     LogService,
-    ReportsService,
 
+    ReportsService,
     ScansService,
     BiomarkersService,
     LaboratoryTestsService,
@@ -46,6 +49,7 @@ import { PrescriptionsService } from './prescriptions/prescriptions.service';
     TherapiesService,
     TreatmentService,
     PrescriptionsService,
+    TestResultsService,
   ],
 })
 export class AppointmentsModule {}
