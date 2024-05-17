@@ -5,8 +5,6 @@ import axios from 'axios';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { format } from 'date-fns';
-import { CalendarIcon } from 'lucide-react';
 
 import {
   Form,
@@ -24,9 +22,7 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 
 import useAccessToken from '@/hooks/useAccessToken';
-import { cn } from '@/lib/utils';
-
-import type { Medication, Therapy } from '@/types/settings.type';
+import type { Therapy } from '@/types/settings.type';
 
 const formSchema = z.object({
   name: z.string({
@@ -56,12 +52,14 @@ const formSchema = z.object({
 interface TreatmentFormProps {
   appointmentId: string;
   onClose: () => void;
+  treatmentId?: string;
   defaultValues?: z.infer<typeof formSchema>;
 }
 
 export default function TreatmentForm({
   appointmentId,
   onClose,
+  treatmentId,
   defaultValues,
 }: TreatmentFormProps) {
   const form = useForm<z.infer<typeof formSchema>>({
@@ -101,30 +99,46 @@ export default function TreatmentForm({
 
   const { mutate: mutateTreatment, isPending } = useMutation({
     mutationFn: async (values: z.infer<typeof formSchema>) => {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/treatments`,
-        {
-          name: values.name,
-          appointmentId,
-          therapyId: values.therapy.value,
-          dosage: values.dosage,
-          duration: values.duration,
-          response: values.response,
-          sideEffect: values.sideEffect,
-          notes: values.notes,
-        },
-        {
-          headers: {
-            authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
+      const body = {
+        name: values.name,
+        appointmentId,
+        therapyId: values.therapy.value,
+        dosage: values.dosage,
+        duration: values.duration,
+        response: values.response,
+        sideEffect: values.sideEffect,
+        notes: values.notes,
+      };
 
-      return response;
+      if (treatmentId) {
+        const response = await axios.patch(
+          `${process.env.NEXT_PUBLIC_API_URL}/treatments/${treatmentId}`,
+          body,
+          {
+            headers: {
+              authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
+
+        return response;
+      } else {
+        const response = await axios.post(
+          `${process.env.NEXT_PUBLIC_API_URL}/treatments`,
+          body,
+          {
+            headers: {
+              authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
+
+        return response;
+      }
     },
     onError: () => {
       return toast({
-        title: `Failed to create treatment`,
+        title: `Failed to ${treatmentId ? 'update' : 'create'} treatment`,
         description: 'Please try again later.',
         variant: 'destructive',
       });
@@ -137,11 +151,13 @@ export default function TreatmentForm({
       onClose();
 
       return toast({
-        title: `Created treatment successfully`,
-        description: `Treatment has been created successfully.`,
+        title: `${treatmentId ? 'Updated' : 'Created'} treatment successfully`,
+        description: `Treatment has been ${treatmentId ? 'updated' : 'created'} successfully.`,
       });
     },
   });
+
+  const isLoading = isPending || isLoadingTherapies;
 
   return (
     <Form {...form}>
@@ -151,9 +167,13 @@ export default function TreatmentForm({
       >
         <div className="w-full space-y-2">
           <div>
-            <h3 className="text-lg font-medium">Create Treatment</h3>
+            <h3 className="text-lg font-medium">
+              {treatmentId ? 'Update Treatment' : 'Create Treatment'}
+            </h3>
             <p className="text-sm text-muted-foreground">
-              Create a new treatment for the patient in this appointment.
+              {treatmentId
+                ? 'Update the treatment details for the patient in this appointment.'
+                : 'Create a new treatment for the patient in this appointment.'}
             </p>
           </div>
           <Separator className="bg-primary/10" />
@@ -170,6 +190,7 @@ export default function TreatmentForm({
                   <Input
                     placeholder="Treatment title..."
                     {...field}
+                    disabled={isLoading}
                     onChange={(event) => field.onChange(event.target.value)}
                   />
                 </FormControl>
@@ -207,7 +228,7 @@ export default function TreatmentForm({
                           }))
                         : []
                     }
-                    disabled={isLoadingTherapies}
+                    disabled={isLoading || Boolean(treatmentId)}
                   />
                 </FormControl>
                 <FormMessage />
@@ -230,6 +251,7 @@ export default function TreatmentForm({
                     type="number"
                     placeholder="10"
                     {...field}
+                    disabled={isLoading}
                     onChange={(event) => field.onChange(+event.target.value)}
                   />
                 </FormControl>
@@ -249,6 +271,7 @@ export default function TreatmentForm({
                     type="number"
                     placeholder="6"
                     {...field}
+                    disabled={isLoading}
                     onChange={(event) => field.onChange(+event.target.value)}
                   />
                 </FormControl>
@@ -267,6 +290,7 @@ export default function TreatmentForm({
                   <Input
                     placeholder="Patient response..."
                     {...field}
+                    disabled={isLoading}
                     onChange={(event) => field.onChange(event.target.value)}
                   />
                 </FormControl>
@@ -285,6 +309,7 @@ export default function TreatmentForm({
                   <Input
                     placeholder="Side effects..."
                     {...field}
+                    disabled={isLoading}
                     onChange={(event) => field.onChange(event.target.value)}
                   />
                 </FormControl>
@@ -302,6 +327,7 @@ export default function TreatmentForm({
                 <FormControl>
                   <Textarea
                     value={field.value || ''}
+                    disabled={isLoading}
                     onChange={field.onChange}
                     placeholder="Notes..."
                     minRows={4}
@@ -314,8 +340,8 @@ export default function TreatmentForm({
         </div>
 
         <div className="flex justify-between gap-2">
-          <Button type="submit" size="sm" disabled={isPending}>
-            Create Prescription
+          <Button type="submit" size="sm" disabled={isLoading}>
+            {treatmentId ? 'Update Treatment' : 'Create Treatment'}
           </Button>
         </div>
       </form>

@@ -5,7 +5,7 @@ import { Plus } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import Modal from '@/components/Modal';
-import CreateReportForm from './CreateReportForm';
+import ReportForm from './ReportForm';
 
 interface NewReportButtonProps {
   appointmentId: string;
@@ -27,7 +27,7 @@ export default function NewReportButton({
         onClose={() => setIsOpen(false)}
         className="h-fit px-6 py-8"
       >
-        <CreateReportForm
+        <ReportForm
           appointmentId={appointmentId}
           onClose={() => setIsOpen(false)}
         />

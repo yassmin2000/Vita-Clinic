@@ -69,12 +69,14 @@ const formSchema = z.object({
 interface PrescriptionFormProps {
   appointmentId: string;
   onClose: () => void;
+  prescriptionId?: string;
   defaultValues?: z.infer<typeof formSchema>;
 }
 
 export default function PrescriptionForm({
   appointmentId,
   onClose,
+  prescriptionId,
   defaultValues,
 }: PrescriptionFormProps) {
   const form = useForm<z.infer<typeof formSchema>>({
@@ -112,32 +114,48 @@ export default function PrescriptionForm({
     enabled: !!accessToken,
   });
 
-  const { mutate: mutatePrescriptions, isPending } = useMutation({
+  const { mutate: mutatePrescription, isPending } = useMutation({
     mutationFn: async (values: z.infer<typeof formSchema>) => {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/prescriptions`,
-        {
-          appointmentId,
-          medicationId: values.medication.value,
-          notes: values.notes,
-          startDate: values.startDate,
-          endDate: values.endDate,
-          dosage: values.dosage,
-          frequency: values.frequency,
-          required: values.required || false,
-        },
-        {
-          headers: {
-            authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
+      const body = {
+        appointmentId,
+        medicationId: values.medication.value,
+        notes: values.notes,
+        startDate: values.startDate,
+        endDate: values.endDate,
+        dosage: values.dosage,
+        frequency: values.frequency,
+        required: values.required || false,
+      };
 
-      return response;
+      if (prescriptionId) {
+        const response = await axios.patch(
+          `${process.env.NEXT_PUBLIC_API_URL}/prescriptions/${prescriptionId}`,
+          body,
+          {
+            headers: {
+              authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
+
+        return response;
+      } else {
+        const response = await axios.post(
+          `${process.env.NEXT_PUBLIC_API_URL}/prescriptions`,
+          body,
+          {
+            headers: {
+              authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
+
+        return response;
+      }
     },
     onError: () => {
       return toast({
-        title: `Failed to create prescription`,
+        title: `Failed to ${prescriptionId ? 'update' : 'create'} prescription`,
         description: 'Please try again later.',
         variant: 'destructive',
       });
@@ -150,23 +168,29 @@ export default function PrescriptionForm({
       onClose();
 
       return toast({
-        title: `Created prescription successfully`,
-        description: `Prescription has been created successfully.`,
+        title: `${prescriptionId ? 'Updated' : 'Created'} prescription successfully`,
+        description: `Prescription has been ${prescriptionId ? 'updated' : 'created'} successfully.`,
       });
     },
   });
 
+  const isLoading = isPending || isLoadingMedications;
+
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit((e) => mutatePrescriptions(e))}
+        onSubmit={form.handleSubmit((e) => mutatePrescription(e))}
         className="space-y-6 px-4 py-2 text-foreground"
       >
         <div className="w-full space-y-2">
           <div>
-            <h3 className="text-lg font-medium">Create Prescription</h3>
+            <h3 className="text-lg font-medium">
+              {prescriptionId ? 'Update Prescription' : 'Create Prescription'}
+            </h3>
             <p className="text-sm text-muted-foreground">
-              Create a new prescription for the patient in this appointment.
+              {prescriptionId
+                ? 'Update the prescription details for the patient in this appointment.'
+                : 'Create a new prescription for the patient in this appointment.'}
             </p>
           </div>
           <Separator className="bg-primary/10" />
@@ -204,7 +228,7 @@ export default function PrescriptionForm({
                           }))
                         : []
                     }
-                    disabled={isLoadingMedications}
+                    disabled={isLoading || Boolean(prescriptionId)}
                   />
                 </FormControl>
                 <FormMessage />
@@ -228,6 +252,7 @@ export default function PrescriptionForm({
                     placeholder="10"
                     {...field}
                     onChange={(event) => field.onChange(+event.target.value)}
+                    disabled={isLoading}
                   />
                 </FormControl>
                 <FormMessage />
@@ -245,6 +270,7 @@ export default function PrescriptionForm({
                   onValueChange={field.onChange}
                   value={field.value}
                   defaultValue={field.value}
+                  disabled={isLoading}
                 >
                   <FormControl>
                     <SelectTrigger className="bg-background">
@@ -277,6 +303,7 @@ export default function PrescriptionForm({
                     <FormControl>
                       <Button
                         variant="outline"
+                        disabled={isLoading}
                         className={cn(
                           'flex h-10 w-full pl-3 text-left font-normal',
                           !field.value && 'text-muted-foreground'
@@ -322,6 +349,7 @@ export default function PrescriptionForm({
                     <FormControl>
                       <Button
                         variant="outline"
+                        disabled={isLoading}
                         className={cn(
                           'flex h-10 w-full pl-3 text-left font-normal',
                           !field.value && 'text-muted-foreground'
@@ -372,6 +400,7 @@ export default function PrescriptionForm({
                       onClick={() => {
                         field.onChange(!field.value);
                       }}
+                      disabled={isLoading}
                     />
                     <label
                       htmlFor="required"
@@ -396,6 +425,7 @@ export default function PrescriptionForm({
                   <Textarea
                     value={field.value || ''}
                     onChange={field.onChange}
+                    disabled={isLoading}
                     placeholder="Notes..."
                     minRows={4}
                   />
@@ -407,8 +437,8 @@ export default function PrescriptionForm({
         </div>
 
         <div className="flex justify-between gap-2">
-          <Button type="submit" size="sm" disabled={isPending}>
-            Create Prescription
+          <Button type="submit" size="sm" disabled={isLoading}>
+            {prescriptionId ? 'Update Prescription' : 'Create Prescription'}
           </Button>
         </div>
       </form>

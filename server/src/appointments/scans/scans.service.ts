@@ -106,7 +106,7 @@ export class ScansService {
   }
 
   async update(id: string, updateScanDto: UpdateScanDto) {
-    const { title, notes, scanURLs } = updateScanDto;
+    const { title, notes } = updateScanDto;
 
     const existingScan = await this.prisma.scan.findUnique({
       where: { id },
@@ -121,7 +121,6 @@ export class ScansService {
       data: {
         title,
         notes,
-        scanURLs,
       },
     });
   }

@@ -45,15 +45,19 @@ const formSchema = z.object({
   notes: z.string().optional(),
 });
 
-interface CreateScanFormProps {
+interface ScanFormProps {
   appointmentId: string;
   onClose: () => void;
+  scanId?: string;
+  defaultValues?: z.infer<typeof formSchema>;
 }
 
-export default function CreateScanForm({
+export default function ScanForm({
   appointmentId,
   onClose,
-}: CreateScanFormProps) {
+  scanId,
+  defaultValues,
+}: ScanFormProps) {
   const [files, setFiles] = useState<File[]>([]);
   const [fileError, setFileError] = useState(false);
 
@@ -68,6 +72,7 @@ export default function CreateScanForm({
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    defaultValues,
   });
 
   const { data: modalities, isLoading: isLoadingModalities } = useQuery({
@@ -92,8 +97,26 @@ export default function CreateScanForm({
     enabled: !!accessToken,
   });
 
-  const { mutate: createScan, isPending } = useMutation({
+  const { mutate: mutateScan, isPending } = useMutation({
     mutationFn: async () => {
+      if (scanId) {
+        const response = await axios.patch(
+          `${process.env.NEXT_PUBLIC_API_URL}/scans/${scanId}`,
+          {
+            title: form.getValues('title'),
+            notes: form.getValues('notes'),
+          },
+          {
+            headers: {
+              authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
+
+        onClose();
+        return response;
+      }
+
       if (files.length === 0) {
         setFileError(true);
         return;
@@ -124,15 +147,15 @@ export default function CreateScanForm({
     },
     onError: () => {
       return toast({
-        title: `Failed to create new scan`,
+        title: `Failed to ${scanId ? 'update' : 'create new'} scan`,
         description: 'Please try again later.',
         variant: 'destructive',
       });
     },
     onSuccess: () => {
       return toast({
-        title: `Scan created successfully`,
-        description: 'The scan has been created successfully.',
+        title: `Scan ${scanId ? 'updated' : 'created'} successfully`,
+        description: `The scan has been ${scanId ? 'updated' : 'created'} successfully.`,
       });
     },
     onSettled: () => {
@@ -227,6 +250,7 @@ export default function CreateScanForm({
                         onChange={field.onChange}
                         placeholder="Select modality..."
                         inputPlaceholder="Search modality..."
+                        disabled={isLoading || Boolean(scanId)}
                         options={modalities || []}
                       />
                     </FormControl>
@@ -365,7 +389,7 @@ export default function CreateScanForm({
             Previous
           </Button>
 
-          {currentStep === 1 ? (
+          {currentStep === 1 && !scanId ? (
             <Button
               type="submit"
               size="sm"
@@ -380,15 +404,15 @@ export default function CreateScanForm({
               size="sm"
               disabled={isLoading}
               onClick={() => {
-                if (files.length === 0) {
+                if (files.length === 0 && !scanId) {
                   setFileError(true);
                 } else {
                   setFileError(false);
-                  createScan();
+                  mutateScan();
                 }
               }}
             >
-              Create Scan
+              {scanId ? 'Update Scan' : 'Create Scan'}
             </Button>
           )}
         </div>

@@ -7,6 +7,7 @@ import { Info, Pencil, Plus } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Modal from '@/components/Modal';
+import PrescriptionForm from '@/app/(app)/(shared)/appointments/[appointmentId]/_components/PrescriptionForm';
 import { Separator } from '@/components/ui/separator';
 import {
   Tooltip,
@@ -31,6 +32,7 @@ export default function PrescriptionItem({
 }: PrescriptionItemProps) {
   const { role } = useUserRole();
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   const Icon = dosageForms.find(
     (form) => form.value === prescription.medication.dosageForm
@@ -91,7 +93,7 @@ export default function PrescriptionItem({
 
         <div className="flex gap-1">
           {role && role === 'doctor' && (
-            <Button size="sm">
+            <Button size="sm" onClick={() => setIsEditing(true)}>
               <Pencil className="h-4 w-4 sm:mr-2" />
               <span className="sr-only sm:not-sr-only">Edit</span>
             </Button>
@@ -199,6 +201,35 @@ export default function PrescriptionItem({
             )}
           </div>
         </div>
+      </Modal>
+
+      <Modal
+        isOpen={isEditing}
+        onClose={() => setIsEditing(false)}
+        className="px-6 py-8"
+      >
+        <PrescriptionForm
+          appointmentId={prescription.appointmentId}
+          onClose={() => setIsEditing(false)}
+          prescriptionId={prescription.id}
+          defaultValues={{
+            medication: {
+              label: prescription.medication.name,
+              value: prescription.medicationId,
+              unit: prescription.medication.unit,
+            },
+            startDate: prescription.startDate
+              ? new Date(prescription.startDate)
+              : undefined,
+            endDate: prescription.endDate
+              ? new Date(prescription.endDate)
+              : undefined,
+            dosage: prescription.dosage || undefined,
+            frequency: prescription.frequency || undefined,
+            required: prescription.required,
+            notes: prescription.notes,
+          }}
+        />
       </Modal>
     </Card>
   );

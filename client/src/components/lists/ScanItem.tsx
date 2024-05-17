@@ -8,6 +8,7 @@ import { Info, Pencil, Plus } from 'lucide-react';
 import { Card } from '../ui/card';
 import { Button } from '../ui/button';
 import Modal from '../Modal';
+import ScanForm from '@/app/(app)/(shared)/appointments/[appointmentId]/_components/ScanForm';
 import { Separator } from '../ui/separator';
 
 import useUserRole from '@/hooks/useUserRole';
@@ -20,6 +21,7 @@ interface ScanItemProps {
 export default function ScanItem({ scan }: ScanItemProps) {
   const { role } = useUserRole();
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   return (
     <Card className="col-span-1 divide-y divide-accent rounded-lg transition-all hover:shadow-lg dark:shadow-white/10">
@@ -46,7 +48,7 @@ export default function ScanItem({ scan }: ScanItemProps) {
 
         <div className="flex gap-1">
           {role && role === 'doctor' && (
-            <Button size="sm">
+            <Button size="sm" onClick={() => setIsEditing(true)}>
               <Pencil className="h-4 w-4 sm:mr-2" />
               <span className="sr-only sm:not-sr-only">Edit</span>
             </Button>
@@ -107,6 +109,23 @@ export default function ScanItem({ scan }: ScanItemProps) {
             )}
           </div>
         </div>
+      </Modal>
+
+      <Modal
+        isOpen={isEditing}
+        onClose={() => setIsEditing(false)}
+        className="h-fit px-6 py-8"
+      >
+        <ScanForm
+          appointmentId={scan.appointmentId}
+          onClose={() => setIsEditing(false)}
+          scanId={scan.id}
+          defaultValues={{
+            title: scan.title,
+            modality: scan.modality.id,
+            notes: scan.notes,
+          }}
+        />
       </Modal>
     </Card>
   );

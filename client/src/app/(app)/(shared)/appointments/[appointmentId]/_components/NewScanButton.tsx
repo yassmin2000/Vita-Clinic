@@ -5,7 +5,7 @@ import { Plus } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import Modal from '@/components/Modal';
-import CreateScanForm from './CreateScanForm';
+import ScanForm from './ScanForm';
 
 interface NewScanButtonProps {
   appointmentId: string;
@@ -25,7 +25,7 @@ export default function NewScanButton({ appointmentId }: NewScanButtonProps) {
         onClose={() => setIsOpen(false)}
         className="h-fit px-4 py-8"
       >
-        <CreateScanForm
+        <ScanForm
           appointmentId={appointmentId}
           onClose={() => setIsOpen(false)}
         />

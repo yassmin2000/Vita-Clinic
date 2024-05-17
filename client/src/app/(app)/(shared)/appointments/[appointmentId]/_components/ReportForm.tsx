@@ -36,15 +36,19 @@ const formSchema = z.object({
   notes: z.string().optional(),
 });
 
-interface CreateReportFormProps {
+interface ReportFormProps {
   appointmentId: string;
   onClose: () => void;
+  reportId?: string;
+  defaultValues?: z.infer<typeof formSchema>;
 }
 
-export default function CreateReportForm({
+export default function ReportForm({
   appointmentId,
   onClose,
-}: CreateReportFormProps) {
+  reportId,
+  defaultValues,
+}: ReportFormProps) {
   const [file, setFile] = useState<File | null>(null);
   const [fileError, setFileError] = useState(false);
 
@@ -59,10 +63,29 @@ export default function CreateReportForm({
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    defaultValues,
   });
 
-  const { mutate: createReport, isPending } = useMutation({
+  const { mutate: mutateReport, isPending } = useMutation({
     mutationFn: async () => {
+      if (reportId) {
+        const response = await axios.patch(
+          `${process.env.NEXT_PUBLIC_API_URL}/reports/${reportId}`,
+          {
+            title: form.getValues('title'),
+            notes: form.getValues('notes'),
+          },
+          {
+            headers: {
+              authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
+
+        onClose();
+        return response;
+      }
+
       if (!file) {
         setFileError(true);
         return;
@@ -97,15 +120,15 @@ export default function CreateReportForm({
     },
     onError: () => {
       return toast({
-        title: `Failed to create new report`,
+        title: `Failed to ${reportId ? 'update' : 'create new'} report`,
         description: 'Please try again later.',
         variant: 'destructive',
       });
     },
     onSuccess: () => {
       return toast({
-        title: `Report created successfully`,
-        description: 'The report has been created successfully.',
+        title: `Report ${reportId ? 'updated' : 'created'} successfully`,
+        description: `The report has been ${reportId ? 'updated' : 'created'} successfully.`,
       });
     },
     onSettled: () => {
@@ -298,7 +321,7 @@ export default function CreateReportForm({
             Previous
           </Button>
 
-          {currentStep === 1 ? (
+          {currentStep === 1 && !reportId ? (
             <Button
               type="submit"
               size="sm"
@@ -313,15 +336,15 @@ export default function CreateReportForm({
               size="sm"
               disabled={isPending}
               onClick={() => {
-                if (!file) {
+                if (!file && !reportId) {
                   setFileError(true);
                 } else {
                   setFileError(false);
-                  createReport();
+                  mutateReport();
                 }
               }}
             >
-              Create Report
+              {reportId ? 'Update Report' : 'Create Report'}
             </Button>
           )}
         </div>

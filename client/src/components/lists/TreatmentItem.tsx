@@ -7,6 +7,7 @@ import { Info, Pencil, Plus } from 'lucide-react';
 import { Card } from '../ui/card';
 import { Button } from '../ui/button';
 import Modal from '../Modal';
+import TreatmentForm from '@/app/(app)/(shared)/appointments/[appointmentId]/_components/TreatmentForm';
 import { Separator } from '../ui/separator';
 
 import useUserRole from '@/hooks/useUserRole';
@@ -19,6 +20,7 @@ interface TreatmentItemProps {
 export default function TreatmentItem({ treatment }: TreatmentItemProps) {
   const { role } = useUserRole();
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   return (
     <Card className="col-span-1 divide-y divide-accent rounded-lg transition-all hover:shadow-lg dark:shadow-white/10">
@@ -43,7 +45,7 @@ export default function TreatmentItem({ treatment }: TreatmentItemProps) {
 
         <div className="flex gap-1">
           {role && role === 'doctor' && (
-            <Button size="sm">
+            <Button size="sm" onClick={() => setIsEditing(true)}>
               <Pencil className="h-4 w-4 sm:mr-2" />
               <span className="sr-only sm:not-sr-only">Edit</span>
             </Button>
@@ -115,6 +117,31 @@ export default function TreatmentItem({ treatment }: TreatmentItemProps) {
             )}
           </div>
         </div>
+      </Modal>
+
+      <Modal
+        isOpen={isEditing}
+        onClose={() => setIsEditing(false)}
+        className="px-6 py-8"
+      >
+        <TreatmentForm
+          appointmentId={treatment.appointmentId}
+          onClose={() => setIsEditing(false)}
+          treatmentId={treatment.id}
+          defaultValues={{
+            name: treatment.name,
+            therapy: {
+              label: treatment.therapy.name,
+              value: treatment.therapy.id,
+              unit: treatment.therapy.unit || '',
+            },
+            dosage: treatment.dosage,
+            duration: treatment.duration,
+            response: treatment.response || '',
+            sideEffect: treatment.sideEffect || '',
+            notes: treatment.notes || '',
+          }}
+        />
       </Modal>
     </Card>
   );
