@@ -5,6 +5,8 @@ type User = {
   firstName: string;
   lastName: string;
   email: string;
+  phoneNumber: string;
+  address: string;
   birthDate: string;
   sex: 'male' | 'female';
   createdAt: string;
@@ -29,4 +31,18 @@ export type Patient = User & {
     bloodType?: BloodType;
     insurance?: Insurance;
   };
+};
+
+export type Profile = User & {
+  role: 'admin' | 'doctor' | 'patient';
+  isSuperAdmin?: boolean;
+  speciality?: string;
+  emrId?: string;
+  insurance?: Insurance;
+  appointments: number;
+  reports: number;
+  scans: number;
+  prescriptions: number;
+  treatments: number;
+  laboratoryTestResults: number;
 };

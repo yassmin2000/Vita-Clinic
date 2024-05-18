@@ -191,6 +191,107 @@ export class UsersService {
     return user;
   }
 
+  async findProfileById(userId: string, isSuperAdmin: boolean) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: userId,
+        isEmailVerified: true,
+        isActive: isSuperAdmin ? undefined : true,
+      },
+      include: {
+        speciality: true,
+        _count: {
+          select: {
+            doctorAppointments: true,
+            patientAppointments: true,
+          },
+        },
+        emr: {
+          select: {
+            id: true,
+            insurance: true,
+            appointments: {
+              select: {
+                _count: {
+                  select: {
+                    reports: true,
+                    scans: true,
+                    prescriptions: true,
+                    treatments: true,
+                    laboratoryTestResults: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const profile = {
+      id: user.id,
+      role: user.role,
+      isSuperAdmin: user.isSuperAdmin,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      sex: user.sex,
+      speciality: user.role === 'doctor' ? user.speciality.name : null,
+      address: user.address,
+      email: user.email,
+      phoneNumber: user.phoneNumber,
+      avatarURL: user.avatarURL,
+      birthDate: user.birthDate,
+      createdAt: user.createdAt,
+      emrId: user.role === 'patient' && user.emr ? user.emr.id : null,
+      insurance:
+        user.role === 'patient' && user.emr ? user.emr.insurance : null,
+      appointments:
+        user.role === 'doctor'
+          ? user._count.doctorAppointments
+          : user.role === 'patient'
+            ? user._count.patientAppointments
+            : 0,
+      reports:
+        user.role === 'patient' && user.emr
+          ? user.emr.appointments.reduce(
+              (acc, appointment) => acc + appointment._count.reports,
+              0,
+            )
+          : 0,
+      scans:
+        user.role === 'patient' && user.emr
+          ? user.emr.appointments.reduce(
+              (acc, appointment) => acc + appointment._count.scans,
+              0,
+            )
+          : 0,
+      prescriptions:
+        user.role === 'patient' && user.emr
+          ? user.emr.appointments.reduce(
+              (acc, appointment) => acc + appointment._count.prescriptions,
+              0,
+            )
+          : 0,
+      treatments:
+        user.role === 'patient' && user.emr
+          ? user.emr.appointments.reduce(
+              (acc, appointment) => acc + appointment._count.treatments,
+              0,
+            )
+          : 0,
+      laboratoryTestResults:
+        user.role === 'patient' && user.emr
+          ? user.emr.appointments.reduce(
+              (acc, appointment) =>
+                acc + appointment._count.laboratoryTestResults,
+              0,
+            )
+          : 0,
+    };
+
+    return profile;
+  }
+
   async create(
     dto: CreateUserDto,
     role: Role = 'patient',

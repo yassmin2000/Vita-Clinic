@@ -147,7 +147,7 @@ const ActionsCell = ({ row }: { row: Row<Admin> }) => {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-          <Link href={`/users/${row.original.id}`}>
+          <Link href={`/profile/${row.original.id}`}>
             <DropdownMenuItem asChild>
               <div className="flex items-center gap-2">
                 <Eye className="h-4 w-4" /> View Profile

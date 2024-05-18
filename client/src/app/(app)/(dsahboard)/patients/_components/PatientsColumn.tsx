@@ -158,7 +158,7 @@ const ActionsCell = ({ row }: { row: Row<Patient> }) => {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-          <Link href={`/users/${userId}`}>
+          <Link href={`/profile/${userId}`}>
             <DropdownMenuItem asChild>
               <div className="flex items-center gap-2">
                 <Eye className="h-4 w-4" /> View Profile

@@ -9,6 +9,7 @@ import {
   ValidationPipe,
   Patch,
   Param,
+  Get,
 } from '@nestjs/common';
 
 import { UsersService } from './users.service';
@@ -24,6 +25,26 @@ import type { Payload } from 'src/types/payload.type';
 @Controller('users')
 export class UsersController {
   constructor(private userService: UsersService) {}
+
+  @UseGuards(JwtGuard)
+  @Get('profile')
+  async getUserProfile(@Req() request: Request) {
+    const user: Payload = request['user'];
+
+    return this.userService.findProfileById(user.id, false);
+  }
+
+  @UseGuards(JwtGuard)
+  @Get('profile/:id')
+  async getUserProfileById(@Param('id') id: string, @Req() request: Request) {
+    const user: Payload = request['user'];
+
+    if (user.role === 'patient') {
+      throw new UnauthorizedException();
+    }
+
+    return this.userService.findProfileById(id, user.isSuperAdmin);
+  }
 
   @UseGuards(JwtGuard)
   @Post()
