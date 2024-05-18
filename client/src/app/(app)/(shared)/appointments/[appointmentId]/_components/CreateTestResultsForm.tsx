@@ -44,16 +44,22 @@ const formSchema = z.object({
 interface CreateTestResultsFormProps {
   appointmentId: string;
   onClose: () => void;
+  testResultsId?: string;
+  defaultValues?: z.infer<typeof formSchema> & {
+    values: { biomarkerId: string; value: number }[];
+  };
 }
 
 export default function CreateTestResultsForm({
   appointmentId,
   onClose,
+  testResultsId,
+  defaultValues,
 }: CreateTestResultsFormProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const [values, setValues] = useState<
     { biomarkerId: string; value: number }[]
-  >([]);
+  >(defaultValues?.values ? defaultValues.values : []);
 
   const accessToken = useAccessToken();
   const queryClient = useQueryClient();
@@ -61,6 +67,11 @@ export default function CreateTestResultsForm({
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    defaultValues: {
+      title: defaultValues?.title,
+      laboratoryTest: defaultValues?.laboratoryTest,
+      notes: defaultValues?.notes,
+    },
   });
 
   const { data: laboratoryTests, isLoading: isLoadingLaboratoryTests } =
@@ -87,7 +98,7 @@ export default function CreateTestResultsForm({
       enabled: !!accessToken,
     });
 
-  const { mutate: createTestResults, isPending } = useMutation({
+  const { mutate: mutateTestResults, isPending } = useMutation({
     mutationFn: async () => {
       const body = {
         title: form.getValues('title'),
@@ -97,31 +108,45 @@ export default function CreateTestResultsForm({
         values,
       };
 
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/test-results`,
-        body,
-        {
-          headers: {
-            authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
+      if (testResultsId) {
+        const response = await axios.patch(
+          `${process.env.NEXT_PUBLIC_API_URL}/test-results/${testResultsId}`,
+          body,
+          {
+            headers: {
+              authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
 
-      onClose();
-      return response;
+        onClose();
+        return response;
+      } else {
+        const response = await axios.post(
+          `${process.env.NEXT_PUBLIC_API_URL}/test-results`,
+          body,
+          {
+            headers: {
+              authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
+
+        onClose();
+        return response;
+      }
     },
     onError: () => {
       return toast({
-        title: `Failed to create new laboratory test results`,
+        title: `Failed to ${testResultsId ? 'update' : 'create new'} laboratory test results`,
         description: 'Please try again later.',
         variant: 'destructive',
       });
     },
     onSuccess: () => {
       return toast({
-        title: `Laboratory test results created successfully`,
-        description:
-          'The laboratory test results have been created successfully.',
+        title: `Laboratory test results ${testResultsId ? 'updated' : 'created'} successfully`,
+        description: `The laboratory test results have been ${testResultsId ? 'updated' : 'created'} successfully.`,
       });
     },
     onSettled: () => {
@@ -182,6 +207,7 @@ export default function CreateTestResultsForm({
                         onChange={field.onChange}
                         placeholder="Select laboratory test..."
                         inputPlaceholder="Search laboratory tests..."
+                        disabled={isLoading || Boolean(testResultsId)}
                         options={
                           laboratoryTests
                             ? laboratoryTests.map((test) => ({
@@ -312,16 +338,16 @@ export default function CreateTestResultsForm({
                   )?.biomarkers.length
                 ) {
                   return toast({
-                    title: `Failed to create new laboratory test results`,
+                    title: `Failed to ${testResultsId ? 'update' : 'create new'} laboratory test results`,
                     description: 'Please fill all the biomarkers values.',
                     variant: 'destructive',
                   });
                 } else {
-                  createTestResults();
+                  mutateTestResults();
                 }
               }}
             >
-              Create Test Results
+              {testResultsId ? 'Update Test Results' : 'Create Test Results'}
             </Button>
           )}
         </div>
