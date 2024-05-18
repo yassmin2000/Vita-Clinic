@@ -2,24 +2,20 @@
 
 import { useEffect } from 'react';
 import Link from 'next/link';
-import { Poppins } from 'next/font/google';
+import Image from 'next/image';
+import { useTheme } from 'next-themes';
 
 import UserButton from './UserButton';
 import ModeToggle from './ModeToggle';
-import { cn } from '@/lib/utils';
 import { signOut, useSession } from 'next-auth/react';
 import MobileSidebar from './MobileSidebar';
-
-const poppins = Poppins({
-  weight: '600',
-  subsets: ['latin'],
-});
 
 interface NavbarProps {
   role: string;
 }
 
 export default function Navbar({ role }: NavbarProps) {
+  const { resolvedTheme } = useTheme();
   const { data: session } = useSession();
 
   useEffect(() => {
@@ -38,15 +34,32 @@ export default function Navbar({ role }: NavbarProps) {
     <div className="fixed z-50 flex h-16 w-full items-center justify-between border-b border-primary/10 bg-secondary px-4 py-2">
       <div className="flex items-center">
         {session && <MobileSidebar role={role} />}
-        <Link href={role === 'patient' ? '/portal' : '/dashboard'}>
-          <p
-            className={cn(
-              'text-3xl font-bold text-zinc-900 dark:text-gray-100',
-              poppins.className
-            )}
-          >
-            Vita Clinic
-          </p>
+        <Link
+          href={role === 'patient' ? '/portal' : '/dashboard'}
+          className="hidden h-full w-52 sm:block"
+        >
+          <Image
+            src={
+              resolvedTheme === 'dark' ? '/logo-dark.png' : '/logo-light.png'
+            }
+            alt="Logo"
+            width={5608}
+            height={1024}
+          />
+        </Link>
+        <Link
+          href={role === 'patient' ? '/portal' : '/dashboard'}
+          className="relative block h-10 w-10 sm:hidden"
+        >
+          <Image
+            src={
+              resolvedTheme === 'dark'
+                ? '/favicon-dark.png'
+                : '/favicon-light.png'
+            }
+            alt="Logo"
+            fill
+          />
         </Link>
       </div>
       <div className="flex items-center gap-x-3">

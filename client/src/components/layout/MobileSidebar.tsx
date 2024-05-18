@@ -25,7 +25,10 @@ export default function MobileSidebar({ role }: MobileSidebarProps) {
       <SheetTrigger className="pr-4 md:hidden">
         <Menu />
       </SheetTrigger>
-      <SheetContent side="left" className="w-fit bg-secondary p-0 pt-10">
+      <SheetContent
+        side="left"
+        className="w-[80%] bg-secondary p-0 pt-10 sm:w-[40%]"
+      >
         {role === 'patient' ? <PatientsSidebar /> : <StaffSidebar />}
       </SheetContent>
     </Sheet>
