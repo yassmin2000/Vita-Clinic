@@ -12,7 +12,7 @@ import {
   ShieldPlus,
   UserIcon,
   Cable,
-  Trash2,
+  FileClock,
 } from 'lucide-react';
 
 import {
@@ -21,6 +21,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '../ui/tooltip';
+
+import useUserRole from '@/hooks/useUserRole';
 import { cn } from '@/lib/utils';
 
 const routes = [
@@ -54,13 +56,21 @@ const routes = [
     href: '/devices',
     label: 'Devices',
   },
-  { icon: Trash2, href: '/trash', label: 'Trash', super: true },
-  { icon: Settings, href: '/settings', label: 'Settings', super: true },
+  {
+    icon: FileClock,
+    href: '/log',
+    label: 'Actions Log',
+    super: true,
+    bottom: true,
+  },
+  { icon: Settings, href: '/settings', label: 'Settings', bottom: true },
 ];
 
 export default function StaffSidebar() {
   const pathname = usePathname();
   const { resolvedTheme } = useTheme();
+
+  const { isSuperAdmin } = useUserRole();
 
   return (
     <div className="flex h-full flex-col space-y-4 overflow-y-auto border-r border-primary/10 bg-secondary text-primary">
@@ -83,7 +93,7 @@ export default function StaffSidebar() {
             </Link>
             <div className="flex flex-col gap-2">
               {routes
-                .filter((route) => !route.super)
+                .filter((route) => !route.bottom)
                 .map((route) => (
                   <TooltipProvider key={route.href}>
                     <Tooltip>
@@ -120,7 +130,7 @@ export default function StaffSidebar() {
 
           <div className="flex flex-col gap-2">
             {routes
-              .filter((route) => route.super)
+              .filter((route) => route.bottom && (!route.super || isSuperAdmin))
               .map((route) => (
                 <TooltipProvider key={route.href}>
                   <Tooltip>

@@ -1,5 +1,5 @@
 import { Transform } from 'class-transformer';
-import { IsInt, IsOptional } from 'class-validator';
+import { IsIn, IsInt, IsOptional, IsString } from 'class-validator';
 
 export class GetAllActionQuery {
   @IsOptional()
@@ -11,6 +11,14 @@ export class GetAllActionQuery {
   @IsInt()
   @Transform(({ value }) => parseInt(value), { toClassOnly: true })
   limit?: number;
+
+  @IsOptional()
+  @IsString()
+  value?: string;
+
+  @IsOptional()
+  @IsIn(['date-desc', 'date-asc'])
+  sort?: 'date-desc' | 'date-asc';
 }
 
 export class CreateLogDto {

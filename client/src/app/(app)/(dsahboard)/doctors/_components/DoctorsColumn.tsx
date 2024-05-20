@@ -40,7 +40,6 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 
-import useAccessToken from '@/hooks/useAccessToken';
 import useUserRole from '@/hooks/useUserRole';
 import { useTableOptions } from '@/hooks/useTableOptions';
 
@@ -49,7 +48,6 @@ import Modal from '@/components/Modal';
 import SpecialityForm from './SpecialityForm';
 
 const ActionsCell = ({ row }: { row: Row<Doctor> }) => {
-  const accessToken = useAccessToken();
   const { role, isSuperAdmin } = useUserRole();
 
   const userId = row.original.id;

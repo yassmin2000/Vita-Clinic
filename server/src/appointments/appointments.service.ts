@@ -305,7 +305,7 @@ export class AppointmentsService {
     await this.logService.create({
       userId,
       targetId: appointment.id,
-      targetName: `Appointment ${appointment.number}`,
+      targetName: `Appointment #${appointment.number}`,
       type: 'appointment',
       action: 'approve',
       targetUserId: appointment.patientId,
@@ -337,7 +337,7 @@ export class AppointmentsService {
     await this.logService.create({
       userId,
       targetId: rejectedAppointment.id,
-      targetName: `Appointment ${rejectedAppointment.number}`,
+      targetName: `Appointment #${rejectedAppointment.number}`,
       type: 'appointment',
       action: 'reject',
       targetUserId: rejectedAppointment.patientId,
@@ -378,7 +378,7 @@ export class AppointmentsService {
     await this.logService.create({
       userId,
       targetId: cancelledAppointment.id,
-      targetName: `Appointment ${cancelledAppointment.number}`,
+      targetName: `Appointment #${cancelledAppointment.number}`,
       type: 'appointment',
       action: 'cancel',
       targetUserId: cancelledAppointment.patientId,
@@ -442,7 +442,7 @@ export class AppointmentsService {
     await this.logService.create({
       userId,
       targetId: completedAppointment.id,
-      targetName: `Appointment ${completedAppointment.number}`,
+      targetName: `Appointment #${completedAppointment.number}`,
       type: 'appointment',
       action: 'complete',
       targetUserId: completedAppointment.patientId,

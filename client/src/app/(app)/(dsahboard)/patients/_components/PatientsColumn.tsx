@@ -48,7 +48,6 @@ import {
 } from '@/components/ui/tooltip';
 import { Icons } from '@/components/Icons';
 
-import useAccessToken from '@/hooks/useAccessToken';
 import useUserRole from '@/hooks/useUserRole';
 import { useTableOptions } from '@/hooks/useTableOptions';
 
@@ -56,7 +55,6 @@ import { bloodTypes } from '@/lib/constants';
 import type { Patient } from '@/types/users.type';
 
 const ActionsCell = ({ row }: { row: Row<Patient> }) => {
-  const accessToken = useAccessToken();
   const { role, isSuperAdmin } = useUserRole();
 
   const userId = row.original.id;

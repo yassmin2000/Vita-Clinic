@@ -40,14 +40,12 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 
-import useAccessToken from '@/hooks/useAccessToken';
 import useUserRole from '@/hooks/useUserRole';
 import { useTableOptions } from '@/hooks/useTableOptions';
 
 import type { Admin } from '@/types/users.type';
 
 const ActionsCell = ({ row }: { row: Row<Admin> }) => {
-  const accessToken = useAccessToken();
   const { isSuperAdmin } = useUserRole();
 
   const userId = row.original.id;
@@ -55,7 +53,6 @@ const ActionsCell = ({ row }: { row: Row<Admin> }) => {
   const [isActivating, setIsActivating] = useState(false);
   const [isDeactivating, setIsDeactivating] = useState(false);
 
-  const queryClient = useQueryClient();
   const {
     sortBy,
     searchValue,
