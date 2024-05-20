@@ -137,6 +137,7 @@ model Otp {
 
 model User {
   id        String  @id @default(uuid())
+  ssn       String? @unique @default(cuid())
   email     String  @unique
   role      Role    @default(patient)
   firstName String
@@ -168,7 +169,8 @@ model User {
   doctorAppointments  Appointment[] @relation("doctorAppointments")
   patientAppointments Appointment[] @relation("patientAppointments")
 
-  actions Action[]
+  actions       Action[] @relation("actions")
+  targetActions Action[] @relation("targetActions")
 }
 
 model ElectronicMedicalRecord {
@@ -671,15 +673,16 @@ model Speciality {
 }
 
 model Action {
-  id         String  @id @default(uuid())
-  user       User    @relation(fields: [userId], references: [id])
+  id         String @id @default(uuid())
+  user       User   @relation("actions", fields: [userId], references: [id])
   targetId   String
   targetName String
   type       String
   action     String
-  notes      String?
+  targetUser User?  @relation("targetActions", fields: [targetUserId], references: [id])
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  userId    String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  userId       String
+  targetUserId String?
 }

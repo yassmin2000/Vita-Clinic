@@ -114,10 +114,10 @@ export default function DoctorsCompletedAppointmentsChart() {
         </div>
       </div>
 
-      <div className="h-[350px]">
+      <div className="h-[400px]">
         <ResponsivePie
           data={data}
-          margin={{ top: 20, right: 60, bottom: 20, left: 0 }}
+          margin={{ top: 20, right: 60, bottom: 30, left: 0 }}
           innerRadius={0.5}
           padAngle={0.2}
           cornerRadius={0}

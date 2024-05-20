@@ -24,8 +24,32 @@ export class VitalsController {
   constructor(private readonly vitalsService: VitalsService) {}
 
   @UseGuards(JwtGuard)
+  @Get()
+  async getVitals(@Req() request: Request) {
+    const user: Payload = request['user'];
+
+    if (user.role !== 'patient') {
+      throw new UnauthorizedException();
+    }
+
+    return this.vitalsService.getVitalsData(user.id);
+  }
+
+  @UseGuards(JwtGuard)
+  @Get('latest')
+  async getLatestVitals(@Req() request: Request) {
+    const user: Payload = request['user'];
+
+    if (user.role !== 'patient') {
+      throw new UnauthorizedException();
+    }
+
+    return this.vitalsService.getLatestByPatientId(user.id);
+  }
+
+  @UseGuards(JwtGuard)
   @Patch(':id')
-  async update(
+  async updateVitals(
     @Param('id') id: string,
     @Body() updateVitalsDto: UpdateVitalsDto,
     @Req() request: Request,

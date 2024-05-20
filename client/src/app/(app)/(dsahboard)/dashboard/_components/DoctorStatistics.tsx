@@ -6,17 +6,7 @@ import useAccessToken from '@/hooks/useAccessToken';
 import { cn } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import {
-  Cable,
-  Calendar,
-  Check,
-  CheckCheck,
-  ClipboardPlus,
-  HomeIcon,
-  Timer,
-  User,
-  X,
-} from 'lucide-react';
+import { Cable, Calendar, User } from 'lucide-react';
 
 const stats = [
   {
@@ -87,7 +77,7 @@ export default function DoctorStatistics() {
               {!data || isLoading ? (
                 <Skeleton className="h-4 w-full" />
               ) : (
-                <p className="mt-2 text-2xl font-semibold text-foreground">
+                <p className="-mt-0.5 text-2xl font-semibold text-foreground">
                   {data[item.field]}
                 </p>
               )}

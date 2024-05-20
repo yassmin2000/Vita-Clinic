@@ -18,6 +18,11 @@ const nextConfig = {
         hostname: 'utfs.io',
         pathname: '**',
       },
+      {
+        protocol: 'https',
+        hostname: 'randomuser.me',
+        pathname: '**',
+      },
     ],
   },
   experimental: {

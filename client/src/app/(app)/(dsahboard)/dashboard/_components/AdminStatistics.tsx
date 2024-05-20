@@ -128,7 +128,7 @@ export default function AdminStatistics() {
               {!data || isLoading ? (
                 <Skeleton className="h-4 w-full" />
               ) : (
-                <p className="mt-2 text-2xl font-semibold text-foreground">
+                <p className="-mt-0.5 text-2xl font-semibold text-foreground">
                   {/* @ts-ignore */}
                   {item.field.split('.').reduce((acc, key) => acc[key], data)}
                 </p>
