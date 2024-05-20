@@ -32,6 +32,7 @@ export class ScansService {
         title: { contains: value, mode: 'insensitive' },
       },
       select: {
+        id: true,
         title: true,
         notes: true,
         createdAt: true,

@@ -9,6 +9,7 @@ import Messages from './Messages';
 import ChatInput from './ChatInput';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
+import { useEffect } from 'react';
 
 interface ChatWrapperProps {
   fileId: string;
@@ -42,6 +43,12 @@ export default function ChatWrapper({ fileId, status }: ChatWrapperProps) {
       });
     },
   });
+
+  useEffect(() => {
+    if (status === 'initial') {
+      processReport();
+    }
+  }, [status]);
 
   if (status === 'initial') {
     return (

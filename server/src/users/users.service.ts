@@ -231,6 +231,10 @@ export class UsersService {
       },
     });
 
+    if (!user) {
+      throw new NotFoundException();
+    }
+
     const profile = {
       id: user.id,
       role: user.role,
@@ -238,6 +242,7 @@ export class UsersService {
       firstName: user.firstName,
       lastName: user.lastName,
       sex: user.sex,
+      specialityId: user.role === 'doctor' ? user.speciality.id : null,
       speciality: user.role === 'doctor' ? user.speciality.name : null,
       address: user.address,
       email: user.email,
@@ -246,6 +251,7 @@ export class UsersService {
       avatarURL: user.avatarURL,
       birthDate: user.birthDate,
       createdAt: user.createdAt,
+      isActive: user.isActive,
       emrId: user.role === 'patient' && user.emr ? user.emr.id : null,
       insurance:
         user.role === 'patient' && user.emr ? user.emr.insurance : null,

@@ -4,8 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import type { ColumnDef, Row } from '@tanstack/react-table';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import axios from 'axios';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   differenceInYears,
   parseISO,
@@ -39,7 +38,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import Modal from '@/components/Modal';
 import InsuranceForm from './InsuranceForm';
-import DeleteAlert from '@/components/DeleteAlert';
+import ActivateModal from '@/components/ActivateModal';
+import DeactivateModal from '@/components/DeactivateModal';
 import {
   Tooltip,
   TooltipContent,
@@ -47,7 +47,6 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { Icons } from '@/components/Icons';
-import { useToast } from '@/components/ui/use-toast';
 
 import useAccessToken from '@/hooks/useAccessToken';
 import useUserRole from '@/hooks/useUserRole';
@@ -68,7 +67,6 @@ const ActionsCell = ({ row }: { row: Row<Patient> }) => {
   const [isEditingInsurance, setIsEditingInsurance] = useState(false);
 
   const queryClient = useQueryClient();
-  const { toast } = useToast();
   const {
     sortBy,
     searchValue,
@@ -77,75 +75,6 @@ const ActionsCell = ({ row }: { row: Row<Patient> }) => {
     currentPage,
     countPerPage,
   } = useTableOptions();
-
-  const { mutate: activateUser, isPending: isActivatingPending } = useMutation({
-    mutationFn: async () => {
-      return await axios.patch(
-        `${process.env.NEXT_PUBLIC_API_URL}/users/${userId}/activate`,
-        {},
-        {
-          headers: {
-            authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
-    },
-    onError: () => {
-      return toast({
-        title: `Failed to activate user`,
-        description: 'Please try again later.',
-        variant: 'destructive',
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: [
-          `patients_page_${currentPage}_count_${countPerPage}_sex_${currentGender}_status_${currentStatus}_sort_${sortBy}_search_${searchValue}`,
-        ],
-      });
-      setIsActivating(false);
-
-      return toast({
-        title: `User activated successfully`,
-        description: 'User can now log in and access the system.',
-      });
-    },
-  });
-
-  const { mutate: deactivateUser, isPending: isDeactivatingPending } =
-    useMutation({
-      mutationFn: async () => {
-        return await axios.patch(
-          `${process.env.NEXT_PUBLIC_API_URL}/users/${userId}/deactivate`,
-          {},
-          {
-            headers: {
-              authorization: `Bearer ${accessToken}`,
-            },
-          }
-        );
-      },
-      onError: () => {
-        return toast({
-          title: `Failed to deactivate user`,
-          description: 'Please try again later.',
-          variant: 'destructive',
-        });
-      },
-      onSuccess: () => {
-        queryClient.invalidateQueries({
-          queryKey: [
-            `patients_page_${currentPage}_count_${countPerPage}_sex_${currentGender}_status_${currentStatus}_sort_${sortBy}_search_${searchValue}`,
-          ],
-        });
-        setIsDeactivating(false);
-
-        return toast({
-          title: `User deactivated successfully`,
-          description: 'User can no longer log in and access the system.',
-        });
-      },
-    });
 
   return (
     <>
@@ -244,24 +173,21 @@ const ActionsCell = ({ row }: { row: Row<Patient> }) => {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <DeleteAlert
-        title={`Activate ${row.original.firstName} ${row.original.lastName} account`}
-        description={`Are you sure you want to activate ${row.original.firstName} ${row.original.lastName} account? This means they will be able to log in and access the system.`}
-        deleteText="Activate"
+      <ActivateModal
+        id={userId}
+        name={`${row.original.firstName} ${row.original.lastName}`}
+        role="patient"
         isOpen={isActivating}
         onClose={() => setIsActivating(false)}
-        onDelete={activateUser}
-        disabled={isActivatingPending}
+        queryKey={`patients_page_${currentPage}_count_${countPerPage}_sex_${currentGender}_status_${currentStatus}_sort_${sortBy}_search_${searchValue}`}
       />
 
-      <DeleteAlert
-        title={`Deactivate ${row.original.firstName} ${row.original.lastName} account`}
-        description={`Are you sure you want to deactivate ${row.original.firstName} ${row.original.lastName} account? This means they will not be able to log in and access the system.`}
-        deleteText="Deactivate"
+      <DeactivateModal
+        id={userId}
+        name={`${row.original.firstName} ${row.original.lastName}`}
         isOpen={isDeactivating}
         onClose={() => setIsDeactivating(false)}
-        onDelete={deactivateUser}
-        disabled={isDeactivatingPending}
+        queryKey={`patients_page_${currentPage}_count_${countPerPage}_sex_${currentGender}_status_${currentStatus}_sort_${sortBy}_search_${searchValue}`}
       />
 
       <Modal

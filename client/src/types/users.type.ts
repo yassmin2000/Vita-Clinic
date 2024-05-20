@@ -37,6 +37,7 @@ export type Patient = User & {
 export type Profile = User & {
   role: 'admin' | 'doctor' | 'patient';
   isSuperAdmin?: boolean;
+  specialityId?: string;
   speciality?: string;
   emrId?: string;
   insurance?: Insurance;

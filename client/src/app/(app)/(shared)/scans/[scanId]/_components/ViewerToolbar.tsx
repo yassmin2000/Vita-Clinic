@@ -19,14 +19,12 @@ import {
   Eraser,
   GalleryVerticalEnd,
   Grid2X2,
-  Layout,
   LayoutGrid,
   LayoutPanelLeft,
   LayoutPanelTop,
   Move,
   Plus,
   RectangleHorizontal,
-  Rotate3D,
   RotateCcw,
   RotateCw,
   Rows2,
@@ -149,6 +147,8 @@ export default function ViewerToolbar() {
         cornerstoneTools.addStackStateManager(element, ['stack']);
         cornerstoneTools.addToolState(element, 'stack', stack);
       });
+
+      handleResetViewport();
     }
   };
 
