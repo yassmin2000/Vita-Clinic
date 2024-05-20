@@ -45,21 +45,17 @@ export default function VitalsChart() {
   useEffect(() => {
     if (chartData && chartData.length > 0) {
       setDate(chartData);
-      // Count the days between first and last entry
-      const firstDate = new Date(chartData[0].data[0].x);
-      const lastDate = new Date(
-        chartData[0].data[chartData[0].data.length - 1].x
-      );
-      const diffTime = Math.abs(lastDate.getTime() - firstDate.getTime());
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      console.log(diffDays);
-      setDaysCount(Math.floor(diffDays / 10));
+      if (chartData[0].data.length > 0) {
+        const firstDate = new Date(chartData[0].data[0].x);
+        const lastDate = new Date(
+          chartData[0].data[chartData[0].data.length - 1].x
+        );
+        const diffTime = Math.abs(lastDate.getTime() - firstDate.getTime());
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        setDaysCount(Math.floor(diffDays / 10));
+      }
     }
   }, [chartData]);
-
-  useEffect(() => {
-    console.log(daysCount);
-  }, [daysCount]);
 
   return (
     <Card>

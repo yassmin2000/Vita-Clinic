@@ -1,14 +1,17 @@
 'use client';
 
-import { Icons } from '@/components/Icons';
+import axios from 'axios';
+import { useQuery } from '@tanstack/react-query';
+import { Gauge, HeartPulse, Thermometer } from 'lucide-react';
+
 import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Icons } from '@/components/Icons';
+
 import useAccessToken from '@/hooks/useAccessToken';
 import { cn } from '@/lib/utils';
-import { Vitals } from '@/types/appointments.type';
-import { useQuery } from '@tanstack/react-query';
-import axios from 'axios';
-import { Gauge, HeartPulse, Thermometer } from 'lucide-react';
+
+import type { Vitals } from '@/types/appointments.type';
 
 const vitals = [
   {
@@ -101,7 +104,7 @@ export default function LatestVitals() {
               {!data || isLoading ? (
                 <Skeleton className="h-4 w-full" />
               ) : (
-                <div className="-mt-0.5 flex gap-0.5">
+                <div className="flex gap-0.5">
                   <p className="text-2xl font-semibold text-foreground">
                     {data[item.field]}
                   </p>

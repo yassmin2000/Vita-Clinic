@@ -70,7 +70,20 @@ const formSchema = z.object({
     required_error: 'Gender is required.',
     invalid_type_error: 'Gender is invalid.',
   }),
-  address: z.string().optional(),
+  ssn: z
+    .string({
+      required_error: 'SSN is required.',
+    })
+    .min(1, {
+      message: 'SSN is required.',
+    }),
+  address: z
+    .string({
+      required_error: 'Address is required.',
+    })
+    .min(1, {
+      message: 'Address is required.',
+    }),
   phone: z
     .string({ required_error: 'Phone number is required.' })
     .refine(isValidPhoneNumber, { message: 'Invalid phone number.' }),
@@ -92,6 +105,7 @@ export default function SignUp() {
         lastName: values.lastName,
         email: values.email,
         password: values.password,
+        ssn: values.ssn,
         birthDate: values.birthDate.toISOString(),
         phoneNumber: values.phone,
         address: values.address,
@@ -273,11 +287,29 @@ export default function SignUp() {
               </div>
 
               <FormField
+                name="ssn"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem className="flex flex-col items-start gap-1">
+                    <FormLabel required>Social Security Number (SSN)</FormLabel>
+                    <FormControl>
+                      <Input
+                        disabled={isPending}
+                        placeholder="SSN"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
                 name="address"
                 control={form.control}
                 render={({ field }) => (
                   <FormItem className="flex flex-col items-start gap-1">
-                    <FormLabel>Address</FormLabel>
+                    <FormLabel required>Address</FormLabel>
                     <FormControl>
                       <Input
                         disabled={isPending}

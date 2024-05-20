@@ -64,9 +64,15 @@ export class CreateUserDto {
   @IsDateString()
   birthDate: Date;
 
+  @IsNotEmpty()
   @IsString()
   phoneNumber: string;
 
+  @IsNotEmpty()
+  @IsString()
+  ssn: string;
+
+  @IsNotEmpty()
   @IsString()
   address: string;
 

@@ -71,6 +71,13 @@ const formSchema = z.object({
   password: z.string().min(8, {
     message: 'Password must be at least 8 characters long.',
   }),
+  ssn: z
+    .string({
+      required_error: 'SSN is required.',
+    })
+    .min(1, {
+      message: 'SSN is required.',
+    }),
   sex: z.enum(['male', 'female'], {
     required_error: 'Gender is required.',
     invalid_type_error: 'Gender is invalid.',
@@ -209,6 +216,7 @@ export default function UserForm() {
         email: values.email,
         password: values.password,
         avatarURL: url || undefined,
+        ssn: values.ssn,
         birthDate: values.birthDate.toISOString(),
         phoneNumber: values.phone,
         address: values.address,
@@ -440,6 +448,20 @@ export default function UserForm() {
                       placeholder="Address..."
                       {...field}
                     />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              name="ssn"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem className="col-span-2">
+                  <FormLabel required>Social Security Number (SSN)</FormLabel>
+                  <FormControl>
+                    <Input disabled={isPending} placeholder="SSN" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

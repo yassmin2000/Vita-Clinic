@@ -88,6 +88,7 @@ export class UsersService {
         avatarURL: true,
         birthDate: true,
         sex: true,
+        ssn: true,
         isSuperAdmin: true,
         isActive: true,
         speciality: {
@@ -239,6 +240,7 @@ export class UsersService {
       address: user.address,
       email: user.email,
       phoneNumber: user.phoneNumber,
+      ssn: user.ssn,
       avatarURL: user.avatarURL,
       birthDate: user.birthDate,
       createdAt: user.createdAt,
@@ -307,6 +309,16 @@ export class UsersService {
 
     if (isPhoneExist) {
       throw new ConflictException('Phone number already exists');
+    }
+
+    const isSSNExist = await this.prisma.user.findUnique({
+      where: {
+        ssn: dto.ssn,
+      },
+    });
+
+    if (isSSNExist) {
+      throw new ConflictException('SSN already exists');
     }
 
     const {

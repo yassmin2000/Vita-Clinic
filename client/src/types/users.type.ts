@@ -5,6 +5,7 @@ type User = {
   firstName: string;
   lastName: string;
   email: string;
+  ssn: string;
   phoneNumber: string;
   address: string;
   birthDate: string;

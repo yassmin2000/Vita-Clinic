@@ -306,6 +306,7 @@ export const columns: ColumnDef<Patient>[] = [
       const lastName = row.original.lastName;
       const avatar = row.original.avatarURL;
       const isActive = row.original.isActive;
+      const ssn = row.original.ssn;
 
       return (
         <div className="flex items-center gap-3">
@@ -327,23 +328,26 @@ export const columns: ColumnDef<Patient>[] = [
               </AvatarFallback>
             )}
           </Avatar>
-          <p className="flex items-center gap-1.5 font-medium text-foreground">
-            <span>
-              {firstName} {lastName}
-            </span>
-            <TooltipProvider>
-              {!isActive && (
-                <Tooltip>
-                  <TooltipTrigger>
-                    <div className="flex items-center justify-center rounded-full p-0.5 dark:bg-white">
-                      <Ban className="h-5 w-5 fill-red-500 text-gray-900" />
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent>Inactive</TooltipContent>
-                </Tooltip>
-              )}
-            </TooltipProvider>
-          </p>
+          <div className="flex flex-col">
+            <p className="flex items-center gap-1.5 font-medium text-foreground">
+              <span>
+                {firstName} {lastName}
+              </span>
+              <TooltipProvider>
+                {!isActive && (
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <div className="flex items-center justify-center rounded-full p-0.5 dark:bg-white">
+                        <Ban className="h-5 w-5 fill-red-500 text-gray-900" />
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>Inactive</TooltipContent>
+                  </Tooltip>
+                )}
+              </TooltipProvider>
+            </p>
+            <p className="text-sm text-muted-foreground">SSN: {ssn}</p>
+          </div>
         </div>
       );
     },
@@ -381,8 +385,18 @@ export const columns: ColumnDef<Patient>[] = [
     },
   },
   {
-    accessorKey: 'email',
-    header: 'Email',
+    header: 'Contact',
+    cell: ({ row }) => {
+      const email = row.original.email;
+      const phoneNumber = row.original.phoneNumber;
+
+      return (
+        <div className="flex flex-col whitespace-nowrap">
+          <span>{email}</span>
+          <span className="text-sm text-muted-foreground">{phoneNumber}</span>
+        </div>
+      );
+    },
   },
   {
     accessorKey: 'birthDate',

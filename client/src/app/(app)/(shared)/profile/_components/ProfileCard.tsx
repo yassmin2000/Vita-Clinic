@@ -135,6 +135,20 @@ export default function ProfileCard({ userId }: ProfileCardProps) {
                 </p>
 
                 <p className="flex items-center gap-1 sm:col-span-2 md:col-span-1">
+                  <span className="font-medium text-primary">SSN:</span>{' '}
+                  {profile.ssn}{' '}
+                  <Button
+                    variant="secondary"
+                    className="ml-1 h-fit w-fit p-1.5 text-primary hover:text-primary/80"
+                    onClick={() =>
+                      navigator.clipboard.writeText(profile.phoneNumber)
+                    }
+                  >
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                </p>
+
+                <p className="flex items-center gap-1 sm:col-span-2 md:col-span-1">
                   <span className="font-medium text-primary">
                     Phone Number:
                   </span>{' '}
