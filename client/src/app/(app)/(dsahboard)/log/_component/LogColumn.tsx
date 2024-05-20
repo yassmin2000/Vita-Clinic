@@ -299,7 +299,7 @@ const actionsSchema = [
     ],
   },
   {
-    type: 'sepciality',
+    type: 'doctor-speciality',
     actions: [
       {
         action: 'update',

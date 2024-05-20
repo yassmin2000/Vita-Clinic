@@ -43,7 +43,7 @@ export class DoctorsService {
       userId,
       targetId: specialityId,
       targetName: speciality.name,
-      type: 'sepciality',
+      type: 'doctor-speciality',
       action: 'update',
       targetUserId: doctor.id,
     });
