@@ -71,6 +71,6 @@ export class DoctorsController {
       throw new UnauthorizedException();
     }
 
-    return this.doctorsService.updateSpeciality(id, dto.specialityId);
+    return this.doctorsService.updateSpeciality(id, dto.specialityId, user.id);
   }
 }

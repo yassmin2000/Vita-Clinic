@@ -19,5 +19,6 @@ export class CreateLogDto {
   targetName: string;
   type: string;
   action: string;
+  targetUserId?: string;
   notes?: string;
 }

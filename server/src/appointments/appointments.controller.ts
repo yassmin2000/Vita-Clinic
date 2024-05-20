@@ -193,7 +193,7 @@ export class AppointmentsController {
       throw new UnauthorizedException();
     }
 
-    return this.appointmentsService.approve(id, dto.doctorId);
+    return this.appointmentsService.approve(id, dto.doctorId, user.id);
   }
 
   @UseGuards(JwtGuard)
@@ -205,7 +205,7 @@ export class AppointmentsController {
       throw new UnauthorizedException();
     }
 
-    return this.appointmentsService.reject(id);
+    return this.appointmentsService.reject(id, user.id);
   }
 
   @UseGuards(JwtGuard)
@@ -221,7 +221,7 @@ export class AppointmentsController {
       throw new UnauthorizedException();
     }
 
-    return this.appointmentsService.complete(id, dto.billingStatus);
+    return this.appointmentsService.complete(id, dto.billingStatus, user.id);
   }
 
   @UseGuards(JwtGuard)
@@ -238,6 +238,6 @@ export class AppointmentsController {
       throw new UnauthorizedException();
     }
 
-    return this.appointmentsService.cancel(id);
+    return this.appointmentsService.cancel(id, user.id);
   }
 }

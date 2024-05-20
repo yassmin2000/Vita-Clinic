@@ -29,21 +29,6 @@ export class DevicesController {
   constructor(private readonly devicesService: DevicesService) {}
 
   @UseGuards(JwtGuard)
-  @Post()
-  async createDevice(
-    @Body(new ValidationPipe({ transform: true })) dto: CreateDeviceDto,
-    @Req() request: Request,
-  ) {
-    const user: Payload = request['user'];
-
-    if (user.role !== 'admin') {
-      throw new UnauthorizedException();
-    }
-
-    return this.devicesService.create(dto);
-  }
-
-  @UseGuards(JwtGuard)
   @Get()
   async getAllDevices(
     @Query(new ValidationPipe({ transform: true })) query: GetAllDevicesQuery,
@@ -71,6 +56,21 @@ export class DevicesController {
   }
 
   @UseGuards(JwtGuard)
+  @Post()
+  async createDevice(
+    @Body(new ValidationPipe({ transform: true })) dto: CreateDeviceDto,
+    @Req() request: Request,
+  ) {
+    const user: Payload = request['user'];
+
+    if (user.role !== 'admin') {
+      throw new UnauthorizedException();
+    }
+
+    return this.devicesService.create(dto, user.id);
+  }
+
+  @UseGuards(JwtGuard)
   @Patch(':id')
   async updateDevice(
     @Param('id') id: string,
@@ -84,7 +84,11 @@ export class DevicesController {
       throw new UnauthorizedException();
     }
 
-    const updatedDevice = await this.devicesService.update(id, updateDeviceDto);
+    const updatedDevice = await this.devicesService.update(
+      id,
+      updateDeviceDto,
+      user.id,
+    );
 
     return updatedDevice;
   }
@@ -98,7 +102,7 @@ export class DevicesController {
       throw new UnauthorizedException();
     }
 
-    const deleted = await this.devicesService.delete(id);
+    const deleted = await this.devicesService.delete(id, user.id);
 
     return deleted;
   }

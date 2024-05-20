@@ -6,10 +6,14 @@ import {
   GetPatientScansQuery,
   UpdateScanDto,
 } from './dto/scans.dto';
+import { LogService } from 'src/log/log.service';
 
 @Injectable()
 export class ScansService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly logService: LogService,
+  ) {}
 
   async findAllByPatientId(
     patientId: string,
@@ -79,7 +83,7 @@ export class ScansService {
     return scan;
   }
 
-  async create(createScanDto: CreateScanDto) {
+  async create(createScanDto: CreateScanDto, userId: string) {
     const { title, notes, modalityId, scanURLs, appointmentId } = createScanDto;
 
     const appointment = await this.prisma.appointment.findUnique({
@@ -94,7 +98,7 @@ export class ScansService {
       throw new NotFoundException('Appointment not found');
     }
 
-    return this.prisma.scan.create({
+    const scan = await this.prisma.scan.create({
       data: {
         title,
         notes,
@@ -103,9 +107,20 @@ export class ScansService {
         appointment: { connect: { id: appointmentId } },
       },
     });
+
+    await this.logService.create({
+      userId,
+      targetId: scan.id,
+      targetName: scan.title,
+      type: 'scan',
+      action: 'create',
+      targetUserId: appointment.patientId,
+    });
+
+    return scan;
   }
 
-  async update(id: string, updateScanDto: UpdateScanDto) {
+  async update(id: string, updateScanDto: UpdateScanDto, userId: string) {
     const { title, notes } = updateScanDto;
 
     const existingScan = await this.prisma.scan.findUnique({
@@ -116,26 +131,28 @@ export class ScansService {
       throw new NotFoundException('Scan not found');
     }
 
-    return this.prisma.scan.update({
+    const scan = await this.prisma.scan.update({
       where: { id },
       data: {
         title,
         notes,
       },
+      include: {
+        appointment: {
+          select: {
+            patientId: true,
+          },
+        },
+      },
     });
-  }
 
-  async delete(id: string) {
-    const existingScan = await this.prisma.scan.findUnique({
-      where: { id },
-    });
-
-    if (!existingScan) {
-      throw new NotFoundException('Scan not found');
-    }
-
-    return this.prisma.scan.delete({
-      where: { id },
+    await this.logService.create({
+      userId,
+      targetId: scan.id,
+      targetName: scan.title,
+      type: 'scan',
+      action: 'update',
+      targetUserId: scan.appointment.patientId,
     });
   }
 }

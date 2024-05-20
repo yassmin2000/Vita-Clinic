@@ -94,7 +94,7 @@ export class PatientsController {
       throw new UnauthorizedException();
     }
 
-    return this.patientsService.craeteInsurance(id, dto);
+    return this.patientsService.craeteInsurance(id, dto, user.id);
   }
 
   @UseGuards(JwtGuard)
@@ -111,7 +111,7 @@ export class PatientsController {
       throw new UnauthorizedException();
     }
 
-    return this.patientsService.updateInsurance(id, dto);
+    return this.patientsService.updateInsurance(id, dto, user.id);
   }
 
   @UseGuards(JwtGuard)
@@ -126,7 +126,7 @@ export class PatientsController {
       throw new UnauthorizedException();
     }
 
-    return this.patientsService.deleteInsurance(id);
+    return this.patientsService.deleteInsurance(id, user.id);
   }
 
   @UseGuards(JwtGuard)

@@ -9,6 +9,7 @@ import type { Role } from '@prisma/client';
 
 import { PrismaService } from 'src/prisma.service';
 import { OtpService } from 'src/otp/otp.service';
+import { LogService } from 'src/log/log.service';
 
 import {
   CreateUserDto,
@@ -26,6 +27,7 @@ export class UsersService {
   constructor(
     private prisma: PrismaService,
     private otp: OtpService,
+    private logService: LogService,
   ) {}
 
   async findAll(
@@ -298,6 +300,7 @@ export class UsersService {
     dto: CreateUserDto,
     role: Role = 'patient',
     verified: boolean = false,
+    userId?: string,
   ) {
     const isEmailExist = await this.findByEmail(dto.email, true);
 
@@ -396,21 +399,51 @@ export class UsersService {
 
     const { password, isEmailVerified, isPhoneVerified, ...result } = newUser;
 
+    if (userId) {
+      await this.logService.create({
+        userId,
+        targetId: newUser.id,
+        targetName: `${newUser.firstName} ${newUser.lastName}`,
+        type: newUser.role,
+        action: 'create',
+      });
+    }
+
     return result;
   }
 
-  async deactivate(id: string) {
-    return this.prisma.user.update({
+  async deactivate(id: string, userId: string) {
+    const user = await this.prisma.user.update({
       where: { id },
       data: { isActive: false },
     });
+
+    await this.logService.create({
+      userId,
+      targetId: user.id,
+      targetName: `${user.firstName} ${user.lastName}`,
+      type: 'user',
+      action: 'deactivate',
+    });
+
+    return user;
   }
 
-  async activate(id: string) {
-    return this.prisma.user.update({
+  async activate(id: string, userId: string) {
+    const user = await this.prisma.user.update({
       where: { id },
       data: { isActive: true },
     });
+
+    await this.logService.create({
+      userId,
+      targetId: user.id,
+      targetName: `${user.firstName} ${user.lastName}`,
+      type: 'user',
+      action: 'activate',
+    });
+
+    return user;
   }
 
   async changeRole(id: string, role: Role) {

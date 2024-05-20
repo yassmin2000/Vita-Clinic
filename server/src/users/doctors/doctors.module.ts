@@ -9,6 +9,7 @@ import { PrismaService } from 'src/prisma.service';
 import { OtpService } from 'src/otp/otp.service';
 import { EmailOtpService } from 'src/email-otp/email-otp.service';
 import { PhoneOtpService } from 'src/phone-otp/phone-otp.service';
+import { LogService } from 'src/log/log.service';
 
 @Module({
   controllers: [DoctorsController],
@@ -20,6 +21,7 @@ import { PhoneOtpService } from 'src/phone-otp/phone-otp.service';
     OtpService,
     EmailOtpService,
     PhoneOtpService,
+    LogService,
   ],
 })
 export class DoctorsModule {}

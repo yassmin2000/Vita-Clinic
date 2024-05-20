@@ -48,7 +48,7 @@ export class ScansController {
     if (user.role !== 'doctor') {
       throw new UnauthorizedException();
     }
-    return this.scansService.create(dto);
+    return this.scansService.create(dto, user.id);
   }
 
   @UseGuards(JwtGuard)
@@ -64,18 +64,6 @@ export class ScansController {
       throw new UnauthorizedException();
     }
 
-    return this.scansService.update(id, updateScanDto);
-  }
-
-  @UseGuards(JwtGuard)
-  @Delete(':id')
-  async deleteScan(@Param('id') id: string, @Req() request: Request) {
-    const user: Payload = request['user'];
-
-    if (!user.isSuperAdmin) {
-      throw new UnauthorizedException();
-    }
-
-    return this.scansService.delete(id);
+    return this.scansService.update(id, updateScanDto, user.id);
   }
 }

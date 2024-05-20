@@ -5,6 +5,8 @@ import {
 } from '@nestjs/common';
 
 import { PrismaService } from 'src/prisma.service';
+import { LogService } from 'src/log/log.service';
+
 import {
   CreateMessageDto,
   CreateReportDto,
@@ -14,7 +16,10 @@ import {
 
 @Injectable()
 export class ReportsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly logService: LogService,
+  ) {}
 
   async findAllByAppointmentId(appointmentId: string) {
     return this.prisma.report.findMany({
@@ -69,7 +74,7 @@ export class ReportsService {
     return report;
   }
 
-  async create(createReportDto: CreateReportDto) {
+  async create(createReportDto: CreateReportDto, userId: string) {
     const appointment = await this.prisma.appointment.findUnique({
       where: { id: createReportDto.appointmentId },
     });
@@ -78,12 +83,23 @@ export class ReportsService {
       throw new NotFoundException('Appointment not found');
     }
 
-    return this.prisma.report.create({
+    const report = await this.prisma.report.create({
       data: createReportDto,
     });
+
+    await this.logService.create({
+      userId,
+      targetId: report.id,
+      targetName: report.title,
+      type: 'report',
+      action: 'create',
+      targetUserId: appointment.patientId,
+    });
+
+    return report;
   }
 
-  async update(id: string, updateReportDto: UpdateReportDto) {
+  async update(id: string, updateReportDto: UpdateReportDto, userId: string) {
     const existingReport = await this.prisma.report.findUnique({
       where: { id },
     });
@@ -94,10 +110,28 @@ export class ReportsService {
 
     const { appointmentId, reportURL, fileName, ...dto } = updateReportDto;
 
-    return this.prisma.report.update({
+    const report = await this.prisma.report.update({
       where: { id },
       data: dto,
+      include: {
+        appointment: {
+          select: {
+            patientId: true,
+          },
+        },
+      },
     });
+
+    await this.logService.create({
+      userId,
+      targetId: id,
+      targetName: report.title,
+      type: 'report',
+      action: 'update',
+      targetUserId: report.appointment.patientId,
+    });
+
+    return report;
   }
 
   async updateStatus(id: string, status: 'processed' | 'failed') {
@@ -116,20 +150,6 @@ export class ReportsService {
     return this.prisma.report.update({
       where: { id },
       data: { status },
-    });
-  }
-
-  async delete(id: string) {
-    const existingReport = await this.prisma.report.findUnique({
-      where: { id },
-    });
-
-    if (!existingReport) {
-      throw new NotFoundException('Report not found');
-    }
-
-    return this.prisma.report.delete({
-      where: { id },
     });
   }
 

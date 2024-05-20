@@ -47,6 +47,6 @@ export class EmrController {
       throw new UnauthorizedException();
     }
 
-    return this.emrService.update(id, emrDto);
+    return this.emrService.update(id, emrDto, user.id);
   }
 }

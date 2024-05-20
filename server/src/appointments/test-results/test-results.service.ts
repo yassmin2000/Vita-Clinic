@@ -1,5 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
+import { LogService } from 'src/log/log.service';
+
 import {
   CreateLaboratoryTestResultDto,
   GetPatientTestResultsQuery,
@@ -8,7 +10,11 @@ import {
 
 @Injectable()
 export class TestResultsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly logService: LogService,
+  ) {}
+
   async findAllByAppointmentId(appointmentId: string) {
     return await this.prisma.laboratoryTestResult.findMany({
       where: { appointmentId },
@@ -64,7 +70,10 @@ export class TestResultsService {
     });
   }
 
-  async create(createLaboratoryTestResultDto: CreateLaboratoryTestResultDto) {
+  async create(
+    createLaboratoryTestResultDto: CreateLaboratoryTestResultDto,
+    userId: string,
+  ) {
     const appointment = await this.prisma.appointment.findUnique({
       where: { id: createLaboratoryTestResultDto.appointmentId },
     });
@@ -98,7 +107,7 @@ export class TestResultsService {
       }),
     );
 
-    return this.prisma.laboratoryTestResult.create({
+    const testResults = await this.prisma.laboratoryTestResult.create({
       data: {
         ...data,
         values: {
@@ -111,11 +120,23 @@ export class TestResultsService {
         },
       },
     });
+
+    await this.logService.create({
+      userId,
+      targetId: testResults.id,
+      targetName: testResults.title,
+      type: 'laboratory-test-results',
+      action: 'create',
+      targetUserId: appointment.patientId,
+    });
+
+    return testResults;
   }
 
   async update(
     id: string,
     updateLaboratoryTestResultDto: UpdateLaboratoryTestResultDto,
+    userId: string,
   ) {
     const existingLaboratoryTestResult =
       await this.prisma.laboratoryTestResult.findUnique({
@@ -150,9 +171,27 @@ export class TestResultsService {
       }),
     );
 
-    return this.prisma.laboratoryTestResult.update({
+    const testResults = await this.prisma.laboratoryTestResult.update({
       where: { id },
       data,
+      include: {
+        appointment: {
+          select: {
+            patientId: true,
+          },
+        },
+      },
     });
+
+    await this.logService.create({
+      userId,
+      targetId: testResults.id,
+      targetName: testResults.title,
+      type: 'laboratory-test-results',
+      action: 'update',
+      targetUserId: testResults.appointment.patientId,
+    });
+
+    return testResults;
   }
 }

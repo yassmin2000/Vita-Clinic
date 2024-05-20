@@ -52,7 +52,7 @@ export class ReportsController {
     if (user.role !== 'doctor') {
       throw new UnauthorizedException();
     }
-    return this.reportsService.create(dto);
+    return this.reportsService.create(dto, user.id);
   }
 
   @UseGuards(JwtGuard)
@@ -68,7 +68,7 @@ export class ReportsController {
       throw new UnauthorizedException();
     }
 
-    return this.reportsService.update(id, updateReportDto);
+    return this.reportsService.update(id, updateReportDto, user.id);
   }
 
   @UseGuards(JwtGuard)
@@ -93,18 +93,6 @@ export class ReportsController {
     }
 
     return this.reportsService.updateStatus(id, 'failed');
-  }
-
-  @UseGuards(JwtGuard)
-  @Delete(':id')
-  async deleteReport(@Param('id') id: string, @Req() request: Request) {
-    const user: Payload = request['user'];
-
-    if (!user.isSuperAdmin) {
-      throw new UnauthorizedException();
-    }
-
-    return this.reportsService.delete(id);
   }
 
   @UseGuards(JwtGuard)

@@ -5,6 +5,8 @@ import {
 } from '@nestjs/common';
 
 import { PrismaService } from 'src/prisma.service';
+import { LogService } from 'src/log/log.service';
+
 import {
   CreateDeviceDto,
   GetAllDevicesQuery,
@@ -13,7 +15,10 @@ import {
 
 @Injectable()
 export class DevicesService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly logService: LogService,
+  ) {}
 
   async findAll({
     page = 1,
@@ -70,7 +75,7 @@ export class DevicesService {
     return device;
   }
 
-  async create(createDeviceDto: CreateDeviceDto) {
+  async create(createDeviceDto: CreateDeviceDto, userId: string) {
     const existingSerialNumber = await this.prisma.device.findUnique({
       where: {
         serialNumber: createDeviceDto.serialNumber,
@@ -89,12 +94,22 @@ export class DevicesService {
       throw new NotFoundException('Manufacturer not found');
     }
 
-    return this.prisma.device.create({
+    const device = await this.prisma.device.create({
       data: createDeviceDto,
     });
+
+    await this.logService.create({
+      userId,
+      targetId: device.id,
+      targetName: device.name,
+      type: 'device',
+      action: 'create',
+    });
+
+    return device;
   }
 
-  async update(id: string, updateDeviceDto: UpdateDeviceDto) {
+  async update(id: string, updateDeviceDto: UpdateDeviceDto, userId: string) {
     const existingDevice = await this.prisma.device.findUnique({
       where: { id },
     });
@@ -127,13 +142,23 @@ export class DevicesService {
       }
     }
 
-    return this.prisma.device.update({
+    const updatedDevice = await this.prisma.device.update({
       where: { id },
       data: updateDeviceDto,
     });
+
+    await this.logService.create({
+      userId,
+      targetId: id,
+      targetName: updatedDevice.name,
+      type: 'device',
+      action: 'update',
+    });
+
+    return updatedDevice;
   }
 
-  async delete(id: string) {
+  async delete(id: string, userId: string) {
     const existingDevice = await this.prisma.device.findUnique({
       where: { id },
     });
@@ -142,10 +167,18 @@ export class DevicesService {
       throw new NotFoundException('Device not found');
     }
 
-    await this.prisma.device.delete({
+    const deletedDevice = await this.prisma.device.delete({
       where: { id },
     });
 
-    return true;
+    await this.logService.create({
+      userId,
+      targetId: id,
+      targetName: deletedDevice.name,
+      type: 'device',
+      action: 'delete',
+    });
+
+    return deletedDevice;
   }
 }

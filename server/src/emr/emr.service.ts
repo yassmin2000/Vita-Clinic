@@ -10,6 +10,7 @@ import { DiagnosesService } from 'src/settings/diagnoses/diagnoses.service';
 import { MedicalConditionsService } from 'src/settings/medical-conditions/medical-conditions.service';
 import { SurgeriesService } from 'src/settings/surgeries/surgeries.service';
 import { MedicationsService } from 'src/settings/medications/medications.service';
+import { LogService } from 'src/log/log.service';
 
 import {
   EmrDto,
@@ -36,6 +37,7 @@ export class EmrService {
     private medicalConditionsService: MedicalConditionsService,
     private surgeriesService: SurgeriesService,
     private medicationsService: MedicationsService,
+    private logService: LogService,
   ) {}
 
   async getById(patientId: string) {
@@ -147,7 +149,7 @@ export class EmrService {
     });
   }
 
-  async update(patientId: string, emrDto: EmrDto) {
+  async update(patientId: string, emrDto: EmrDto, userId: string) {
     const patient = await this.prisma.user.findUnique({
       where: {
         id: patientId,
@@ -207,12 +209,42 @@ export class EmrService {
       },
     });
 
+    if (
+      height ||
+      weight ||
+      bloodType ||
+      smokingStatus ||
+      alcoholStatus ||
+      drugsUsage
+    ) {
+      await this.logService.create({
+        userId,
+        targetId: emr.id,
+        targetName: `${patient.firstName} ${patient.lastName}`,
+        type: 'patient-general',
+        action: 'update',
+        targetUserId: patient.id,
+      });
+    }
+
     if (allergies) {
-      await this.updateAllergies(emrId, emr.allergies || [], allergies);
+      await this.updateAllergies(
+        emrId,
+        emr.allergies || [],
+        allergies,
+        patient.id,
+        userId,
+      );
     }
 
     if (diagnoses) {
-      await this.updateDiagnoses(emrId, emr.diagnoses || [], diagnoses);
+      await this.updateDiagnoses(
+        emrId,
+        emr.diagnoses || [],
+        diagnoses,
+        patient.id,
+        userId,
+      );
     }
 
     if (medicalConditions) {
@@ -220,15 +252,29 @@ export class EmrService {
         emrId,
         emr.medicalConditions || [],
         medicalConditions,
+        patient.id,
+        userId,
       );
     }
 
     if (surgeries) {
-      await this.updateSurgeries(emrId, emr.surgeries || [], surgeries);
+      await this.updateSurgeries(
+        emrId,
+        emr.surgeries || [],
+        surgeries,
+        patient.id,
+        userId,
+      );
     }
 
     if (medications) {
-      await this.updateMedications(emrId, emr.medications || [], medications);
+      await this.updateMedications(
+        emrId,
+        emr.medications || [],
+        medications,
+        patient.id,
+        userId,
+      );
     }
 
     return emr;
@@ -238,6 +284,8 @@ export class EmrService {
     emrId: string,
     patientAllergies: PatientAllergy[],
     allergies: PatientAllergiesDto,
+    patientId: string,
+    userId: string,
   ): Promise<boolean> {
     try {
       // Create new allergies
@@ -257,14 +305,26 @@ export class EmrService {
           );
 
           if (currentAllergy) {
-            return this.prisma.patientAllergy.create({
-              data: {
-                emrId,
-                allergyId: currentAllergy.id,
-                notes: allergy.notes,
-                patientReaction: allergy.reaction,
-              },
+            const createdPatientAllergy =
+              await this.prisma.patientAllergy.create({
+                data: {
+                  emrId,
+                  allergyId: currentAllergy.id,
+                  notes: allergy.notes,
+                  patientReaction: allergy.reaction,
+                },
+              });
+
+            await this.logService.create({
+              userId,
+              targetId: createdPatientAllergy.id,
+              targetName: currentAllergy.name,
+              type: 'patient-allergy',
+              action: 'create',
+              targetUserId: patientId,
             });
+
+            return createdPatientAllergy;
           }
         }),
       );
@@ -277,15 +337,30 @@ export class EmrService {
           );
 
           if (currentPatientAllergy) {
-            return this.prisma.patientAllergy.update({
-              where: {
-                id: currentPatientAllergy.id,
-              },
-              data: {
-                notes: allergy.notes,
-                patientReaction: allergy.reaction,
-              },
+            const updatedPatientAllergy =
+              await this.prisma.patientAllergy.update({
+                where: {
+                  id: currentPatientAllergy.id,
+                },
+                data: {
+                  notes: allergy.notes,
+                  patientReaction: allergy.reaction,
+                },
+                include: {
+                  allergy: true,
+                },
+              });
+
+            await this.logService.create({
+              userId,
+              targetId: updatedPatientAllergy.id,
+              targetName: updatedPatientAllergy.allergy.name,
+              type: 'patient-allergy',
+              action: 'update',
+              targetUserId: patientId,
             });
+
+            return updatedPatientAllergy;
           }
         }),
       );
@@ -298,11 +373,26 @@ export class EmrService {
           );
 
           if (currentPatientAllergy) {
-            return this.prisma.patientAllergy.delete({
-              where: {
-                id: currentPatientAllergy.id,
-              },
+            const deletedPatientAllergy =
+              await this.prisma.patientAllergy.delete({
+                where: {
+                  id: currentPatientAllergy.id,
+                },
+                include: {
+                  allergy: true,
+                },
+              });
+
+            await this.logService.create({
+              userId,
+              targetId: deletedPatientAllergy.id,
+              targetName: deletedPatientAllergy.allergy.name,
+              type: 'patient-allergy',
+              action: 'delete',
+              targetUserId: patientId,
             });
+
+            return deletedPatientAllergy;
           }
         }),
       );
@@ -318,6 +408,8 @@ export class EmrService {
     emrId: string,
     patientDiagnoses: PatientDiagnosis[],
     diagnoses: PatientDiagnosesDto,
+    patientId: string,
+    userId: string,
   ): Promise<boolean> {
     try {
       // Create new diagnoses
@@ -337,14 +429,26 @@ export class EmrService {
           );
 
           if (currentDiagnosis) {
-            return this.prisma.patientDiagnosis.create({
-              data: {
-                emrId,
-                diagnosisId: currentDiagnosis.id,
-                notes: diagnosis.notes,
-                date: diagnosis.date,
-              },
+            const createdPatientDiagnosis =
+              await this.prisma.patientDiagnosis.create({
+                data: {
+                  emrId,
+                  diagnosisId: currentDiagnosis.id,
+                  notes: diagnosis.notes,
+                  date: diagnosis.date,
+                },
+              });
+
+            await this.logService.create({
+              userId,
+              targetId: createdPatientDiagnosis.id,
+              targetName: currentDiagnosis.name,
+              type: 'patient-diagnosis',
+              action: 'create',
+              targetUserId: patientId,
             });
+
+            return createdPatientDiagnosis;
           }
         }),
       );
@@ -358,15 +462,30 @@ export class EmrService {
           );
 
           if (currentPatientDiagnosis) {
-            return this.prisma.patientDiagnosis.update({
-              where: {
-                id: currentPatientDiagnosis.id,
-              },
-              data: {
-                notes: diagnosis.notes,
-                date: diagnosis.date,
-              },
+            const updatedPatientDiagnosis =
+              await this.prisma.patientDiagnosis.update({
+                where: {
+                  id: currentPatientDiagnosis.id,
+                },
+                data: {
+                  notes: diagnosis.notes,
+                  date: diagnosis.date,
+                },
+                include: {
+                  diagnosis: true,
+                },
+              });
+
+            await this.logService.create({
+              userId,
+              targetId: updatedPatientDiagnosis.id,
+              targetName: updatedPatientDiagnosis.diagnosis.name,
+              type: 'patient-diagnosis',
+              action: 'update',
+              targetUserId: patientId,
             });
+
+            return updatedPatientDiagnosis;
           }
         }),
       );
@@ -379,10 +498,23 @@ export class EmrService {
           );
 
           if (currentPatientDiagnosis) {
-            return this.prisma.patientDiagnosis.delete({
-              where: {
-                id: currentPatientDiagnosis.id,
-              },
+            const deletedPatientDiagnosis =
+              await this.prisma.patientDiagnosis.delete({
+                where: {
+                  id: currentPatientDiagnosis.id,
+                },
+                include: {
+                  diagnosis: true,
+                },
+              });
+
+            await this.logService.create({
+              userId,
+              targetId: deletedPatientDiagnosis.id,
+              targetName: deletedPatientDiagnosis.diagnosis.name,
+              type: 'patient-diagnosis',
+              action: 'delete',
+              targetUserId: patientId,
             });
           }
         }),
@@ -399,6 +531,8 @@ export class EmrService {
     emrId: string,
     patientMedicalConditions: PatientMedicalCondition[],
     medicalConditions: PatientMedicalConditionsDto,
+    patientId: string,
+    userId: string,
   ): Promise<boolean> {
     try {
       // Create new medical conditions
@@ -420,14 +554,26 @@ export class EmrService {
             );
 
           if (currentMedicalCondition) {
-            return this.prisma.patientMedicalCondition.create({
-              data: {
-                emrId,
-                medicalConditionId: currentMedicalCondition.id,
-                notes: medicalCondition.notes,
-                date: medicalCondition.date,
-              },
+            const createdMedicalCondition =
+              await this.prisma.patientMedicalCondition.create({
+                data: {
+                  emrId,
+                  medicalConditionId: currentMedicalCondition.id,
+                  notes: medicalCondition.notes,
+                  date: medicalCondition.date,
+                },
+              });
+
+            await this.logService.create({
+              userId,
+              targetId: createdMedicalCondition.id,
+              targetName: currentMedicalCondition.name,
+              type: 'patient-medical-condition',
+              action: 'create',
+              targetUserId: patientId,
             });
+
+            return createdMedicalCondition;
           }
         }),
       );
@@ -442,15 +588,30 @@ export class EmrService {
           );
 
           if (currentPatientMedicalCondition) {
-            return this.prisma.patientMedicalCondition.update({
-              where: {
-                id: currentPatientMedicalCondition.id,
-              },
-              data: {
-                notes: medicalCondition.notes,
-                date: medicalCondition.date,
-              },
+            const updatedMedicalCondition =
+              await this.prisma.patientMedicalCondition.update({
+                where: {
+                  id: currentPatientMedicalCondition.id,
+                },
+                data: {
+                  notes: medicalCondition.notes,
+                  date: medicalCondition.date,
+                },
+                include: {
+                  medicalCondition: true,
+                },
+              });
+
+            await this.logService.create({
+              userId,
+              targetId: updatedMedicalCondition.id,
+              targetName: updatedMedicalCondition.medicalCondition.name,
+              type: 'patient-medical-condition',
+              action: 'update',
+              targetUserId: patientId,
             });
+
+            return updatedMedicalCondition;
           }
         }),
       );
@@ -464,11 +625,26 @@ export class EmrService {
           );
 
           if (currentPatientMedicalCondition) {
-            return this.prisma.patientMedicalCondition.delete({
-              where: {
-                id: currentPatientMedicalCondition.id,
-              },
+            const deletedMedicalCondition =
+              await this.prisma.patientMedicalCondition.delete({
+                where: {
+                  id: currentPatientMedicalCondition.id,
+                },
+                include: {
+                  medicalCondition: true,
+                },
+              });
+
+            await this.logService.create({
+              userId,
+              targetId: deletedMedicalCondition.id,
+              targetName: deletedMedicalCondition.medicalCondition.name,
+              type: 'patient-medical-condition',
+              action: 'delete',
+              targetUserId: patientId,
             });
+
+            return deletedMedicalCondition;
           }
         }),
       );
@@ -484,6 +660,8 @@ export class EmrService {
     emrId: string,
     patientSurgeries: PatientSurgery[],
     surgeries: PatientSurgeriesDto,
+    patientId: string,
+    userId: string,
   ): Promise<boolean> {
     try {
       // Create new surgeries
@@ -503,14 +681,26 @@ export class EmrService {
           );
 
           if (currentSurgery) {
-            return this.prisma.patientSurgery.create({
-              data: {
-                emrId,
-                surgeryId: currentSurgery.id,
-                notes: surgery.notes,
-                date: surgery.date,
-              },
+            const createdPatientSurgery =
+              await this.prisma.patientSurgery.create({
+                data: {
+                  emrId,
+                  surgeryId: currentSurgery.id,
+                  notes: surgery.notes,
+                  date: surgery.date,
+                },
+              });
+
+            await this.logService.create({
+              userId,
+              targetId: createdPatientSurgery.id,
+              targetName: currentSurgery.name,
+              type: 'patient-surgery',
+              action: 'create',
+              targetUserId: patientId,
             });
+
+            return createdPatientSurgery;
           }
         }),
       );
@@ -523,15 +713,30 @@ export class EmrService {
           );
 
           if (currentPatientSurgery) {
-            return this.prisma.patientSurgery.update({
-              where: {
-                id: currentPatientSurgery.id,
-              },
-              data: {
-                notes: surgery.notes,
-                date: surgery.date,
-              },
+            const updatedPatientSurgery =
+              await this.prisma.patientSurgery.update({
+                where: {
+                  id: currentPatientSurgery.id,
+                },
+                data: {
+                  notes: surgery.notes,
+                  date: surgery.date,
+                },
+                include: {
+                  surgery: true,
+                },
+              });
+
+            await this.logService.create({
+              userId,
+              targetId: updatedPatientSurgery.id,
+              targetName: updatedPatientSurgery.surgery.name,
+              type: 'patient-surgery',
+              action: 'update',
+              targetUserId: patientId,
             });
+
+            return updatedPatientSurgery;
           }
         }),
       );
@@ -544,11 +749,26 @@ export class EmrService {
           );
 
           if (currentPatientSurgery) {
-            return this.prisma.patientSurgery.delete({
-              where: {
-                id: currentPatientSurgery.id,
-              },
+            const deletedPatientSurgery =
+              await this.prisma.patientSurgery.delete({
+                where: {
+                  id: currentPatientSurgery.id,
+                },
+                include: {
+                  surgery: true,
+                },
+              });
+
+            await this.logService.create({
+              userId,
+              targetId: deletedPatientSurgery.id,
+              targetName: deletedPatientSurgery.surgery.name,
+              type: 'patient-surgery',
+              action: 'delete',
+              targetUserId: patientId,
             });
+
+            return deletedPatientSurgery;
           }
         }),
       );
@@ -564,6 +784,8 @@ export class EmrService {
     emrId: string,
     patientMedications: PatientMedication[],
     medications: PatientMedicationsDto,
+    patientId: string,
+    userId: string,
   ): Promise<boolean> {
     try {
       // Create new medications
@@ -583,18 +805,30 @@ export class EmrService {
           );
 
           if (currentMedication) {
-            return this.prisma.patientMedication.create({
-              data: {
-                emrId,
-                medicationId: currentMedication.id,
-                notes: medication.notes,
-                startDate: medication.startDate,
-                endDate: medication.endDate,
-                dosage: medication.dosage,
-                frequency: medication.frequency,
-                required: medication.required,
-              },
+            const createdPatientMedication =
+              await this.prisma.patientMedication.create({
+                data: {
+                  emrId,
+                  medicationId: currentMedication.id,
+                  notes: medication.notes,
+                  startDate: medication.startDate,
+                  endDate: medication.endDate,
+                  dosage: medication.dosage,
+                  frequency: medication.frequency,
+                  required: medication.required,
+                },
+              });
+
+            await this.logService.create({
+              userId,
+              targetId: createdPatientMedication.id,
+              targetName: currentMedication.name,
+              type: 'patient-medication',
+              action: 'create',
+              targetUserId: patientId,
             });
+
+            return createdPatientMedication;
           }
         }),
       );
@@ -608,19 +842,34 @@ export class EmrService {
           );
 
           if (currentPatientMedication) {
-            return this.prisma.patientMedication.update({
-              where: {
-                id: currentPatientMedication.id,
-              },
-              data: {
-                notes: medication.notes,
-                startDate: medication.startDate,
-                endDate: medication.endDate,
-                dosage: medication.dosage,
-                frequency: medication.frequency,
-                required: medication.required,
-              },
+            const updatedPatientMedication =
+              await this.prisma.patientMedication.update({
+                where: {
+                  id: currentPatientMedication.id,
+                },
+                data: {
+                  notes: medication.notes,
+                  startDate: medication.startDate,
+                  endDate: medication.endDate,
+                  dosage: medication.dosage,
+                  frequency: medication.frequency,
+                  required: medication.required,
+                },
+                include: {
+                  medication: true,
+                },
+              });
+
+            await this.logService.create({
+              userId,
+              targetId: updatedPatientMedication.id,
+              targetName: updatedPatientMedication.medication.name,
+              type: 'patient-medication',
+              action: 'update',
+              targetUserId: patientId,
             });
+
+            return updatedPatientMedication;
           }
         }),
       );
@@ -633,11 +882,26 @@ export class EmrService {
           );
 
           if (currentPatientMedication) {
-            return this.prisma.patientMedication.delete({
-              where: {
-                id: currentPatientMedication.id,
-              },
+            const deletedPatientMedication =
+              await this.prisma.patientMedication.delete({
+                where: {
+                  id: currentPatientMedication.id,
+                },
+                include: {
+                  medication: true,
+                },
+              });
+
+            await this.logService.create({
+              userId,
+              targetId: deletedPatientMedication.id,
+              targetName: deletedPatientMedication.medication.name,
+              type: 'patient-medication',
+              action: 'delete',
+              targetUserId: patientId,
             });
+
+            return deletedPatientMedication;
           }
         }),
       );

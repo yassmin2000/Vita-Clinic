@@ -1,5 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
+import { LogService } from 'src/log/log.service';
+
 import {
   CreateTreatmentDto,
   UpdateTreatmentDto,
@@ -8,7 +10,10 @@ import {
 
 @Injectable()
 export class TreatmentService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly logService: LogService,
+  ) {}
 
   async findAllByAppointmentId(appointmentId: string) {
     return this.prisma.treatment.findMany({
@@ -52,7 +57,7 @@ export class TreatmentService {
     });
   }
 
-  async create(createTreatmentDto: CreateTreatmentDto) {
+  async create(createTreatmentDto: CreateTreatmentDto, userId: string) {
     const appointment = await this.prisma.appointment.findUnique({
       where: { id: createTreatmentDto.appointmentId },
     });
@@ -69,12 +74,27 @@ export class TreatmentService {
       throw new NotFoundException('Therapy not found');
     }
 
-    return this.prisma.treatment.create({
+    const treatment = await this.prisma.treatment.create({
       data: createTreatmentDto,
     });
+
+    await this.logService.create({
+      userId,
+      targetId: treatment.id,
+      targetName: treatment.name,
+      type: 'treatment',
+      action: 'create',
+      targetUserId: appointment.patientId,
+    });
+
+    return treatment;
   }
 
-  async update(id: string, updateTreatmentDto: UpdateTreatmentDto) {
+  async update(
+    id: string,
+    updateTreatmentDto: UpdateTreatmentDto,
+    userId: string,
+  ) {
     const existingTreatment = await this.prisma.treatment.findUnique({
       where: { id },
     });
@@ -85,9 +105,27 @@ export class TreatmentService {
 
     const { therapyId, appointmentId, ...dto } = updateTreatmentDto;
 
-    return this.prisma.treatment.update({
+    const treatment = await this.prisma.treatment.update({
       where: { id },
       data: dto,
+      include: {
+        appointment: {
+          select: {
+            patientId: true,
+          },
+        },
+      },
     });
+
+    await this.logService.create({
+      userId,
+      targetId: treatment.id,
+      targetName: treatment.name,
+      type: 'treatment',
+      action: 'update',
+      targetUserId: treatment.appointment.patientId,
+    });
+
+    return treatment;
   }
 }

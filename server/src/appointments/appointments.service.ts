@@ -10,6 +10,7 @@ import { LaboratoryTestsService } from 'src/settings/laboratory-tests/laboratory
 import { ModalitiesService } from 'src/settings/modalities/modalities.service';
 import { ServicesService } from 'src/settings/services/services.service';
 import { TherapiesService } from 'src/settings/therapies/therapies.service';
+import { LogService } from 'src/log/log.service';
 
 import {
   CreateAppointmentDto,
@@ -25,6 +26,7 @@ export class AppointmentsService {
     private modalitiesService: ModalitiesService,
     private servicesService: ServicesService,
     private therapiesService: TherapiesService,
+    private logService: LogService,
   ) {}
 
   async findAll(
@@ -271,7 +273,7 @@ export class AppointmentsService {
     });
   }
 
-  async approve(appointmentId: string, doctorId: string) {
+  async approve(appointmentId: string, doctorId: string, userId: string) {
     const appointment = await this.prisma.appointment.findUnique({
       where: { id: appointmentId },
     });
@@ -292,16 +294,27 @@ export class AppointmentsService {
       throw new ConflictException('Appointment is not pending');
     }
 
-    return this.prisma.appointment.update({
+    const approvedAppointment = this.prisma.appointment.update({
       where: { id: appointmentId },
       data: {
         status: 'approved',
         doctorId,
       },
     });
+
+    await this.logService.create({
+      userId,
+      targetId: appointment.id,
+      targetName: `Appointment ${appointment.number}`,
+      type: 'appointment',
+      action: 'approve',
+      targetUserId: appointment.patientId,
+    });
+
+    return approvedAppointment;
   }
 
-  async reject(appointmentId: string) {
+  async reject(appointmentId: string, userId: string) {
     const appointment = await this.prisma.appointment.findUnique({
       where: { id: appointmentId },
     });
@@ -314,15 +327,26 @@ export class AppointmentsService {
       throw new ConflictException('Appointment is not pending');
     }
 
-    return this.prisma.appointment.update({
+    const rejectedAppointment = await this.prisma.appointment.update({
       where: { id: appointmentId },
       data: {
         status: 'rejected',
       },
     });
+
+    await this.logService.create({
+      userId,
+      targetId: rejectedAppointment.id,
+      targetName: `Appointment ${rejectedAppointment.number}`,
+      type: 'appointment',
+      action: 'reject',
+      targetUserId: rejectedAppointment.patientId,
+    });
+
+    return rejectedAppointment;
   }
 
-  async cancel(appointmentId: string) {
+  async cancel(appointmentId: string, userId: string) {
     const appointment = await this.prisma.appointment.findUnique({
       where: { id: appointmentId },
     });
@@ -344,15 +368,30 @@ export class AppointmentsService {
       },
     });
 
-    return this.prisma.appointment.update({
+    const cancelledAppointment = await this.prisma.appointment.update({
       where: { id: appointmentId },
       data: {
         status: 'cancelled',
       },
     });
+
+    await this.logService.create({
+      userId,
+      targetId: cancelledAppointment.id,
+      targetName: `Appointment ${cancelledAppointment.number}`,
+      type: 'appointment',
+      action: 'cancel',
+      targetUserId: cancelledAppointment.patientId,
+    });
+
+    return cancelledAppointment;
   }
 
-  async complete(appointmentId: string, billingStatus: BillingStatus) {
+  async complete(
+    appointmentId: string,
+    billingStatus: BillingStatus,
+    userId: string,
+  ) {
     const appointment = await this.prisma.appointment.findUnique({
       where: { id: appointmentId },
       select: {
@@ -393,11 +432,22 @@ export class AppointmentsService {
       },
     });
 
-    return this.prisma.appointment.update({
+    const completedAppointment = await this.prisma.appointment.update({
       where: { id: appointmentId },
       data: {
         status: 'completed',
       },
     });
+
+    await this.logService.create({
+      userId,
+      targetId: completedAppointment.id,
+      targetName: `Appointment ${completedAppointment.number}`,
+      type: 'appointment',
+      action: 'complete',
+      targetUserId: completedAppointment.patientId,
+    });
+
+    return completedAppointment;
   }
 }

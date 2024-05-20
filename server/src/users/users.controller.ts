@@ -62,7 +62,7 @@ export class UsersController {
       throw new UnauthorizedException();
     }
 
-    return this.userService.create(dto, dto.role || 'patient', true);
+    return this.userService.create(dto, dto.role || 'patient', true, user.id);
   }
 
   @UseGuards(JwtGuard)
@@ -74,7 +74,7 @@ export class UsersController {
       throw new UnauthorizedException();
     }
 
-    return this.userService.deactivate(id);
+    return this.userService.deactivate(id, user.id);
   }
 
   @UseGuards(JwtGuard)
@@ -86,7 +86,7 @@ export class UsersController {
       throw new UnauthorizedException();
     }
 
-    return this.userService.activate(id);
+    return this.userService.activate(id, user.id);
   }
 
   @UseGuards(JwtGuard)

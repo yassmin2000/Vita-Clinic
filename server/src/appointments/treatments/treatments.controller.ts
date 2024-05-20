@@ -33,7 +33,7 @@ export class TreatmentController {
       throw new UnauthorizedException();
     }
 
-    return this.treatmentService.create(createTreatmentDto);
+    return this.treatmentService.create(createTreatmentDto, user.id);
   }
 
   @UseGuards(JwtGuard)
@@ -49,6 +49,6 @@ export class TreatmentController {
       throw new UnauthorizedException();
     }
 
-    return this.treatmentService.update(id, updateTreatmentDto);
+    return this.treatmentService.update(id, updateTreatmentDto, user.id);
   }
 }

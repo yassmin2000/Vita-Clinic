@@ -23,7 +23,7 @@ export class TestResultsController {
 
   @UseGuards(JwtGuard)
   @Post()
-  async createTreatment(
+  async createTestResults(
     @Body(ValidationPipe) dto: CreateLaboratoryTestResultDto,
     @Req() request: Request,
   ) {
@@ -33,12 +33,12 @@ export class TestResultsController {
       throw new UnauthorizedException();
     }
 
-    return this.testResultsService.create(dto);
+    return this.testResultsService.create(dto, user.id);
   }
 
   @UseGuards(JwtGuard)
   @Patch(':id')
-  async updateTreatment(
+  async updateTestResults(
     @Param('id') id: string,
     @Body(ValidationPipe) dto: UpdateLaboratoryTestResultDto,
     @Req() request: Request,
@@ -49,6 +49,6 @@ export class TestResultsController {
       throw new UnauthorizedException();
     }
 
-    return this.testResultsService.update(id, dto);
+    return this.testResultsService.update(id, dto, user.id);
   }
 }
