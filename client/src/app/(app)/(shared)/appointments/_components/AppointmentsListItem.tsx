@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useSession } from 'next-auth/react';
 import { format, parseISO } from 'date-fns';
 import {
   ArrowRight,
@@ -13,7 +14,7 @@ import {
 
 import { Card } from '@/components/ui/card';
 import AppointmentDropdownMenu from './AppointmentDropdownMenu';
-import { buttonVariants } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 
 import useUserRole from '@/hooks/useUserRole';
 import { cn } from '@/lib/utils';
@@ -24,7 +25,9 @@ import type { Insurance } from '@/types/emr.type';
 interface AppointmentsListItemProps {
   id: string;
   appointmentNumber: number;
+  patientId: string;
   patientName: string;
+  doctorId: string;
   doctorName: string;
   status: AppointmentStatus;
   bookedAt: string;
@@ -65,7 +68,9 @@ const appointmentStatus = {
 export default function AppointmentsListItem({
   id,
   appointmentNumber,
+  patientId,
   patientName,
+  doctorId,
   doctorName,
   status,
   bookedAt,
@@ -74,6 +79,7 @@ export default function AppointmentsListItem({
   insurance,
   queryKey,
 }: AppointmentsListItemProps) {
+  const session = useSession();
   const { role } = useUserRole();
   const currentStatus = appointmentStatus[status];
 
@@ -94,7 +100,7 @@ export default function AppointmentsListItem({
           <p className="font-medium">
             Appointment by{' '}
             <Link
-              href={`/users/${patientName}`}
+              href={`/profile/${patientId}`}
               className="text-primary transition-all hover:text-primary/80"
             >
               {patientName}
@@ -108,7 +114,7 @@ export default function AppointmentsListItem({
               <p className="text-sm text-muted-foreground">
                 Appointment to Dr.{' '}
                 <Link
-                  href={`/users/${doctorName}`}
+                  href={`/profile/${doctorId}`}
                   className="text-primary transition-all hover:text-primary/80"
                 >
                   {doctorName}
@@ -126,7 +132,7 @@ export default function AppointmentsListItem({
             <p className="text-sm text-muted-foreground">
               Appointment to Dr.{' '}
               <Link
-                href={`/users/${doctorName}`}
+                href={`/profile/${doctorId}`}
                 className="text-primary transition-all hover:text-primary/80"
               >
                 {doctorName}
@@ -137,7 +143,7 @@ export default function AppointmentsListItem({
         </div>
       </div>
       <div className="flex items-center gap-2">
-        {role === 'admin' && (
+        {(role === 'admin' || patientId === session.data?.user.id) && (
           <AppointmentDropdownMenu
             id={id}
             appointmentNumber={appointmentNumber}

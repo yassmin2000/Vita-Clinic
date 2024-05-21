@@ -146,6 +146,23 @@ export class PatientsController {
   }
 
   @UseGuards(JwtGuard)
+  @Get(':id/appointments')
+  async getPatientsAppointmentsById(
+    @Param('id') id: string,
+    @Query(new ValidationPipe({ transform: true }))
+    query: GetAllAppointmentsQuery,
+    @Req() request: Request,
+  ) {
+    const user: Payload = request['user'];
+
+    if (user.role === 'patient') {
+      throw new UnauthorizedException();
+    }
+
+    return this.appointmentsService.findAll(query, id);
+  }
+
+  @UseGuards(JwtGuard)
   @Get('/reports')
   async getPatientReports(
     @Req() request: Request,

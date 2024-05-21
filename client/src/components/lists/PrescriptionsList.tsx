@@ -31,7 +31,7 @@ export default function PrescriptionsList({
     isLoading,
   } = useQuery({
     queryKey: [
-      `prescriptions_page_${currentPage}_count_${countPerPage}_sort_${sortBy}_search_${searchValue}`,
+      `prescriptions_page_${currentPage}_count_${countPerPage}_sort_${sortBy}_search_${searchValue}_patient_${patientId}`,
     ],
     queryFn: async () => {
       let url;

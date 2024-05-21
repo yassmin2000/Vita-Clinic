@@ -15,7 +15,11 @@ import { useTableOptions } from '@/hooks/useTableOptions';
 
 import type { Appointment } from '@/types/appointments.type';
 
-export default function AppointmentsList() {
+interface AppointmentsListProps {
+  patientId?: string;
+}
+
+export default function AppointmentsList({ patientId }: AppointmentsListProps) {
   const accessToken = useAccessToken();
   const { role } = useUserRole();
 
@@ -37,14 +41,18 @@ export default function AppointmentsList() {
     isLoading,
   } = useQuery({
     queryKey: [
-      `appointments_page_${currentPage}_count_${countPerPage}_status_${currentAppointmentStatus}_show_${currentVisibleAppointments}_sort_${sortBy}_search_${searchValue}`,
+      `appointments_page_${currentPage}_count_${countPerPage}_status_${currentAppointmentStatus}_show_${currentVisibleAppointments}_sort_${sortBy}_search_${searchValue}_patient_${patientId}`,
     ],
     queryFn: async () => {
       let url = '';
       if (role === 'patient') {
         url = `${process.env.NEXT_PUBLIC_API_URL}/users/patients/appointments?page=${currentPage}&limit=${countPerPage}&status=${currentAppointmentStatus}&value=${searchValue}&sort=${sortBy}`;
       } else {
-        url = `${process.env.NEXT_PUBLIC_API_URL}/appointments?page=${currentPage}&limit=${countPerPage}&status=${currentAppointmentStatus}&doctor=${currentVisibleAppointments === 'yours' ? true : false}&value=${searchValue}&sort=${sortBy}`;
+        if (patientId) {
+          url = `${process.env.NEXT_PUBLIC_API_URL}/users/patients/${patientId}/appointments?page=${currentPage}&limit=${countPerPage}&status=${currentAppointmentStatus}&doctor=${currentVisibleAppointments === 'yours' ? true : false}&value=${searchValue}&sort=${sortBy}`;
+        } else {
+          url = `${process.env.NEXT_PUBLIC_API_URL}/appointments?page=${currentPage}&limit=${countPerPage}&status=${currentAppointmentStatus}&doctor=${currentVisibleAppointments === 'yours' ? true : false}&value=${searchValue}&sort=${sortBy}`;
+        }
       }
 
       const response = await axios.get(url, {
@@ -103,7 +111,9 @@ export default function AppointmentsList() {
               key={appointment.id}
               id={appointment.id}
               appointmentNumber={appointment.number}
+              patientId={appointment.patient.id}
               patientName={`${appointment.patient.firstName} ${appointment.patient.lastName}`}
+              doctorId={appointment.doctor?.id || ''}
               doctorName={
                 appointment.doctor
                   ? `${appointment.doctor.firstName} ${appointment.doctor.lastName}`
@@ -114,7 +124,7 @@ export default function AppointmentsList() {
               cancelledAt={appointment.updatedAt}
               status={appointment.status}
               insurance={appointment.emr?.insurance}
-              queryKey={`appointments_page_${currentPage}_count_${countPerPage}_status_${currentAppointmentStatus}_sort_${sortBy}_search_${searchValue}`}
+              queryKey={`appointments_page_${currentPage}_count_${countPerPage}_status_${currentAppointmentStatus}_sort_${sortBy}_search_${searchValue}_patient_${patientId}`}
             />
           ))}
       </div>

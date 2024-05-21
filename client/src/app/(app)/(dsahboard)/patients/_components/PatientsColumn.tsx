@@ -13,6 +13,7 @@ import {
 } from 'date-fns';
 import {
   Ban,
+  CalendarCheck,
   Eye,
   File,
   FileScan,
@@ -115,6 +116,13 @@ const ActionsCell = ({ row }: { row: Row<Patient> }) => {
               </DropdownMenuItem>
             </Link>
           )}
+          <Link href={`/patients/${userId}/appointments`}>
+            <DropdownMenuItem asChild>
+              <div className="flex items-center gap-2">
+                <CalendarCheck className="h-4 w-4" /> View Patient Appointments
+              </div>
+            </DropdownMenuItem>
+          </Link>
           <Link href={`/patients/${userId}/reports`}>
             <DropdownMenuItem asChild>
               <div className="flex items-center gap-2">

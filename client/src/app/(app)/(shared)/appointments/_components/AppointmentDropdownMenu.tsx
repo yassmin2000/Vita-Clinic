@@ -36,6 +36,7 @@ import useAccessToken from '@/hooks/useAccessToken';
 import { cn } from '@/lib/utils';
 
 import type { AppointmentStatus } from '@/types/appointments.type';
+import useUserRole from '@/hooks/useUserRole';
 
 interface AppointmentDropdownMenuProps {
   id: string;
@@ -55,6 +56,7 @@ export default function AppointmentDropdownMenu({
   queryKey,
 }: AppointmentDropdownMenuProps) {
   const accessToken = useAccessToken();
+  const { role } = useUserRole();
 
   const [currentDoctor, setCurrentDoctor] = useState<string | undefined>(
     undefined
@@ -134,8 +136,8 @@ export default function AppointmentDropdownMenu({
       if (queryKey) {
         queryClient.invalidateQueries({ queryKey: [queryKey] });
       }
-
       setIsApproving(false);
+
       return toast({
         title: 'Appointment approved successfully',
         description: `Appointment #${appointmentNumber} has been approved successfully.`,
@@ -178,8 +180,8 @@ export default function AppointmentDropdownMenu({
       if (queryKey) {
         queryClient.invalidateQueries({ queryKey: [queryKey] });
       }
-
       setIsCompleting(false);
+
       return toast({
         title: 'Appointment completed successfully',
         description: `Appointment #${appointmentNumber} has been completed successfully.`,
@@ -216,6 +218,7 @@ export default function AppointmentDropdownMenu({
       if (queryKey) {
         queryClient.invalidateQueries({ queryKey: [queryKey] });
       }
+      setIsRejecting(false);
 
       return toast({
         title: 'Appointment rejected successfully',
@@ -253,6 +256,7 @@ export default function AppointmentDropdownMenu({
       if (queryKey) {
         queryClient.invalidateQueries({ queryKey: [queryKey] });
       }
+      setIsCanceling(false);
 
       return toast({
         title: 'Appointment canceled successfully',
@@ -291,7 +295,7 @@ export default function AppointmentDropdownMenu({
           {(status === 'pending' || status === 'approved') && (
             <DropdownMenuSeparator />
           )}
-          {status === 'pending' && (
+          {role === 'admin' && status === 'pending' && (
             <>
               <DropdownMenuItem onClick={() => setIsApproving(true)}>
                 <Check className="mr-2 h-4 w-4" /> Approve appointment
@@ -303,9 +307,11 @@ export default function AppointmentDropdownMenu({
           )}
           {status === 'approved' && (
             <>
-              <DropdownMenuItem onClick={() => setIsCompleting(true)}>
-                <Check className="mr-2 h-4 w-4" /> Mark as completed
-              </DropdownMenuItem>
+              {role === 'admin' && (
+                <DropdownMenuItem onClick={() => setIsCompleting(true)}>
+                  <Check className="mr-2 h-4 w-4" /> Mark as completed
+                </DropdownMenuItem>
+              )}
               <DropdownMenuItem onClick={() => setIsCanceling(true)}>
                 <X className="mr-2 h-4 w-4" /> Cancel appointment
               </DropdownMenuItem>
@@ -321,6 +327,7 @@ export default function AppointmentDropdownMenu({
         isOpen={isRejecting}
         onClose={() => setIsRejecting(false)}
         onDelete={() => rejectAppointment()}
+        disabled={isSaving}
       />
 
       <DeleteAlert
@@ -330,6 +337,7 @@ export default function AppointmentDropdownMenu({
         isOpen={isCanceling}
         onClose={() => setIsCanceling(false)}
         onDelete={() => cancelAppointment()}
+        disabled={isSaving}
       />
 
       <Dialog open={isApproving} onOpenChange={() => setIsApproving(false)}>

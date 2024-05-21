@@ -2,8 +2,8 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { format, formatDistanceToNow, parseISO } from 'date-fns';
-import { Eye, MoreVertical, Pencil, Trash } from 'lucide-react';
+import { format, parseISO } from 'date-fns';
+import { MoreVertical, Pencil, Trash } from 'lucide-react';
 
 import { Card, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -132,15 +132,6 @@ export default function DeviceCard({
                       <Trash className="mr-2 h-4 w-4" /> Delete
                     </DropdownMenuItem>
                   )}
-                  <DropdownMenuSeparator />
-                  <Link href={`/users/${id}`}>
-                    <DropdownMenuItem asChild>
-                      <div className="flex items-center gap-2">
-                        <Eye className="h-4 w-4" />
-                        View
-                      </div>
-                    </DropdownMenuItem>
-                  </Link>
                 </DropdownMenuContent>
               </DropdownMenu>
             )}
@@ -169,11 +160,6 @@ export default function DeviceCard({
             </p>
           </div>
           <div className="mt-0.5">
-            <p className="text-sm text-muted-foreground">
-              Last maintained{' '}
-              {formatDistanceToNow(parseISO(lastMaintenanceDate))} ago (
-              {format(parseISO(lastMaintenanceDate), 'MMM dd, yyyy')})
-            </p>
             <p className="text-sm text-muted-foreground">
               Purchased on {format(parseISO(purchaseDate), 'MMM dd, yyyy')}
             </p>

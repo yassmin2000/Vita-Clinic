@@ -23,7 +23,7 @@ export default function DeleteAlert({
   title,
   description,
   deleteText = 'Delete',
-  disabled = true,
+  disabled = false,
   isOpen,
   onClose,
   onDelete,

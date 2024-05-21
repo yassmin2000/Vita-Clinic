@@ -29,7 +29,7 @@ export default function TestResultsList({ patientId }: TestResultsListProps) {
     isLoading,
   } = useQuery({
     queryKey: [
-      `test_results_page_${currentPage}_count_${countPerPage}_sort_${sortBy}_search_${searchValue}`,
+      `test_results_page_${currentPage}_count_${countPerPage}_sort_${sortBy}_search_${searchValue}_patient_${patientId}`,
     ],
     queryFn: async () => {
       let url;

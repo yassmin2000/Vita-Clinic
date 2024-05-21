@@ -66,7 +66,7 @@ export default function AppointmentDetailsCard({
         <CardDescription>
           Appointment by{' '}
           <Link
-            href={`/users/${appointment.patientId}`}
+            href={`/profile/${appointment.patientId}`}
             className="text-primary transition-all hover:text-primary/80"
           >
             {`${appointment.patient.firstName} ${appointment.patient.lastName}`}
@@ -76,7 +76,7 @@ export default function AppointmentDetailsCard({
               {' '}
               with Dr.{' '}
               <Link
-                href={`/users/${appointment.doctorId}`}
+                href={`/profile/${appointment.doctorId}`}
                 className="text-primary transition-all hover:text-primary/80"
               >
                 {`${appointment.doctor.firstName} ${appointment.doctor.lastName}`}
@@ -229,11 +229,16 @@ export default function AppointmentDetailsCard({
           </div>
         </div>
 
-        <Separator />
-        <AppointmentVitals
-          appointmentId={appointment.id}
-          vitals={appointment.vitals}
-        />
+        {appointment.status === 'approved' ||
+          (appointment.status === 'completed' && (
+            <>
+              <Separator />
+              <AppointmentVitals
+                appointmentId={appointment.id}
+                vitals={appointment.vitals}
+              />
+            </>
+          ))}
         <Separator />
 
         <div className="px-6 py-4">

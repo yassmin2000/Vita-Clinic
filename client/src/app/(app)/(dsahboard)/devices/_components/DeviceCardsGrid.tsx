@@ -67,7 +67,6 @@ export default function DeviceCardsGrid() {
         sortingEnabled
         sortByNameEnabled
         sortByPurchaseDateEnabled
-        sortByLastMaintenanceDateEnabled
         addNewButton={role === 'admin'}
         addNewRoute="/devices/new"
         addNewContent="New Device"
