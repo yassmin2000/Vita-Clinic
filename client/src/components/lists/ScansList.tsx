@@ -16,11 +16,22 @@ import type { Scan } from '@/types/appointments.type';
 
 interface ScansListProps {
   patientId?: string;
+  viewAll?: boolean;
 }
 
-export default function ScansList({ patientId }: ScansListProps) {
-  const { currentPage, countPerPage, reset, setSortBy, searchValue, sortBy } =
-    useTableOptions();
+export default function ScansList({
+  patientId,
+  viewAll = false,
+}: ScansListProps) {
+  const {
+    currentPage,
+    countPerPage,
+    setCountPerPage,
+    reset,
+    setSortBy,
+    searchValue,
+    sortBy,
+  } = useTableOptions();
   const accessToken = useAccessToken();
 
   const {
@@ -53,19 +64,24 @@ export default function ScansList({ patientId }: ScansListProps) {
   useEffect(() => {
     reset();
     setSortBy('createdAt-desc');
-  }, []);
+    if (viewAll) {
+      setCountPerPage(5000);
+    }
+  }, [viewAll]);
 
   return (
     <>
-      <FiltersBar
-        refetch={refetch}
-        searchFilter
-        searchPlaceholder="Search by scan title"
-        sortingEnabled
-        sortByNameEnabled
-        sortByDateEnabled
-        dateTitle="Created at"
-      />
+      {!viewAll && (
+        <FiltersBar
+          refetch={refetch}
+          searchFilter
+          searchPlaceholder="Search by scan title"
+          sortingEnabled
+          sortByNameEnabled
+          sortByDateEnabled
+          dateTitle="Created at"
+        />
+      )}
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         {isLoading &&
@@ -77,10 +93,12 @@ export default function ScansList({ patientId }: ScansListProps) {
           scans.map((scan) => <ScanItem key={scan.id} scan={scan} />)}
       </div>
 
-      <Pagination
-        previousDisabled={currentPage === 1 || isLoading}
-        nextDisabled={(scans && scans.length < countPerPage) || isLoading}
-      />
+      {!viewAll && (
+        <Pagination
+          previousDisabled={currentPage === 1 || isLoading}
+          nextDisabled={(scans && scans.length < countPerPage) || isLoading}
+        />
+      )}
     </>
   );
 }

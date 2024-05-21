@@ -16,11 +16,22 @@ import type { TestResult } from '@/types/appointments.type';
 
 interface TestResultsListProps {
   patientId?: string;
+  viewAll?: boolean;
 }
 
-export default function TestResultsList({ patientId }: TestResultsListProps) {
-  const { currentPage, countPerPage, reset, setSortBy, searchValue, sortBy } =
-    useTableOptions();
+export default function TestResultsList({
+  patientId,
+  viewAll = false,
+}: TestResultsListProps) {
+  const {
+    currentPage,
+    countPerPage,
+    setCountPerPage,
+    reset,
+    setSortBy,
+    searchValue,
+    sortBy,
+  } = useTableOptions();
   const accessToken = useAccessToken();
 
   const {
@@ -53,19 +64,24 @@ export default function TestResultsList({ patientId }: TestResultsListProps) {
   useEffect(() => {
     reset();
     setSortBy('createdAt-desc');
-  }, []);
+    if (viewAll) {
+      setCountPerPage(5000);
+    }
+  }, [viewAll]);
 
   return (
     <>
-      <FiltersBar
-        refetch={refetch}
-        searchFilter
-        searchPlaceholder="Search by report title"
-        sortingEnabled
-        sortByNameEnabled
-        sortByDateEnabled
-        dateTitle="Created at"
-      />
+      {!viewAll && (
+        <FiltersBar
+          refetch={refetch}
+          searchFilter
+          searchPlaceholder="Search by report title"
+          sortingEnabled
+          sortByNameEnabled
+          sortByDateEnabled
+          dateTitle="Created at"
+        />
+      )}
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         {isLoading &&
@@ -79,12 +95,14 @@ export default function TestResultsList({ patientId }: TestResultsListProps) {
           ))}
       </div>
 
-      <Pagination
-        previousDisabled={currentPage === 1 || isLoading}
-        nextDisabled={
-          (testResults && testResults.length < countPerPage) || isLoading
-        }
-      />
+      {!viewAll && (
+        <Pagination
+          previousDisabled={currentPage === 1 || isLoading}
+          nextDisabled={
+            (testResults && testResults.length < countPerPage) || isLoading
+          }
+        />
+      )}
     </>
   );
 }

@@ -20,9 +20,14 @@ import PatientAllergies from './PatientAllergies';
 import PatientDiagnoses from './PatientDiagnoses';
 import PatientMedicalConditions from './PatientMedicalConditions';
 import PatientSurgeries from './PatientSurgeries';
+import PatientMedications from './PatientMedications';
+import ReportsList from '@/components/lists/ReportsList';
+import ScansList from '@/components/lists/ScansList';
+import PrescriptionsList from '@/components/lists/PrescriptionsList';
+import TreatmentsList from '@/components/lists/TreatmentsList';
+import TestResultsList from '@/components/lists/TestResultsList';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/components/ui/use-toast';
-import PatientMedications from './PatientMedications';
 
 import useAccessToken from '@/hooks/useAccessToken';
 import useUserRole from '@/hooks/useUserRole';
@@ -307,6 +312,51 @@ export default function EmrAccordions({
             patientMedications={data.medications}
             view={view}
           />
+        </AccordionContent>
+      </AccordionItem>
+
+      <AccordionItem value="reports" className="border-none">
+        <AccordionTrigger className="rounded-t-md bg-primary px-4 text-lg font-semibold text-white transition-all hover:bg-primary/90 hover:no-underline">
+          Patient Reports
+        </AccordionTrigger>
+        <AccordionContent className="rounded-b-md border-b-2 border-l-2 border-r-2 border-secondary px-4 py-6 md:px-8">
+          <ReportsList patientId={patientId} viewAll />
+        </AccordionContent>
+      </AccordionItem>
+
+      <AccordionItem value="scans" className="border-none">
+        <AccordionTrigger className="rounded-t-md bg-primary px-4 text-lg font-semibold text-white transition-all hover:bg-primary/90 hover:no-underline">
+          Patient Scans
+        </AccordionTrigger>
+        <AccordionContent className="rounded-b-md border-b-2 border-l-2 border-r-2 border-secondary px-4 py-6 md:px-8">
+          <ScansList patientId={patientId} viewAll />
+        </AccordionContent>
+      </AccordionItem>
+
+      <AccordionItem value="prescriptions" className="border-none">
+        <AccordionTrigger className="rounded-t-md bg-primary px-4 text-lg font-semibold text-white transition-all hover:bg-primary/90 hover:no-underline">
+          Patient Prescriptons
+        </AccordionTrigger>
+        <AccordionContent className="rounded-b-md border-b-2 border-l-2 border-r-2 border-secondary px-4 py-6 md:px-8">
+          <PrescriptionsList patientId={patientId} viewAll />
+        </AccordionContent>
+      </AccordionItem>
+
+      <AccordionItem value="treatments" className="border-none">
+        <AccordionTrigger className="rounded-t-md bg-primary px-4 text-lg font-semibold text-white transition-all hover:bg-primary/90 hover:no-underline">
+          Patient Treatments
+        </AccordionTrigger>
+        <AccordionContent className="rounded-b-md border-b-2 border-l-2 border-r-2 border-secondary px-4 py-6 md:px-8">
+          <TreatmentsList patientId={patientId} viewAll />
+        </AccordionContent>
+      </AccordionItem>
+
+      <AccordionItem value="test-results" className="border-none">
+        <AccordionTrigger className="rounded-t-md bg-primary px-4 text-lg font-semibold text-white transition-all hover:bg-primary/90 hover:no-underline">
+          Laboratory Test Results
+        </AccordionTrigger>
+        <AccordionContent className="rounded-b-md border-b-2 border-l-2 border-r-2 border-secondary px-4 py-6 md:px-8">
+          <TestResultsList patientId={patientId} viewAll />
         </AccordionContent>
       </AccordionItem>
     </Accordion>
