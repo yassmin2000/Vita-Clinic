@@ -57,6 +57,7 @@ export default function Header() {
       <div className="hidden items-center gap-4 md:flex">
         {links.map((link) => (
           <Link
+            key={link.href}
             href={link.href}
             className="font-semibold transition-all hover:text-primary"
             onClick={(e) => {
