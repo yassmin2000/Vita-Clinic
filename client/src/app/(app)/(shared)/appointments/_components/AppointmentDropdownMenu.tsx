@@ -22,13 +22,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Combobox } from '@/components/ui/combobox';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/components/ui/use-toast';
 
@@ -58,9 +52,7 @@ export default function AppointmentDropdownMenu({
   const accessToken = useAccessToken();
   const { role } = useUserRole();
 
-  const [currentDoctor, setCurrentDoctor] = useState<string | undefined>(
-    undefined
-  );
+  const [currentDoctor, setCurrentDoctor] = useState<string | null>(null);
   const [currentPaymentMethod, setCurrentPaymentMethod] = useState<
     string | undefined
   >(undefined);
@@ -351,8 +343,17 @@ export default function AppointmentDropdownMenu({
 
           <div className="flex flex-col gap-2">
             <Label required>Doctor</Label>
-            <Select
+            <Combobox
+              value={currentDoctor || ''}
+              onChange={(value) => setCurrentDoctor(value)}
+              placeholder="Select doctor..."
+              inputPlaceholder="Search doctors..."
+              options={doctors || []}
               disabled={isSaving || isLoadingDoctors}
+            />
+
+            {/* <Select
+              disabled={}
               value={currentDoctor}
               onValueChange={(value) => {
                 setCurrentDoctor(value);
@@ -372,7 +373,7 @@ export default function AppointmentDropdownMenu({
                   </>
                 )}
               </SelectContent>
-            </Select>
+            </Select> */}
 
             <div className="mt-4 flex items-center gap-4 self-end">
               <Button
