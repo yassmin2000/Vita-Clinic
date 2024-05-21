@@ -149,72 +149,71 @@ export default function FiltersBar({
           </div>
         ) : null}
 
-        {appointmentsVisibleFilter ||
-          (appointmentStatusFilter && (
-            <div className="flex flex-wrap gap-2">
-              {appointmentsVisibleFilter && (
-                <Tabs
-                  value={currentVisibleAppointments}
-                  onValueChange={(value) => {
-                    if (value === 'all' || value === 'yours') {
-                      setCurrentPage(1);
-                      setCurrentVisibleAppointments(value);
-                    }
-                  }}
-                  className="w-[200px]"
-                >
-                  <TabsList className="w-full">
-                    <TabsTrigger value="all">All</TabsTrigger>
-                    <TabsTrigger value="yours">Your Appointments</TabsTrigger>
-                  </TabsList>
-                </Tabs>
-              )}
+        {appointmentsVisibleFilter || appointmentStatusFilter ? (
+          <div className="flex flex-wrap gap-2">
+            {appointmentsVisibleFilter && (
+              <Tabs
+                value={currentVisibleAppointments}
+                onValueChange={(value) => {
+                  if (value === 'all' || value === 'yours') {
+                    setCurrentPage(1);
+                    setCurrentVisibleAppointments(value);
+                  }
+                }}
+                className="w-[200px]"
+              >
+                <TabsList className="w-full">
+                  <TabsTrigger value="all">All</TabsTrigger>
+                  <TabsTrigger value="yours">Your Appointments</TabsTrigger>
+                </TabsList>
+              </Tabs>
+            )}
 
-              {appointmentStatusFilter && (
-                <Tabs
-                  value={currentAppointmentStatus}
-                  onValueChange={(value) => {
-                    if (
-                      value === 'all' ||
-                      value === 'completed' ||
-                      value === 'pending' ||
-                      value === 'cancelled' ||
-                      value === 'rejected' ||
-                      value === 'approved'
-                    ) {
-                      setCurrentPage(1);
-                      setCurrentAppointmentStatus(value);
-                    }
-                  }}
+            {appointmentStatusFilter && (
+              <Tabs
+                value={currentAppointmentStatus}
+                onValueChange={(value) => {
+                  if (
+                    value === 'all' ||
+                    value === 'completed' ||
+                    value === 'pending' ||
+                    value === 'cancelled' ||
+                    value === 'rejected' ||
+                    value === 'approved'
+                  ) {
+                    setCurrentPage(1);
+                    setCurrentAppointmentStatus(value);
+                  }
+                }}
+                className={cn(
+                  currentVisibleAppointments === 'yours'
+                    ? 'w-[350px]'
+                    : 'w-[500px]'
+                )}
+              >
+                <TabsList
                   className={cn(
+                    'grid w-full',
                     currentVisibleAppointments === 'yours'
-                      ? 'w-[350px]'
-                      : 'w-[500px]'
+                      ? 'grid-cols-4'
+                      : 'grid-cols-6'
                   )}
                 >
-                  <TabsList
-                    className={cn(
-                      'grid w-full',
-                      currentVisibleAppointments === 'yours'
-                        ? 'grid-cols-4'
-                        : 'grid-cols-6'
-                    )}
-                  >
-                    <TabsTrigger value="all">All</TabsTrigger>
-                    <TabsTrigger value="approved">Approved</TabsTrigger>
-                    <TabsTrigger value="completed">Completed</TabsTrigger>
-                    {currentVisibleAppointments === 'all' && (
-                      <>
-                        <TabsTrigger value="pending">Pending</TabsTrigger>
-                        <TabsTrigger value="rejected">Rejected</TabsTrigger>
-                      </>
-                    )}
-                    <TabsTrigger value="cancelled">Cancelled</TabsTrigger>
-                  </TabsList>
-                </Tabs>
-              )}
-            </div>
-          ))}
+                  <TabsTrigger value="all">All</TabsTrigger>
+                  <TabsTrigger value="approved">Approved</TabsTrigger>
+                  <TabsTrigger value="completed">Completed</TabsTrigger>
+                  {currentVisibleAppointments === 'all' && (
+                    <>
+                      <TabsTrigger value="pending">Pending</TabsTrigger>
+                      <TabsTrigger value="rejected">Rejected</TabsTrigger>
+                    </>
+                  )}
+                  <TabsTrigger value="cancelled">Cancelled</TabsTrigger>
+                </TabsList>
+              </Tabs>
+            )}
+          </div>
+        ) : null}
 
         {sortingEnabled && (
           <Select value={sortBy} onValueChange={(value) => setSortBy(value)}>

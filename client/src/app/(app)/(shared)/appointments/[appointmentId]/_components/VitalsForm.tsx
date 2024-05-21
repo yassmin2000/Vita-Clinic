@@ -117,7 +117,7 @@ export default function VitalsForm({
             control={form.control}
             render={({ field }) => (
               <FormItem className="w-full">
-                <FormLabel>Temperature</FormLabel>
+                <FormLabel>Temperature (°C)</FormLabel>
                 <FormControl>
                   <Input
                     disabled={isPending}
@@ -138,7 +138,7 @@ export default function VitalsForm({
             control={form.control}
             render={({ field }) => (
               <FormItem className="w-full">
-                <FormLabel>Heart Rate</FormLabel>
+                <FormLabel>Heart Rate (bpm)</FormLabel>
                 <FormControl>
                   <Input
                     disabled={isPending}
@@ -159,7 +159,7 @@ export default function VitalsForm({
             control={form.control}
             render={({ field }) => (
               <FormItem className="w-full">
-                <FormLabel>Systolic Blood Pressure</FormLabel>
+                <FormLabel>Systolic Blood Pressure (mmHg)</FormLabel>
                 <FormControl>
                   <Input
                     disabled={isPending}
@@ -180,7 +180,7 @@ export default function VitalsForm({
             control={form.control}
             render={({ field }) => (
               <FormItem className="w-full">
-                <FormLabel>Diastolic Blood Pressure</FormLabel>
+                <FormLabel>Diastolic Blood Pressure (mmHg)</FormLabel>
                 <FormControl>
                   <Input
                     disabled={isPending}
@@ -201,7 +201,7 @@ export default function VitalsForm({
             control={form.control}
             render={({ field }) => (
               <FormItem className="w-full">
-                <FormLabel>Respiratory Rate</FormLabel>
+                <FormLabel>Respiratory Rate (bpm)</FormLabel>
                 <FormControl>
                   <Input
                     disabled={isPending}
@@ -222,7 +222,7 @@ export default function VitalsForm({
             control={form.control}
             render={({ field }) => (
               <FormItem className="w-full">
-                <FormLabel>Oxygen Saturation</FormLabel>
+                <FormLabel>Oxygen Saturation (%)</FormLabel>
                 <FormControl>
                   <Input
                     disabled={isPending}

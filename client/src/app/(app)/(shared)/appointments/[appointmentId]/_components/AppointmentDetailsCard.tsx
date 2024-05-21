@@ -229,16 +229,16 @@ export default function AppointmentDetailsCard({
           </div>
         </div>
 
-        {appointment.status === 'approved' ||
-          (appointment.status === 'completed' && (
-            <>
-              <Separator />
-              <AppointmentVitals
-                appointmentId={appointment.id}
-                vitals={appointment.vitals}
-              />
-            </>
-          ))}
+        {(appointment.status === 'approved' ||
+          appointment.status === 'completed') && (
+          <>
+            <Separator />
+            <AppointmentVitals
+              appointmentId={appointment.id}
+              vitals={appointment.vitals}
+            />
+          </>
+        )}
         <Separator />
 
         <div className="px-6 py-4">

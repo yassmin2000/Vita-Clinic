@@ -41,7 +41,7 @@ export default function AppointmentTreatments({
 
   return (
     <div className="flex flex-col gap-4 px-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col items-start justify-between gap-2 sm:flex-row sm:items-center sm:gap-0">
         <span className="text-xl font-semibold text-primary">
           Appointment Treatments
         </span>

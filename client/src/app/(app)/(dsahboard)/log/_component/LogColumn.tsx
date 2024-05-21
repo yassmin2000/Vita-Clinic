@@ -31,6 +31,10 @@ const actions = [
     color: 'bg-yellow-500',
   },
   {
+    action: 'rejected',
+    color: 'bg-yellow-500',
+  },
+  {
     action: 'cancel',
     color: 'bg-red-500',
   },
@@ -474,6 +478,11 @@ const actionsSchema = [
         href: '/appointments/:id',
       },
       {
+        action: 'rejected',
+        message: '%USER% rejected %TARGET% by %USERTARGET%',
+        href: '/appointments/:id',
+      },
+      {
         action: 'cancel',
         message: '%USER% cancelled %TARGET% by %USERTARGET%',
         href: '/appointments/:id',
@@ -520,7 +529,7 @@ const actionsSchema = [
     actions: [
       {
         action: 'create',
-        message: '%USER% prescripted new medication %TARGET% for %USERTARGET%',
+        message: '%USER% prescribed new medication %TARGET% for %USERTARGET%',
       },
       {
         action: 'update',

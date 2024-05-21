@@ -20,7 +20,7 @@ export default function NewTestResultsButton({
     <>
       <Button size="sm" onClick={() => setIsOpen(true)}>
         <Plus className="mr-1" />
-        New Laboratory Test Results
+        New Test Results
       </Button>
       <Modal
         isOpen={isOpen}

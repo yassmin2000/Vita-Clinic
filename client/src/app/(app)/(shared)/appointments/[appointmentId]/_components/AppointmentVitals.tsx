@@ -44,6 +44,7 @@ export default function AppointmentVitals({
           <span className="font-medium text-primary">Temperature</span>
           <span className="flex items-center gap-1 text-foreground">
             <Thermometer className="h-6 w-6" /> {vitals.temperature || 'XX'}
+            <p className="-ml-1 text-sm text-muted-foreground">°C</p>
           </span>
         </div>
 
@@ -52,6 +53,7 @@ export default function AppointmentVitals({
           <span className="flex items-center gap-2 text-foreground">
             <Gauge className="h-6 w-6" /> {vitals.systolicBloodPressure || 'XX'}
             /{vitals.diastolicBloodPressure || 'XX'}
+            <p className="-ml-1 text-sm text-muted-foreground">mmHg</p>
           </span>
         </div>
 
@@ -59,6 +61,7 @@ export default function AppointmentVitals({
           <span className="font-medium text-primary">Pulse Rate</span>
           <span className="flex items-center gap-2 text-foreground">
             <HeartPulse className="h-6 w-6" /> {vitals.heartRate || 'XX'}
+            <p className="-ml-1 text-sm text-muted-foreground">bpm</p>
           </span>
         </div>
 
@@ -67,6 +70,7 @@ export default function AppointmentVitals({
           <span className="flex items-center gap-2 text-foreground">
             <Icons.oxygen className="h-6 w-6" />{' '}
             {vitals.oxygenSaturation || 'XX'}
+            <p className="-ml-1 text-sm text-muted-foreground">%</p>
           </span>
         </div>
 
@@ -74,6 +78,7 @@ export default function AppointmentVitals({
           <span className="font-medium text-primary">Respiratory Rate</span>
           <span className="flex items-center gap-2 text-foreground">
             <Icons.lungs className="h-6 w-6" /> {vitals.respiratoryRate || 'XX'}
+            <p className="-ml-1 text-sm text-muted-foreground">bpm</p>
           </span>
         </div>
       </div>
