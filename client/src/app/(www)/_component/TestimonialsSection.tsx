@@ -2,7 +2,7 @@ import { InfiniteMovingCards } from '@/components/ui/infinite-moving-cards';
 
 export default function TestimonialsSection() {
   return (
-    <div id="testimonials" className="pb-16">
+    <div id="testimonials" className="bg-white pb-16">
       <div className="mb-6 flex items-center justify-center">
         <h2 className="text-4xl font-bold text-primary">Testimonials</h2>
       </div>

@@ -6,9 +6,9 @@ export default async function AppLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="h-full">
+    <div className="h-full bg-white">
       <Header />
-      <main className="h-full">{children}</main>
+      {children}
     </div>
   );
 }

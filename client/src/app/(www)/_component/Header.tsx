@@ -31,7 +31,7 @@ export default function Header() {
   const { role } = useUserRole();
 
   return (
-    <header className="fixed top-0 z-[200] mx-auto flex w-full items-start justify-between self-center p-5 backdrop-blur-[2px] xl:items-center">
+    <header className="fixed top-0 z-[200] mx-auto flex w-full items-start justify-between self-center p-5 text-black backdrop-blur-[2px] xl:items-center">
       <Link
         href="/"
         className="hidden h-full w-52 sm:block"
@@ -82,7 +82,7 @@ export default function Header() {
             href="/sign-in"
             className={cn(
               buttonVariants({ variant: 'secondary' }),
-              'rounded-full'
+              'rounded-full bg-gray-100 text-black hover:bg-gray-100/60'
             )}
           >
             Sign In

@@ -1,9 +1,13 @@
 import Link from 'next/link';
 
 import { buttonVariants } from '@/components/ui/button';
+
+import { getAuthSession } from '@/lib/auth';
 import { cn } from '@/lib/utils';
 
-export default function HeroSection() {
+export default async function HeroSection() {
+  const session = await getAuthSession();
+
   return (
     <div className="h-full sm:h-[90%]">
       <div className="flex h-full w-full items-center justify-start bg-[url(/hero-mobile.jpg)] bg-cover bg-center bg-no-repeat sm:bg-[url(/hero.jpg)]">
@@ -21,15 +25,36 @@ export default function HeroSection() {
               href="#"
               className={cn(
                 buttonVariants({ variant: 'secondary' }),
-                'rounded-full'
+                'rounded-full bg-gray-100 text-black hover:bg-gray-100/60'
               )}
             >
               Learn More
             </Link>
 
-            <Link href="#" className={cn(buttonVariants(), 'rounded-full')}>
-              Get Started
-            </Link>
+            {session?.user ? (
+              session.user.role === 'patient' ? (
+                <Link
+                  href="/portal"
+                  className={cn(buttonVariants(), 'rounded-full')}
+                >
+                  Patient Portal
+                </Link>
+              ) : (
+                <Link
+                  href="/dashboard"
+                  className={cn(buttonVariants(), 'rounded-full')}
+                >
+                  Dashboard
+                </Link>
+              )
+            ) : (
+              <Link
+                href="/sign-up"
+                className={cn(buttonVariants(), 'rounded-full')}
+              >
+                Get Started
+              </Link>
+            )}
           </div>
         </div>
       </div>
