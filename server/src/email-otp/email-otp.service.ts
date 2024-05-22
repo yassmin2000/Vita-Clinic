@@ -14,7 +14,7 @@ export class EmailOtpService {
     await this.mailerService.sendMail({
       to: recipient,
       from: 'muhammad.abdel-al02@eng-st.cu.edu.eg',
-      subject: 'Vita Clinic Email verification',
+      subject: 'Vita Clinic Email Verification',
       template: 'temp',
       context: {
         data: {

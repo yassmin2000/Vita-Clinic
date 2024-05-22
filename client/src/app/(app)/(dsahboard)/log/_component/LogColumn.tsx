@@ -31,10 +31,6 @@ const actions = [
     color: 'bg-yellow-500',
   },
   {
-    action: 'rejected',
-    color: 'bg-yellow-500',
-  },
-  {
     action: 'cancel',
     color: 'bg-red-500',
   },
@@ -474,11 +470,6 @@ const actionsSchema = [
       },
       {
         action: 'reject',
-        message: '%USER% rejected %TARGET% by %USERTARGET%',
-        href: '/appointments/:id',
-      },
-      {
-        action: 'rejected',
         message: '%USER% rejected %TARGET% by %USERTARGET%',
         href: '/appointments/:id',
       },

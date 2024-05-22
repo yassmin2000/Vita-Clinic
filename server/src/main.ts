@@ -1,5 +1,7 @@
 import { NestFactory } from '@nestjs/core';
+import { ConfigService } from '@nestjs/config';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import * as basicAuth from 'express-basic-auth';
 
 import { AppModule } from './app.module';
 
@@ -9,6 +11,15 @@ async function bootstrap() {
     origin: '*',
   });
   app.setGlobalPrefix('api');
+
+  const swaggerPassword = app.get(ConfigService).get('SWAGGER_PASSWORD');
+  app.use(
+    ['/api/docs'],
+    basicAuth({
+      challenge: true,
+      users: { admin: swaggerPassword },
+    }),
+  );
 
   const config = new DocumentBuilder()
     .setTitle('Vita Clinic API')
