@@ -191,14 +191,7 @@ export default function FiltersBar({
                     : 'w-[500px]'
                 )}
               >
-                <TabsList
-                  className={cn(
-                    'grid w-full',
-                    currentVisibleAppointments === 'yours'
-                      ? 'grid-cols-4'
-                      : 'grid-cols-6'
-                  )}
-                >
+                <TabsList className="flex h-full w-fit flex-wrap justify-start gap-0.5">
                   <TabsTrigger value="all">All</TabsTrigger>
                   <TabsTrigger value="approved">Approved</TabsTrigger>
                   <TabsTrigger value="completed">Completed</TabsTrigger>
