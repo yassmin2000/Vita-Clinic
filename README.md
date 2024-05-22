@@ -14,8 +14,9 @@ You can experience the full capabilities of Vita Clinic by trying our demo at [V
 
 <details>
 <summary>Click to view demo credentials</summary>
-<p>  
-**Super Admin**  
+<p>
+
+**Super Admin**
 Email: abdallah@gmail.com  
 Password: admin123  
 
