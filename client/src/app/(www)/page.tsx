@@ -1,19 +1,17 @@
-import HeroSection from './_component/HeroSection';
-import ServicesSection from './_component/ServicesSection';
-import AboutSection from './_component/AboutSection';
-import TestimonialsSection from './_component/TestimonialsSection';
-import ContactSection from './_component/ContactSection';
-import Footer from './_component/Footer';
+import HeroSection from './_components/HeroSection';
+import ServicesSection from './_components/ServicesSection';
+import AboutSection from './_components/AboutSection';
+import TestimonialsSection from './_components/TestimonialsSection';
+import ContactSection from './_components/ContactSection';
 
 export default function LandingPage() {
   return (
-    <main className="h-full bg-white">
+    <>
       <HeroSection />
       <ServicesSection />
       <AboutSection />
       <TestimonialsSection />
       <ContactSection />
-      <Footer />
-    </main>
+    </>
   );
 }

@@ -3,11 +3,11 @@
 import { useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { signOut, useSession } from 'next-auth/react';
 import { useTheme } from 'next-themes';
 
 import UserButton from './UserButton';
 import ModeToggle from './ModeToggle';
-import { signOut, useSession } from 'next-auth/react';
 import MobileSidebar from './MobileSidebar';
 
 interface NavbarProps {

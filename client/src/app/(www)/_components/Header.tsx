@@ -7,6 +7,8 @@ import { buttonVariants } from '@/components/ui/button';
 
 import useUserRole from '@/hooks/useUserRole';
 import { cn } from '@/lib/utils';
+import UserButton from '@/components/layout/UserButton';
+import { useSession } from 'next-auth/react';
 
 const links = [
   {
@@ -28,7 +30,7 @@ const links = [
 ];
 
 export default function Header() {
-  const { role } = useUserRole();
+  const { data: session } = useSession();
 
   return (
     <header className="fixed top-0 z-[200] mx-auto flex w-full items-start justify-between self-center p-5 text-black backdrop-blur-[2px] xl:items-center">
@@ -76,7 +78,7 @@ export default function Header() {
         </Link>
       </div>
 
-      {!role ? (
+      {!session?.user ? (
         <div className="flex items-center gap-4">
           <Link
             href="/sign-in"
@@ -95,17 +97,32 @@ export default function Header() {
             Sign Up
           </Link>
         </div>
-      ) : role === 'patient' ? (
-        <Link href="/portal" className={cn(buttonVariants(), 'rounded-full')}>
-          Patient Portal
-        </Link>
       ) : (
-        <Link
-          href="/dashboard"
-          className={cn(buttonVariants(), 'rounded-full')}
-        >
-          Dashboard
-        </Link>
+        <div className="flex items-center gap-4">
+          {session.user.role === 'patient' ? (
+            <Link
+              href="/portal"
+              className={cn(buttonVariants(), 'rounded-full')}
+            >
+              Patient Portal
+            </Link>
+          ) : (
+            <Link
+              href="/dashboard"
+              className={cn(buttonVariants(), 'rounded-full')}
+            >
+              Dashboard
+            </Link>
+          )}
+
+          <UserButton
+            user={{
+              name: `${session.user.firstName} ${session.user.lastName}`,
+              email: session.user.email,
+              image: session.user.avatarURL,
+            }}
+          />
+        </div>
       )}
     </header>
   );

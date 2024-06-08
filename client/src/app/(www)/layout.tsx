@@ -1,4 +1,5 @@
-import Header from './_component/Header';
+import Header from './_components/Header';
+import Footer from './_components/Footer';
 
 export default async function AppLayout({
   children,
@@ -8,7 +9,10 @@ export default async function AppLayout({
   return (
     <div className="h-full bg-white">
       <Header />
-      {children}
+      <main className="h-full bg-white">
+        {children}
+        <Footer />
+      </main>
     </div>
   );
 }
