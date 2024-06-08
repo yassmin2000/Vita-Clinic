@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import axios, { AxiosError } from 'axios';
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -135,7 +135,7 @@ const formSchema = z.object({
     .optional(),
 });
 
-export default function UserForm() {
+function UserFormComponent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const role = searchParams.get('role')?.toLocaleLowerCase();
@@ -947,5 +947,13 @@ export default function UserForm() {
         </form>
       </Form>
     </div>
+  );
+}
+
+export default function UserForm() {
+  return (
+    <Suspense>
+      <UserFormComponent />
+    </Suspense>
   );
 }
