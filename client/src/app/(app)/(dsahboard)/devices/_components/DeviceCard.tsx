@@ -30,7 +30,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import useAccessToken from '@/hooks/useAccessToken';
 import { useToast } from '@/components/ui/use-toast';
-import { useTableOptions } from '@/hooks/useTableOptions';
+import { useFiltersStore } from '@/hooks/useFiltersStore';
 
 interface DeviceCardProps {
   id: string;
@@ -61,7 +61,7 @@ export default function DeviceCard({
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const { sortBy, searchValue, currentPage, countPerPage, currentStatus } =
-    useTableOptions();
+    useFiltersStore();
 
   const { mutate: deleteDevice, isPending } = useMutation({
     mutationFn: async () => {

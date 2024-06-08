@@ -10,7 +10,7 @@ import Pagination from '@/components/Pagination';
 import ScanItemSkeleton from '@/components/skeletons/ScanItemSkeleton';
 
 import useAccessToken from '@/hooks/useAccessToken';
-import { useTableOptions } from '@/hooks/useTableOptions';
+import { useFiltersStore } from '@/hooks/useFiltersStore';
 
 import type { Scan } from '@/types/appointments.type';
 
@@ -31,7 +31,7 @@ export default function ScansList({
     setSortBy,
     searchValue,
     sortBy,
-  } = useTableOptions();
+  } = useFiltersStore();
   const accessToken = useAccessToken();
 
   const {

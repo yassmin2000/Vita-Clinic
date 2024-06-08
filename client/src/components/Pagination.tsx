@@ -11,7 +11,7 @@ import {
 } from './ui/select';
 import { Button } from './ui/button';
 
-import { useTableOptions } from '@/hooks/useTableOptions';
+import { useFiltersStore } from '@/hooks/useFiltersStore';
 
 interface PaginationProps {
   previousDisabled: boolean;
@@ -23,7 +23,7 @@ export default function Pagination({
   nextDisabled,
 }: PaginationProps) {
   const { countPerPage, setCountPerPage, currentPage, setCurrentPage } =
-    useTableOptions();
+    useFiltersStore();
 
   return (
     <div className="flex flex-col-reverse justify-between gap-2 sm:flex-row md:items-center">

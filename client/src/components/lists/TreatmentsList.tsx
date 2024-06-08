@@ -10,7 +10,7 @@ import Pagination from '@/components/Pagination';
 import ReportItemSkeleton from '@/components/skeletons/ReportItemSkeleton';
 
 import useAccessToken from '@/hooks/useAccessToken';
-import { useTableOptions } from '@/hooks/useTableOptions';
+import { useFiltersStore } from '@/hooks/useFiltersStore';
 
 import type { Treatment } from '@/types/appointments.type';
 
@@ -31,7 +31,7 @@ export default function TreatmentsList({
     setSortBy,
     searchValue,
     sortBy,
-  } = useTableOptions();
+  } = useFiltersStore();
   const accessToken = useAccessToken();
 
   const {

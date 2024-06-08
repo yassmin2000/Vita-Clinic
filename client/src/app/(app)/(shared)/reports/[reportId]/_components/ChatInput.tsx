@@ -5,7 +5,7 @@ import { Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
-import { useChat } from '@/hooks/useChat';
+import { useChatStore } from '@/hooks/useChatStore';
 
 interface ChatInputProps {
   fileId: string;
@@ -24,7 +24,7 @@ export default function ChatInput({
     addNewMessage,
     updateMessage,
     deleteLastMessage,
-  } = useChat();
+  } = useChatStore();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const queryClient = useQueryClient();
 

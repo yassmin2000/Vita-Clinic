@@ -11,7 +11,7 @@ import AppointmentItemSkeleton from './AppointmentItemSkeleton';
 
 import useAccessToken from '@/hooks/useAccessToken';
 import useUserRole from '@/hooks/useUserRole';
-import { useTableOptions } from '@/hooks/useTableOptions';
+import { useFiltersStore } from '@/hooks/useFiltersStore';
 
 import type { Appointment } from '@/types/appointments.type';
 
@@ -33,7 +33,7 @@ export default function AppointmentsList({ patientId }: AppointmentsListProps) {
     currentVisibleAppointments,
     setCurrentVisibleAppointments,
     reset,
-  } = useTableOptions();
+  } = useFiltersStore();
 
   const {
     data: appointments,

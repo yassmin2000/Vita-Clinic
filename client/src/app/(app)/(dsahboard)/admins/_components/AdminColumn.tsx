@@ -41,7 +41,7 @@ import {
 } from '@/components/ui/tooltip';
 
 import useUserRole from '@/hooks/useUserRole';
-import { useTableOptions } from '@/hooks/useTableOptions';
+import { useFiltersStore } from '@/hooks/useFiltersStore';
 
 import type { Admin } from '@/types/users.type';
 
@@ -60,7 +60,7 @@ const ActionsCell = ({ row }: { row: Row<Admin> }) => {
     currentStatus,
     currentPage,
     countPerPage,
-  } = useTableOptions();
+  } = useFiltersStore();
 
   return (
     <>

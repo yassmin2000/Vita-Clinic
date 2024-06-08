@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-type useViewerStoreProps = {
+interface ViewerStore {
   currentViewerId: number;
   setCurrentViewerId: (id: number) => void;
   firstViewportsCount: number;
@@ -9,9 +9,9 @@ type useViewerStoreProps = {
   setSecondViewportsCount: (count: number) => void;
   splitViewportsBy: 'cols' | 'rows';
   setSplitViewportsBy: (splitMode: 'cols' | 'rows') => void;
-};
+}
 
-const useViewerStore = create<useViewerStoreProps>((set) => ({
+const useViewerStore = create<ViewerStore>((set) => ({
   currentViewerId: 0,
   setCurrentViewerId: (id: number) => set({ currentViewerId: id }),
   firstViewportsCount: 1,

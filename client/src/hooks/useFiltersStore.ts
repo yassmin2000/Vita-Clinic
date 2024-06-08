@@ -2,7 +2,7 @@ import { create } from 'zustand';
 
 import type { AppointmentStatus } from '@/types/appointments.type';
 
-type UseTableOptions = {
+type FiltersStore = {
   currentPage: number;
   setCurrentPage: (page: number) => void;
   countPerPage: number;
@@ -22,7 +22,7 @@ type UseTableOptions = {
   reset: () => void;
 };
 
-export const useTableOptions = create<UseTableOptions>((set) => ({
+export const useFiltersStore = create<FiltersStore>((set) => ({
   currentPage: 1,
   setCurrentPage: (page) => set({ currentPage: page }),
   countPerPage: 10,

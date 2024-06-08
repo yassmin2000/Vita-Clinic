@@ -20,7 +20,7 @@ import {
 import { Tabs, TabsList, TabsTrigger } from './ui/tabs';
 import { buttonVariants } from './ui/button';
 
-import { useTableOptions } from '@/hooks/useTableOptions';
+import { useFiltersStore } from '@/hooks/useFiltersStore';
 import { cn } from '@/lib/utils';
 
 interface FiltersBarProps {
@@ -86,7 +86,7 @@ export default function FiltersBar({
     setCurrentAppointmentStatus,
     currentVisibleAppointments,
     setCurrentVisibleAppointments,
-  } = useTableOptions();
+  } = useFiltersStore();
 
   const request = debounce(async () => {
     refetch();

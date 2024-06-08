@@ -6,7 +6,7 @@ import { Loader2, MessageSquare } from 'lucide-react';
 import Message from './Message';
 import { Skeleton } from '@/components/ui/skeleton';
 
-import { useChat } from '@/hooks/useChat';
+import { useChatStore } from '@/hooks/useChatStore';
 import useAccessToken from '@/hooks/useAccessToken';
 import type { Message as MessageType } from '@/types/appointments.type';
 
@@ -15,7 +15,11 @@ interface MessagesProps {
 }
 
 export default function Messages({ fileId }: MessagesProps) {
-  const { isLoading: isLoadingAIMessage, messages, setMessages } = useChat();
+  const {
+    isLoading: isLoadingAIMessage,
+    messages,
+    setMessages,
+  } = useChatStore();
   const accessToken = useAccessToken();
 
   const { data, isLoading } = useQuery({

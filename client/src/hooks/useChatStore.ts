@@ -2,7 +2,7 @@ import { create } from 'zustand';
 
 import type { Message } from '@/types/appointments.type';
 
-type useChatProps = {
+interface ChatStore {
   addMessage: () => void;
   message: string;
   setMessage: (message: string) => void;
@@ -13,9 +13,9 @@ type useChatProps = {
   addNewMessage: (message: Message) => void;
   deleteLastMessage: () => void;
   updateMessage: (id: string, text: string) => void;
-};
+}
 
-export const useChat = create<useChatProps>((set) => ({
+export const useChatStore = create<ChatStore>((set) => ({
   addMessage: () => {},
   message: '',
   setMessage: (message: string) => set({ message }),

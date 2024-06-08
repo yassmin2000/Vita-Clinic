@@ -11,7 +11,7 @@ import Pagination from '@/components/Pagination';
 
 import useAccessToken from '@/hooks/useAccessToken';
 import useUserRole from '@/hooks/useUserRole';
-import { useTableOptions } from '@/hooks/useTableOptions';
+import { useFiltersStore } from '@/hooks/useFiltersStore';
 
 import type { Patient } from '@/types/users.type';
 
@@ -28,7 +28,7 @@ export default function PatientsTable() {
     countPerPage,
     setCurrentStatus,
     reset,
-  } = useTableOptions();
+  } = useFiltersStore();
 
   const {
     data: patients,

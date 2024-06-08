@@ -50,7 +50,7 @@ import {
 import { Icons } from '@/components/Icons';
 
 import useUserRole from '@/hooks/useUserRole';
-import { useTableOptions } from '@/hooks/useTableOptions';
+import { useFiltersStore } from '@/hooks/useFiltersStore';
 
 import { bloodTypes } from '@/lib/constants';
 import type { Patient } from '@/types/users.type';
@@ -73,7 +73,7 @@ const ActionsCell = ({ row }: { row: Row<Patient> }) => {
     currentStatus,
     currentPage,
     countPerPage,
-  } = useTableOptions();
+  } = useFiltersStore();
 
   return (
     <>

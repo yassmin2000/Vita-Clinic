@@ -41,7 +41,7 @@ import {
 } from '@/components/ui/tooltip';
 
 import useUserRole from '@/hooks/useUserRole';
-import { useTableOptions } from '@/hooks/useTableOptions';
+import { useFiltersStore } from '@/hooks/useFiltersStore';
 
 import type { Doctor } from '@/types/users.type';
 import Modal from '@/components/Modal';
@@ -64,7 +64,7 @@ const ActionsCell = ({ row }: { row: Row<Doctor> }) => {
     currentStatus,
     currentPage,
     countPerPage,
-  } = useTableOptions();
+  } = useFiltersStore();
 
   return (
     <>

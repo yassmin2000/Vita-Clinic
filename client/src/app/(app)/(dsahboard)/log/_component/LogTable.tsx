@@ -10,7 +10,7 @@ import FiltersBar from '@/components/FiltersBar';
 import Pagination from '@/components/Pagination';
 
 import useAccessToken from '@/hooks/useAccessToken';
-import { useTableOptions } from '@/hooks/useTableOptions';
+import { useFiltersStore } from '@/hooks/useFiltersStore';
 
 import { Action } from '@/types/log.type';
 
@@ -18,7 +18,7 @@ export default function LogTable() {
   const accessToken = useAccessToken();
 
   const { sortBy, setSortBy, currentPage, countPerPage, searchValue, reset } =
-    useTableOptions();
+    useFiltersStore();
 
   const {
     data: actions,

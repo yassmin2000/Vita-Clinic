@@ -9,7 +9,7 @@ import type {
   Therapy,
 } from '@/types/settings.type';
 
-type useSettingsStoreProps = {
+interface SettingsStore {
   isFormOpen: boolean;
   openForm: () => void;
   closeForm: () => void;
@@ -26,9 +26,9 @@ type useSettingsStoreProps = {
   currentBiomarker: Biomarker | null;
   setCurrentBiomarker: (biomarker: Biomarker | null) => void;
   resetEntity: () => void;
-};
+}
 
-const useSettingsStore = create<useSettingsStoreProps>((set) => ({
+const useSettingsStore = create<SettingsStore>((set) => ({
   isFormOpen: false,
   openForm: () => set({ isFormOpen: true }),
   closeForm: () => set({ isFormOpen: false }),
