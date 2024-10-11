@@ -3,9 +3,11 @@
 </div>
 
 # Vita Clinic
+
 Welcome to Vita Clinic, an advanced oncology clinic information system designed to streamline operations for administrators, doctors, and patients. Our system provides comprehensive tools for managing medical records, appointments, and clinical workflows, all in one place.
 
 ## Demo
+
 You can experience the full capabilities of Vita Clinic by trying our demo at [Vita Clinic Demo](https://vita-clinic.vercel.app).
 
 <div align="center">
@@ -18,54 +20,64 @@ You can experience the full capabilities of Vita Clinic by trying our demo at [V
 
 **Super Admin**  
 Email: abdallah@gmail.com  
-Password: admin1234  
+Password: admin1234
 
 **Admin**  
 Email: jennifer.jackson@example.com  
-Password: admin123  
+Password: admin123
 
 **Doctor**  
 Email: hazem@gmail.com  
-Password: doctor123  
+Password: doctor123
 
 **Patient**  
 Email: michael.king@example.com  
-Password: patient123  
+Password: patient123
+
 </p>
 </details>
 
 ## Features
+
 - **Super Admin**
+
   - Manage users including admins
   - Access comprehensive actions log
 
 - **Admins**
+
   - Manage users (doctors and patients)
   - Manage devices in the clinic
   - Manage settings (create lookup databases for diagnoses, medical conditions, allergies, medications, and all medical data)
   - Manage appointments (approve, reject, complete, or cancel)
 
 - **Doctors**
+
   - Manage patients' EMR (edit general info, allergies, diagnoses, medical conditions, surgeries, medications)
   - Update patients' vitals for each appointment
   - Create reports, scans, laboratory test results, treatment plans, and prescriptions
 
 - **Patients**
+
   - Access patient portal (view latest vitals, vitals over time, EMR, reports, scans)
   - Schedule appointments
 
 - **Dashboards**
+
   - **Admin Dashboard:** Insights on invoices, appointment volume, most required services, patients' age & sex distribution, doctors' sex distribution, doctors generating the most revenue
   - **Doctor Dashboard:** Upcoming appointments, patients' age & sex distribution, common diagnoses, surgeries, medical conditions, medications in the clinic
 
 - **Medical Reports AI Assistant**
+
   - Chat with an AI assistant to help doctors easily create medical reports
 
 - **DICOM Viewer**
   - Full functionality for viewing patients' scans, including segmentation, annotations, and measurements
 
 ## Tech Stack
+
 - **Front-end**
+
   - Next.js
   - React.js
   - TypeScript
@@ -78,6 +90,7 @@ Password: patient123
   - React Hook Form
 
 - **Back-end**
+
   - Nest.js
   - Node.js
   - TypeScript
@@ -85,6 +98,7 @@ Password: patient123
   - Prisma ORM
 
 - **Databases**
+
   - PostgreSQL
   - Pinecone
 
@@ -156,12 +170,6 @@ npm install
     <img src="https://avatars.githubusercontent.com/u/100636693?v=4" width="150px;" alt="Hazem Raafat"/>
     <br />
     <sub><b>Hazem Raafat</b></sub></a>
-    </td>
-    <td align="center">
-    <a href="https://github.com/heshamtamer" target="_black">
-    <img src="https://avatars.githubusercontent.com/u/100705845?v=4" width="150px;" alt="Hesham Tamer"/>
-    <br />
-    <sub><b>Hesham Tamer</b></sub></a>
     </td>
    <td align="center">
     <a href="https://github.com/IbrahimEmad11" target="_black">
