@@ -84,7 +84,7 @@ export default function AdminStatistics() {
     queryKey: [`statistics_general`],
     queryFn: async () => {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/dashboards/general`,
+        `${process.env.NEXT_PUBLIC_API_URL}/dashboards/general/admin`,
         {
           headers: {
             authorization: `Bearer ${accessToken}`,

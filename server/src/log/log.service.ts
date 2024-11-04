@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
+
 import { PrismaService } from 'src/prisma.service';
-import { CreateLogDto, GetAllActionQuery } from './dto/log.dto';
+import { CreateLogDto, GetAllActionQuery, LogDto } from './dto/log.dto';
 
 @Injectable()
 export class LogService {
@@ -11,9 +12,9 @@ export class LogService {
     limit = 10,
     value = '',
     sort = 'date-desc',
-  }: GetAllActionQuery) {
+  }: GetAllActionQuery): Promise<LogDto[]> {
     const names = value.trim().split(' ');
-    const mode = 'insensitive' as 'insensitive';
+    const mode = 'insensitive' as const;
     const [sortField, sortOrder] = sort.split('-') as [string, 'desc' | 'asc'];
     const offset = (page - 1) * limit;
 
@@ -94,7 +95,7 @@ export class LogService {
     });
   }
 
-  async create(createLogDto: CreateLogDto) {
+  async create(createLogDto: CreateLogDto): Promise<LogDto> {
     return this.prisma.action.create({
       data: createLogDto,
     });

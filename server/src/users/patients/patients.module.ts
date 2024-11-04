@@ -15,12 +15,12 @@ import { ModalitiesService } from 'src/settings/modalities/modalities.service';
 import { LaboratoryTestsService } from 'src/settings/laboratory-tests/laboratory-tests.service';
 import { ServicesService } from 'src/settings/services/services.service';
 import { TherapiesService } from 'src/settings/therapies/therapies.service';
-import { OtpService } from 'src/otp/otp.service';
-import { EmailOtpService } from 'src/email-otp/email-otp.service';
-import { PhoneOtpService } from 'src/phone-otp/phone-otp.service';
 import { TreatmentService } from 'src/appointments/treatments/treatments.service';
 import { PrescriptionsService } from 'src/appointments/prescriptions/prescriptions.service';
 import { TestResultsService } from 'src/appointments/test-results/test-results.service';
+import { OtpService } from 'src/otp/otp.service';
+import { EmailOtpService } from 'src/email-otp/email-otp.service';
+import { PhoneOtpService } from 'src/phone-otp/phone-otp.service';
 
 @Module({
   controllers: [PatientsController],
@@ -30,7 +30,6 @@ import { TestResultsService } from 'src/appointments/test-results/test-results.s
     PrismaService,
     JwtService,
     LogService,
-
     AppointmentsService,
     ReportsService,
     ScansService,
@@ -38,14 +37,13 @@ import { TestResultsService } from 'src/appointments/test-results/test-results.s
     LaboratoryTestsService,
     ModalitiesService,
     ServicesService,
+    PrescriptionsService,
     TherapiesService,
     TreatmentService,
     TestResultsService,
-
     OtpService,
     EmailOtpService,
     PhoneOtpService,
-    PrescriptionsService,
   ],
 })
 export class PatientsModule {}

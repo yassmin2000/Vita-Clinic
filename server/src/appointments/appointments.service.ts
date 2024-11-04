@@ -4,19 +4,23 @@ import {
   NotFoundException,
   UnprocessableEntityException,
 } from '@nestjs/common';
+import { BillingStatus } from '@prisma/client';
 
 import { PrismaService } from 'src/prisma.service';
-import { LaboratoryTestsService } from 'src/settings/laboratory-tests/laboratory-tests.service';
-import { ModalitiesService } from 'src/settings/modalities/modalities.service';
 import { ServicesService } from 'src/settings/services/services.service';
 import { TherapiesService } from 'src/settings/therapies/therapies.service';
+import { ModalitiesService } from 'src/settings/modalities/modalities.service';
+import { LaboratoryTestsService } from 'src/settings/laboratory-tests/laboratory-tests.service';
 import { LogService } from 'src/log/log.service';
 
 import {
+  AppointmentDto,
+  AppointmentListItemDto,
+  BasicAppointmentDto,
   CreateAppointmentDto,
+  CreateAppointmentResponseDto,
   GetAllAppointmentsQuery,
 } from './dto/appointments.dto';
-import type { BillingStatus } from '@prisma/client';
 
 @Injectable()
 export class AppointmentsService {
@@ -40,9 +44,9 @@ export class AppointmentsService {
     }: GetAllAppointmentsQuery,
     patientId?: string,
     doctorId?: string,
-  ) {
+  ): Promise<AppointmentListItemDto[]> {
     const names = value.trim().split(' ');
-    const mode = 'insensitive' as 'insensitive';
+    const mode = 'insensitive' as const;
     const [sortField, sortOrder] = sort.split('-') as [string, 'desc' | 'asc'];
 
     const nameConditions = names.flatMap((name) => [
@@ -129,7 +133,7 @@ export class AppointmentsService {
     });
   }
 
-  async findById(id: string) {
+  async findById(id: string): Promise<AppointmentDto> {
     const appointment = await this.prisma.appointment.findUnique({
       where: { id },
       include: {
@@ -172,7 +176,10 @@ export class AppointmentsService {
     return appointment;
   }
 
-  async create(patientId: string, createAppointmentDto: CreateAppointmentDto) {
+  async create(
+    patientId: string,
+    createAppointmentDto: CreateAppointmentDto,
+  ): Promise<CreateAppointmentResponseDto> {
     const { date, notes, service, therapy, scans, labWorks } =
       createAppointmentDto;
 
@@ -273,7 +280,11 @@ export class AppointmentsService {
     });
   }
 
-  async approve(appointmentId: string, doctorId: string, userId: string) {
+  async approve(
+    appointmentId: string,
+    doctorId: string,
+    userId: string,
+  ): Promise<BasicAppointmentDto> {
     const appointment = await this.prisma.appointment.findUnique({
       where: { id: appointmentId },
     });
@@ -294,7 +305,7 @@ export class AppointmentsService {
       throw new ConflictException('Appointment is not pending');
     }
 
-    const approvedAppointment = this.prisma.appointment.update({
+    const approvedAppointment = await this.prisma.appointment.update({
       where: { id: appointmentId },
       data: {
         status: 'approved',
@@ -314,7 +325,10 @@ export class AppointmentsService {
     return approvedAppointment;
   }
 
-  async reject(appointmentId: string, userId: string) {
+  async reject(
+    appointmentId: string,
+    userId: string,
+  ): Promise<BasicAppointmentDto> {
     const appointment = await this.prisma.appointment.findUnique({
       where: { id: appointmentId },
     });
@@ -346,7 +360,10 @@ export class AppointmentsService {
     return rejectedAppointment;
   }
 
-  async cancel(appointmentId: string, userId: string) {
+  async cancel(
+    appointmentId: string,
+    userId: string,
+  ): Promise<BasicAppointmentDto> {
     const appointment = await this.prisma.appointment.findUnique({
       where: { id: appointmentId },
     });
@@ -391,7 +408,7 @@ export class AppointmentsService {
     appointmentId: string,
     billingStatus: BillingStatus,
     userId: string,
-  ) {
+  ): Promise<BasicAppointmentDto> {
     const appointment = await this.prisma.appointment.findUnique({
       where: { id: appointmentId },
       select: {

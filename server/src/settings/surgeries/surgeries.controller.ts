@@ -1,4 +1,4 @@
-import { Request } from 'express';
+import type { Request } from 'express';
 import {
   Controller,
   Post,
@@ -16,17 +16,41 @@ import {
 import { SurgeriesService } from './surgeries.service';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
 
-import { CreateSurgeryDto, UpdateSurgeryDto } from './dto/surgeries.dto';
-import type { Payload } from 'src/types/payload.type';
+import {
+  CreateSurgeryDto,
+  SurgeryDto,
+  UpdateSurgeryDto,
+} from './dto/surgeries.dto';
+import { ApiDocumentation } from 'src/decorators/documentation.decorator';
 
+@ApiDocumentation({
+  tags: 'Surgeries',
+  security: 'bearer',
+  unauthorizedResponse: {
+    description: 'Unauthorized',
+  },
+  badRequestResponse: {
+    description: 'Bad request',
+  },
+})
+@UseGuards(JwtGuard)
 @Controller('settings/surgeries')
 export class SurgeriesController {
   constructor(private readonly surgeriesService: SurgeriesService) {}
 
-  @UseGuards(JwtGuard)
+  @ApiDocumentation({
+    operation: {
+      summary: 'Get all surgeries',
+      description: 'Get all surgeries data',
+    },
+    okResponse: {
+      description: 'Surgeries data',
+      type: [SurgeryDto],
+    },
+  })
   @Get()
-  async getAllSurgeries(@Req() request: Request) {
-    const user: Payload = request['user'];
+  async getAllSurgeries(@Req() request: Request): Promise<SurgeryDto[]> {
+    const user = request.user;
 
     if (user.role === 'patient') {
       throw new UnauthorizedException();
@@ -35,27 +59,57 @@ export class SurgeriesController {
     return this.surgeriesService.findAll();
   }
 
-  @UseGuards(JwtGuard)
-  @Get(':id')
-  async getSurgeryById(@Param('id') id: string, @Req() request: Request) {
-    const user: Payload = request['user'];
+  @ApiDocumentation({
+    operation: {
+      summary: 'Get surgery by ID',
+      description: 'Get surgery data by ID',
+    },
+    params: {
+      name: 'surgeryId',
+      type: String,
+      description: 'Surgery ID',
+      example: crypto.randomUUID(),
+    },
+    notFoundResponse: {
+      description: 'Surgery not found',
+    },
+    okResponse: {
+      description: 'Surgery data',
+      type: SurgeryDto,
+    },
+  })
+  @Get(':surgeryId')
+  async getSurgeryById(
+    @Param('surgeryId') surgeryId: string,
+    @Req() request: Request,
+  ): Promise<SurgeryDto> {
+    const user = request.user;
 
     if (user.role === 'patient') {
       throw new UnauthorizedException();
     }
 
-    const surgery = await this.surgeriesService.findById(id);
+    const surgery = await this.surgeriesService.findById(surgeryId);
 
     return surgery;
   }
 
-  @UseGuards(JwtGuard)
+  @ApiDocumentation({
+    operation: {
+      summary: 'Create surgery',
+      description: 'Create a new surgery',
+    },
+    okResponse: {
+      description: 'Surgery created',
+      type: SurgeryDto,
+    },
+  })
   @Post()
   async createSurgery(
     @Body(ValidationPipe) dto: CreateSurgeryDto,
     @Req() request: Request,
-  ) {
-    const user: Payload = request['user'];
+  ): Promise<SurgeryDto> {
+    const user = request.user;
 
     if (user.role === 'patient') {
       throw new UnauthorizedException();
@@ -63,31 +117,72 @@ export class SurgeriesController {
     return this.surgeriesService.create(user.id, dto);
   }
 
-  @UseGuards(JwtGuard)
-  @Patch(':id')
+  @ApiDocumentation({
+    operation: {
+      summary: 'Update surgery',
+      description: 'Update surgery data',
+    },
+    params: {
+      name: 'surgeryId',
+      type: String,
+      description: 'Surgery ID',
+      example: crypto.randomUUID(),
+    },
+    notFoundResponse: {
+      description: 'Surgery not found',
+    },
+    okResponse: {
+      description: 'Surgery updated',
+      type: SurgeryDto,
+    },
+  })
+  @Patch(':surgeryId')
   async updateSurgery(
-    @Param('id') id: string,
+    @Param('surgeryId') surgeryId: string,
     @Body(ValidationPipe) updateSurgeryDto: UpdateSurgeryDto,
     @Req() request: Request,
-  ) {
-    const user: Payload = request['user'];
+  ): Promise<SurgeryDto> {
+    const user = request.user;
 
     if (user.role === 'patient') {
       throw new UnauthorizedException();
     }
 
-    return this.surgeriesService.update(user.id, id, updateSurgeryDto);
+    return this.surgeriesService.update(user.id, surgeryId, updateSurgeryDto);
   }
 
-  @UseGuards(JwtGuard)
-  @Delete(':id')
-  async deleteSurgery(@Param('id') id: string, @Req() request: Request) {
-    const user: Payload = request['user'];
+  @ApiDocumentation({
+    operation: {
+      summary: 'Delete surgery',
+      description: 'Delete surgery data',
+    },
+    params: {
+      name: 'surgeryId',
+      type: String,
+      description: 'Surgery ID',
+      example: crypto.randomUUID(),
+    },
+    notFoundResponse: {
+      description: 'Surgery not found',
+    },
+    conflictResponse: {
+      description: 'Surgery is being used in an EMR',
+    },
+    okResponse: {
+      description: 'Surgery deleted',
+    },
+  })
+  @Delete(':surgeryId')
+  async deleteSurgery(
+    @Param('surgeryId') surgeryId: string,
+    @Req() request: Request,
+  ) {
+    const user = request.user;
 
     if (!user.isSuperAdmin) {
       throw new UnauthorizedException();
     }
 
-    return this.surgeriesService.delete(user.id, id);
+    return this.surgeriesService.delete(user.id, surgeryId);
   }
 }

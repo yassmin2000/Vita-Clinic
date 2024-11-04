@@ -1,4 +1,4 @@
-import { Request } from 'express';
+import type { Request } from 'express';
 import {
   Controller,
   Post,
@@ -18,20 +18,43 @@ import { JwtGuard } from 'src/auth/guards/jwt.guard';
 
 import {
   CreateMedicalConditionDto,
+  MedicalConditionDto,
   UpdateMedicalConditionDto,
 } from './dto/medical-conditions.dto';
-import type { Payload } from 'src/types/payload.type';
+import { ApiDocumentation } from 'src/decorators/documentation.decorator';
 
+@ApiDocumentation({
+  tags: 'Medical Conditions',
+  security: 'bearer',
+  unauthorizedResponse: {
+    description: 'Unauthorized',
+  },
+  badRequestResponse: {
+    description: 'Bad Request',
+  },
+})
+@UseGuards(JwtGuard)
 @Controller('settings/medical-conditions')
 export class MedicalConditionsController {
   constructor(
     private readonly medicalConditionsService: MedicalConditionsService,
   ) {}
 
-  @UseGuards(JwtGuard)
+  @ApiDocumentation({
+    operation: {
+      summary: 'Get all medical conditions',
+      description: 'Get all medical conditions data',
+    },
+    okResponse: {
+      description: 'Medical conditions data',
+      type: [MedicalConditionDto],
+    },
+  })
   @Get()
-  async getAllMedicalConditions(@Req() request: Request) {
-    const user: Payload = request['user'];
+  async getAllMedicalConditions(
+    @Req() request: Request,
+  ): Promise<MedicalConditionDto[]> {
+    const user = request.user;
 
     if (user.role === 'patient') {
       throw new UnauthorizedException();
@@ -40,28 +63,55 @@ export class MedicalConditionsController {
     return this.medicalConditionsService.findAll();
   }
 
-  @UseGuards(JwtGuard)
-  @Get(':id')
+  @ApiDocumentation({
+    operation: {
+      summary: 'Get medical condition by ID',
+      description: 'Get medical condition data by ID',
+    },
+    params: {
+      name: 'medicalConditionId',
+      type: String,
+      description: 'Medical condition ID',
+      example: crypto.randomUUID(),
+    },
+    notFoundResponse: {
+      description: 'Medical condition not found',
+    },
+    okResponse: {
+      description: 'Medical condition data',
+      type: MedicalConditionDto,
+    },
+  })
+  @Get(':medicalConditionId')
   async getMedicalConditionById(
-    @Param('id') id: string,
+    @Param('medicalConditionId') medicalConditionId: string,
     @Req() request: Request,
-  ) {
-    const user: Payload = request['user'];
+  ): Promise<MedicalConditionDto> {
+    const user = request.user;
 
     if (user.role === 'patient') {
       throw new UnauthorizedException();
     }
 
-    return this.medicalConditionsService.findById(id);
+    return this.medicalConditionsService.findById(medicalConditionId);
   }
 
-  @UseGuards(JwtGuard)
+  @ApiDocumentation({
+    operation: {
+      summary: 'Create medical condition',
+      description: 'Create medical condition data',
+    },
+    okResponse: {
+      description: 'Medical condition data',
+      type: MedicalConditionDto,
+    },
+  })
   @Post()
   async createMedicalCondition(
     @Body(ValidationPipe) dto: CreateMedicalConditionDto,
     @Req() request: Request,
-  ) {
-    const user: Payload = request['user'];
+  ): Promise<MedicalConditionDto> {
+    const user = request.user;
 
     if (user.role === 'patient') {
       throw new UnauthorizedException();
@@ -70,14 +120,32 @@ export class MedicalConditionsController {
     return this.medicalConditionsService.create(user.id, dto);
   }
 
-  @UseGuards(JwtGuard)
-  @Patch(':id')
+  @ApiDocumentation({
+    operation: {
+      summary: 'Update medical condition',
+      description: 'Update medical condition data',
+    },
+    params: {
+      name: 'medicalConditionId',
+      type: String,
+      description: 'Medical condition ID',
+      example: crypto.randomUUID(),
+    },
+    notFoundResponse: {
+      description: 'Medical condition not found',
+    },
+    okResponse: {
+      description: 'Medical condition data',
+      type: MedicalConditionDto,
+    },
+  })
+  @Patch(':medicalConditionId')
   async updateMedicalCondition(
-    @Param('id') id: string,
+    @Param('medicalConditionId') medicalConditionId: string,
     @Body(ValidationPipe) UpdateMedicalConditionDto: UpdateMedicalConditionDto,
     @Req() request: Request,
-  ) {
-    const user: Payload = request['user'];
+  ): Promise<MedicalConditionDto> {
+    const user = request.user;
 
     if (user.role === 'patient') {
       throw new UnauthorizedException();
@@ -85,23 +153,44 @@ export class MedicalConditionsController {
 
     return this.medicalConditionsService.update(
       user.id,
-      id,
+      medicalConditionId,
       UpdateMedicalConditionDto,
     );
   }
 
-  @UseGuards(JwtGuard)
-  @Delete(':id')
+  @ApiDocumentation({
+    operation: {
+      summary: 'Delete medical condition',
+      description: 'Delete medical condition data',
+    },
+    params: {
+      name: 'medicalConditionId',
+      type: String,
+      description: 'Medical condition ID',
+      example: crypto.randomUUID(),
+    },
+    notFoundResponse: {
+      description: 'Medical condition not found',
+    },
+    conflictResponse: {
+      description: 'Medical condition is being used in an EMR',
+    },
+    okResponse: {
+      description: 'Medical condition deleted',
+      type: MedicalConditionDto,
+    },
+  })
+  @Delete(':medicalConditionId')
   async deleteMedicalCondition(
-    @Param('id') id: string,
+    @Param('medicalConditionId') medicalConditionId: string,
     @Req() request: Request,
-  ) {
-    const user: Payload = request['user'];
+  ): Promise<MedicalConditionDto> {
+    const user = request.user;
 
     if (!user.isSuperAdmin) {
       throw new UnauthorizedException();
     }
 
-    return this.medicalConditionsService.delete(user.id, id);
+    return this.medicalConditionsService.delete(user.id, medicalConditionId);
   }
 }

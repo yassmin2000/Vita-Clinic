@@ -1,4 +1,4 @@
-import { Request } from 'express';
+import type { Request } from 'express';
 import {
   Body,
   Controller,
@@ -25,18 +25,43 @@ import { TestResultsService } from 'src/appointments/test-results/test-results.s
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
 
 import {
+  CreateInsuranceDto,
   GetAllUsersQuery,
-  InsuranceDto,
   UpdateInsuranceDto,
 } from '../dto/users.dto';
 import { GetAllAppointmentsQuery } from 'src/appointments/dto/appointments.dto';
-import { GetPatientReportsQuery } from 'src/appointments/reports/dto/reports.dto';
-import { GetPatientTreatmentsQuery } from 'src/appointments/treatments/dto/treatments.dto';
-import { GetPatientScansQuery } from 'src/appointments/scans/dto/scans.dto';
+import {
+  BasicReportDto,
+  GetPatientReportsQuery,
+} from 'src/appointments/reports/dto/reports.dto';
+import {
+  GetPatientTreatmentsQuery,
+  TreatmentDto,
+} from 'src/appointments/treatments/dto/treatments.dto';
+import {
+  GetPatientScansQuery,
+  ScanDto,
+} from 'src/appointments/scans/dto/scans.dto';
 import { GetPatientPrescriptionsQuery } from 'src/appointments/prescriptions/dto/prescriptions.dto';
-import { GetPatientTestResultsQuery } from 'src/appointments/test-results/dto/test-results.dto';
-import type { Payload } from 'src/types/payload.type';
+import {
+  GetPatientTestResultsQuery,
+  LaboratoryTestResultDto,
+} from 'src/appointments/test-results/dto/test-results.dto';
+import { UserListItemDto } from '../dto/users-response.dto';
+import { InsuranceDto } from './dto/patients.dto';
+import { ApiDocumentation } from 'src/decorators/documentation.decorator';
 
+@ApiDocumentation({
+  tags: 'Patients',
+  security: 'bearer',
+  unauthorizedResponse: {
+    description: 'Unauthorized',
+  },
+  badRequestResponse: {
+    description: 'Bad Request',
+  },
+})
+@UseGuards(JwtGuard)
 @Controller('/users/patients')
 export class PatientsController {
   constructor(
@@ -50,14 +75,23 @@ export class PatientsController {
     private readonly testResultsService: TestResultsService,
   ) {}
 
-  @UseGuards(JwtGuard)
+  @ApiDocumentation({
+    operation: {
+      summary: 'Get all patients',
+      description: 'Get all patients data',
+    },
+    okResponse: {
+      description: 'Patients data',
+      type: [UserListItemDto],
+    },
+  })
   @Get()
   async getAllPatients(
     @Req() request: Request,
     @Query(new ValidationPipe({ transform: true }))
     query: GetAllUsersQuery,
   ) {
-    const user: Payload = request['user'];
+    const user = request.user;
 
     if (user.role === 'patient') {
       throw new UnauthorizedException();
@@ -68,75 +102,171 @@ export class PatientsController {
     });
   }
 
-  @UseGuards(JwtGuard)
-  @Get(':id/insurance')
-  async getPatientInsurance(@Param('id') id: string, @Req() request: Request) {
-    const user: Payload = request['user'];
+  @ApiDocumentation({
+    operation: {
+      summary: 'Get patient insurance',
+      description: 'Get patient insurance by id',
+    },
+    params: {
+      name: 'patientId',
+      type: String,
+      description: 'Patient ID',
+      example: crypto.randomUUID(),
+    },
+    notFoundResponse: {
+      description: 'Insurance not found',
+    },
+    okResponse: {
+      description: 'Patient insurance',
+      type: InsuranceDto,
+    },
+  })
+  @Get(':patientId/insurance')
+  async getPatientInsurance(
+    @Param('patientId') patientId: string,
+    @Req() request: Request,
+  ) {
+    const user = request.user;
 
-    if (user.role === 'patient' && user.id !== id) {
+    if (user.role === 'patient' && user.id !== patientId) {
       throw new UnauthorizedException();
     }
 
-    return this.patientsService.getInsurance(id);
+    return this.patientsService.getInsurance(patientId);
   }
 
-  @UseGuards(JwtGuard)
-  @Post(':id/insurance')
+  @ApiDocumentation({
+    operation: {
+      summary: 'Create patient insurance',
+      description: 'Create new patient insurance',
+    },
+    params: {
+      name: 'patientId',
+      type: String,
+      description: 'Patient ID',
+      example: crypto.randomUUID(),
+    },
+    body: {
+      description: 'Insurance data',
+      type: CreateInsuranceDto,
+    },
+    consumes: 'application/json',
+    notFoundResponse: {
+      description: 'Patient not found',
+    },
+    conflictResponse: {
+      description: 'Patient already has insurance',
+    },
+    createdResponse: {
+      description: 'New patient insurance created',
+      type: InsuranceDto,
+    },
+  })
+  @Post(':patientId/insurance')
   async createPatientInsurance(
-    @Param('id') id: string,
+    @Param('patientId') patientId: string,
     @Req() request: Request,
     @Body(new ValidationPipe())
-    dto: InsuranceDto,
+    dto: CreateInsuranceDto,
   ) {
-    const user: Payload = request['user'];
+    const user = request.user;
 
     if (user.role !== 'admin') {
       throw new UnauthorizedException();
     }
 
-    return this.patientsService.craeteInsurance(id, dto, user.id);
+    return this.patientsService.craeteInsurance(patientId, dto, user.id);
   }
 
-  @UseGuards(JwtGuard)
-  @Patch(':id/insurance')
+  @ApiDocumentation({
+    operation: {
+      summary: 'Update patient insurance',
+      description: 'Update patient insurance by id',
+    },
+    params: {
+      name: 'patientId',
+      type: String,
+      description: 'Patient ID',
+      example: crypto.randomUUID(),
+    },
+    body: {
+      description: 'Insurance data',
+      type: UpdateInsuranceDto,
+    },
+    consumes: 'application/json',
+    notFoundResponse: {
+      description: 'Patient/Insurance not found',
+    },
+    okResponse: {
+      description: 'Patient insurance updated',
+      type: InsuranceDto,
+    },
+  })
+  @Patch(':patientId/insurance')
   async updatePatientInsurance(
-    @Param('id') id: string,
+    @Param('patientId') patientId: string,
     @Req() request: Request,
     @Body(new ValidationPipe())
     dto: UpdateInsuranceDto,
   ) {
-    const user: Payload = request['user'];
+    const user = request.user;
 
     if (user.role !== 'admin') {
       throw new UnauthorizedException();
     }
 
-    return this.patientsService.updateInsurance(id, dto, user.id);
+    return this.patientsService.updateInsurance(patientId, dto, user.id);
   }
 
-  @UseGuards(JwtGuard)
-  @Delete(':id/insurance')
+  @ApiDocumentation({
+    operation: {
+      summary: 'Delete patient insurance',
+      description: 'Delete patient insurance by id',
+    },
+    params: {
+      name: 'patientId',
+      type: String,
+      description: 'Patient ID',
+      example: crypto.randomUUID(),
+    },
+    notFoundResponse: {
+      description: 'Patient/Insurance not found',
+    },
+    okResponse: {
+      description: 'Insurance deleted',
+      type: InsuranceDto,
+    },
+  })
+  @Delete(':patientId/insurance')
   async deletePatientInsurance(
-    @Param('id') id: string,
+    @Param('patientId') patientId: string,
     @Req() request: Request,
   ) {
-    const user: Payload = request['user'];
+    const user = request.user;
 
     if (!user.isSuperAdmin) {
       throw new UnauthorizedException();
     }
 
-    return this.patientsService.deleteInsurance(id, user.id);
+    return this.patientsService.deleteInsurance(patientId, user.id);
   }
 
-  @UseGuards(JwtGuard)
+  @ApiDocumentation({
+    operation: {
+      summary: 'Get current patient appointments',
+      description: 'Get current patient appointments (If patient is logged in)',
+    },
+    okResponse: {
+      description: 'All patient appointments',
+    },
+  })
   @Get('/appointments')
   async getPatientsAppointments(
     @Query(new ValidationPipe({ transform: true }))
     query: GetAllAppointmentsQuery,
     @Req() request: Request,
   ) {
-    const user: Payload = request['user'];
+    const user = request.user;
 
     if (user.role !== 'patient') {
       throw new UnauthorizedException();
@@ -145,31 +275,57 @@ export class PatientsController {
     return this.appointmentsService.findAll(query, user.id);
   }
 
-  @UseGuards(JwtGuard)
-  @Get(':id/appointments')
+  @ApiDocumentation({
+    operation: {
+      summary: 'Get current patient appointments',
+      description: 'Get current patient appointments (If patient is logged in)',
+    },
+    params: {
+      name: 'patientId',
+      type: String,
+      description: 'Patient ID',
+      example: crypto.randomUUID(),
+    },
+    notFoundResponse: {
+      description: 'Patient not found',
+    },
+    okResponse: {
+      description: 'All patient appointments',
+    },
+  })
+  @Get(':patientId/appointments')
   async getPatientsAppointmentsById(
-    @Param('id') id: string,
+    @Param('patientId') patientId: string,
     @Query(new ValidationPipe({ transform: true }))
     query: GetAllAppointmentsQuery,
     @Req() request: Request,
   ) {
-    const user: Payload = request['user'];
+    const user = request.user;
 
     if (user.role === 'patient') {
       throw new UnauthorizedException();
     }
 
-    return this.appointmentsService.findAll(query, id);
+    return this.appointmentsService.findAll(query, patientId);
   }
 
-  @UseGuards(JwtGuard)
+  @ApiDocumentation({
+    operation: {
+      summary: 'Get current patient reports',
+      description: 'Get current patient reports (If patient is logged in)',
+    },
+    okResponse: {
+      description: 'All patient reports',
+      type: [BasicReportDto],
+    },
+  })
   @Get('/reports')
   async getPatientReports(
     @Req() request: Request,
     @Query(new ValidationPipe({ transform: true }))
     query: GetPatientReportsQuery,
-  ) {
-    const user: Payload = request['user'];
+  ): Promise<BasicReportDto[]> {
+    const user = request.user;
 
     if (user.role !== 'patient') {
       throw new UnauthorizedException();
@@ -178,31 +334,58 @@ export class PatientsController {
     return this.reportsService.findAllByPatientId(user.id, query);
   }
 
-  @UseGuards(JwtGuard)
-  @Get(':id/reports')
+  @ApiDocumentation({
+    operation: {
+      summary: 'Get current patient reports',
+      description: 'Get current patient reports (If patient is logged in)',
+    },
+    params: {
+      name: 'patientId',
+      type: String,
+      description: 'Patient ID',
+      example: crypto.randomUUID(),
+    },
+    notFoundResponse: {
+      description: 'Patient not found',
+    },
+    okResponse: {
+      description: 'All patient reports',
+      type: [BasicReportDto],
+    },
+  })
+  @Get(':patientId/reports')
   async getPatientReportsById(
-    @Param('id') id: string,
+    @Param('patientId') patientId: string,
     @Req() request: Request,
     @Query(new ValidationPipe({ transform: true }))
     query: GetPatientReportsQuery,
-  ) {
-    const user: Payload = request['user'];
+  ): Promise<BasicReportDto[]> {
+    const user = request.user;
 
     if (user.role === 'patient') {
       throw new UnauthorizedException();
     }
 
-    return this.reportsService.findAllByPatientId(id, query);
+    return this.reportsService.findAllByPatientId(patientId, query);
   }
 
-  @UseGuards(JwtGuard)
+  @ApiDocumentation({
+    operation: {
+      summary: 'Get current patient scans',
+      description: 'Get current patient scans (If patient is logged in)',
+    },
+    okResponse: {
+      description: 'All patient scans',
+      type: [ScanDto],
+    },
+  })
   @Get('/scans')
   async getPatientScans(
     @Req() request: Request,
     @Query(new ValidationPipe({ transform: true }))
     query: GetPatientScansQuery,
-  ) {
-    const user: Payload = request['user'];
+  ): Promise<ScanDto[]> {
+    const user = request.user;
 
     if (user.role !== 'patient') {
       throw new UnauthorizedException();
@@ -211,31 +394,58 @@ export class PatientsController {
     return this.scansService.findAllByPatientId(user.id, query);
   }
 
-  @UseGuards(JwtGuard)
-  @Get(':id/scans')
+  @ApiDocumentation({
+    operation: {
+      summary: 'Get current patient scans',
+      description: 'Get current patient scans (If patient is logged in)',
+    },
+    params: {
+      name: 'patientId',
+      type: String,
+      description: 'Patient ID',
+      example: crypto.randomUUID(),
+    },
+    notFoundResponse: {
+      description: 'Patient not found',
+    },
+    okResponse: {
+      description: 'All patient scans',
+      type: [ScanDto],
+    },
+  })
+  @Get(':patientId/scans')
   async getPatientScansById(
-    @Param('id') id: string,
+    @Param('patientId') patientId: string,
     @Req() request: Request,
     @Query(new ValidationPipe({ transform: true }))
     query: GetPatientReportsQuery,
-  ) {
-    const user: Payload = request['user'];
+  ): Promise<ScanDto[]> {
+    const user = request.user;
 
     if (user.role === 'patient') {
       throw new UnauthorizedException();
     }
 
-    return this.scansService.findAllByPatientId(id, query);
+    return this.scansService.findAllByPatientId(patientId, query);
   }
 
-  @UseGuards(JwtGuard)
+  @ApiDocumentation({
+    operation: {
+      summary: 'Get current patient treatments',
+      description: 'Get current patient treatments (If patient is logged in)',
+    },
+    okResponse: {
+      description: 'All patient treatments',
+      type: [TreatmentDto],
+    },
+  })
   @Get('treatments')
   async getPatientTreatments(
     @Req() request: Request,
     @Query(new ValidationPipe({ transform: true }))
     query: GetPatientTreatmentsQuery,
-  ) {
-    const user: Payload = request['user'];
+  ): Promise<TreatmentDto[]> {
+    const user = request.user;
 
     if (user.role !== 'patient') {
       throw new UnauthorizedException();
@@ -244,31 +454,58 @@ export class PatientsController {
     return this.treatmentService.findAllByPatientId(user.id, query);
   }
 
-  @UseGuards(JwtGuard)
-  @Get(':id/treatments')
+  @ApiDocumentation({
+    operation: {
+      summary: 'Get current patient treatments',
+      description: 'Get current patient treatments (If patient is logged in)',
+    },
+    params: {
+      name: 'patientId',
+      type: String,
+      description: 'Patient ID',
+      example: crypto.randomUUID(),
+    },
+    notFoundResponse: {
+      description: 'Patient not found',
+    },
+    okResponse: {
+      description: 'All patient treatments',
+      type: [TreatmentDto],
+    },
+  })
+  @Get(':patientId/treatments')
   async getPatientTreatmentsById(
-    @Param('id') id: string,
+    @Param('patientId') patientId: string,
     @Req() request: Request,
     @Query(new ValidationPipe({ transform: true }))
     query: GetPatientTreatmentsQuery,
-  ) {
-    const user: Payload = request['user'];
+  ): Promise<TreatmentDto[]> {
+    const user = request.user;
 
     if (user.role === 'patient') {
       throw new UnauthorizedException();
     }
 
-    return this.treatmentService.findAllByPatientId(id, query);
+    return this.treatmentService.findAllByPatientId(patientId, query);
   }
 
-  @UseGuards(JwtGuard)
+  @ApiDocumentation({
+    operation: {
+      summary: 'Get current patient prescriptions',
+      description:
+        'Get current patient prescriptions (If patient is logged in)',
+    },
+    okResponse: {
+      description: 'All patient prescriptions',
+    },
+  })
   @Get('prescriptions')
   async getPatientPrescriptions(
     @Req() request: Request,
     @Query(new ValidationPipe({ transform: true }))
     query: GetPatientPrescriptionsQuery,
   ) {
-    const user: Payload = request['user'];
+    const user = request.user;
 
     if (user.role !== 'patient') {
       throw new UnauthorizedException();
@@ -277,31 +514,58 @@ export class PatientsController {
     return this.prescriptionsService.findAllByPatientId(user.id, query);
   }
 
-  @UseGuards(JwtGuard)
-  @Get(':id/prescriptions')
+  @ApiDocumentation({
+    operation: {
+      summary: 'Get current patient prescriptions',
+      description:
+        'Get current patient prescriptions (If patient is logged in)',
+    },
+    params: {
+      name: 'patientId',
+      type: String,
+      description: 'Patient ID',
+      example: crypto.randomUUID(),
+    },
+    notFoundResponse: {
+      description: 'Patient not found',
+    },
+    okResponse: {
+      description: 'All patient prescriptions',
+    },
+  })
+  @Get(':patientId/prescriptions')
   async getPatientPrescriptionsById(
-    @Param('id') id: string,
+    @Param('patientId') patientId: string,
     @Req() request: Request,
     @Query(new ValidationPipe({ transform: true }))
     query: GetPatientPrescriptionsQuery,
   ) {
-    const user: Payload = request['user'];
+    const user = request.user;
 
     if (user.role === 'patient') {
       throw new UnauthorizedException();
     }
 
-    return this.prescriptionsService.findAllByPatientId(id, query);
+    return this.prescriptionsService.findAllByPatientId(patientId, query);
   }
 
-  @UseGuards(JwtGuard)
+  @ApiDocumentation({
+    operation: {
+      summary: 'Get current patient test results',
+      description: 'Get current patient test results (If patient is logged in)',
+    },
+    okResponse: {
+      description: 'All patient test results',
+      type: [LaboratoryTestResultDto],
+    },
+  })
   @Get('test-results')
   async getPatientTestResults(
     @Req() request: Request,
     @Query(new ValidationPipe({ transform: true }))
     query: GetPatientTestResultsQuery,
-  ) {
-    const user: Payload = request['user'];
+  ): Promise<LaboratoryTestResultDto[]> {
+    const user = request.user;
 
     if (user.role !== 'patient') {
       throw new UnauthorizedException();
@@ -310,20 +574,38 @@ export class PatientsController {
     return this.testResultsService.findAllByPatientId(user.id, query);
   }
 
-  @UseGuards(JwtGuard)
-  @Get(':id/test-results')
+  @ApiDocumentation({
+    operation: {
+      summary: 'Get current patient test results',
+      description: 'Get current patient test results (If patient is logged in)',
+    },
+    params: {
+      name: 'patientId',
+      type: String,
+      description: 'Patient ID',
+      example: crypto.randomUUID(),
+    },
+    notFoundResponse: {
+      description: 'Patient not found',
+    },
+    okResponse: {
+      description: 'All patient test results',
+      type: [LaboratoryTestResultDto],
+    },
+  })
+  @Get(':patientId/test-results')
   async getPatientTestResultsById(
-    @Param('id') id: string,
+    @Param('patientId') patientId: string,
     @Req() request: Request,
     @Query(new ValidationPipe({ transform: true }))
     query: GetPatientTestResultsQuery,
-  ) {
-    const user: Payload = request['user'];
+  ): Promise<LaboratoryTestResultDto[]> {
+    const user = request.user;
 
     if (user.role === 'patient') {
       throw new UnauthorizedException();
     }
 
-    return this.testResultsService.findAllByPatientId(id, query);
+    return this.testResultsService.findAllByPatientId(patientId, query);
   }
 }

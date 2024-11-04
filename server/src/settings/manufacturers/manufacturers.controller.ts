@@ -1,4 +1,4 @@
-import { Request } from 'express';
+import type { Request } from 'express';
 import {
   Controller,
   Post,
@@ -17,18 +17,39 @@ import { JwtGuard } from 'src/auth/guards/jwt.guard';
 
 import {
   CreateManufacturerDto,
+  ManufacturerDto,
   UpdateManufacturerDto,
 } from './dto/manufacturers.dto';
-import type { Payload } from 'src/types/payload.type';
+import { ApiDocumentation } from 'src/decorators/documentation.decorator';
 
+@ApiDocumentation({
+  tags: 'Manufacturers',
+  security: 'bearer',
+  unauthorizedResponse: {
+    description: 'Unauthorized',
+  },
+  badRequestResponse: {
+    description: 'Bad Request',
+  },
+})
+@UseGuards(JwtGuard)
 @Controller('settings/manufacturers')
 export class ManufacturersController {
   constructor(private readonly manufacturersService: ManufacturersService) {}
 
-  @UseGuards(JwtGuard)
+  @ApiDocumentation({
+    operation: {
+      summary: 'Get all manufacturers',
+      description: 'Get all manufacturers data',
+    },
+    okResponse: {
+      description: 'Manufacturers data',
+      type: [ManufacturerDto],
+    },
+  })
   @Get()
-  async findAll(@Req() request: Request) {
-    const user: Payload = request['user'];
+  async findAll(@Req() request: Request): Promise<ManufacturerDto[]> {
+    const user = request.user;
 
     if (user.role !== 'admin') {
       throw new UnauthorizedException();
@@ -37,25 +58,55 @@ export class ManufacturersController {
     return this.manufacturersService.findAll();
   }
 
-  @UseGuards(JwtGuard)
-  @Get(':id')
-  async getManufacturers(@Param('id') id: string, @Req() request: Request) {
-    const user: Payload = request['user'];
+  @ApiDocumentation({
+    operation: {
+      summary: 'Get manufacturer by ID',
+      description: 'Get manufacturer data by ID',
+    },
+    params: {
+      name: 'manufacturerId',
+      type: String,
+      description: 'Manufacturer ID',
+      example: crypto.randomUUID(),
+    },
+    notFoundResponse: {
+      description: 'Manufacturer not found',
+    },
+    okResponse: {
+      description: 'Manufacturer data',
+      type: ManufacturerDto,
+    },
+  })
+  @Get(':manufacturerId')
+  async getManufacturers(
+    @Param('manufacturerId') manufacturerId: string,
+    @Req() request: Request,
+  ): Promise<ManufacturerDto> {
+    const user = request.user;
 
     if (user.role !== 'admin') {
       throw new UnauthorizedException();
     }
 
-    return this.manufacturersService.findById(id);
+    return this.manufacturersService.findById(manufacturerId);
   }
 
-  @UseGuards(JwtGuard)
+  @ApiDocumentation({
+    operation: {
+      summary: 'Create manufacturer',
+      description: 'Create new manufacturer',
+    },
+    okResponse: {
+      description: 'Manufacturer created',
+      type: ManufacturerDto,
+    },
+  })
   @Post()
   async createManufacturer(
     @Body() createManufacturerDto: CreateManufacturerDto,
     @Req() request: Request,
-  ) {
-    const user: Payload = request['user'];
+  ): Promise<ManufacturerDto> {
+    const user = request.user;
 
     if (user.role !== 'admin') {
       throw new UnauthorizedException();
@@ -64,31 +115,74 @@ export class ManufacturersController {
     return this.manufacturersService.create(user.id, createManufacturerDto);
   }
 
-  @UseGuards(JwtGuard)
-  @Patch(':id')
+  @ApiDocumentation({
+    operation: {
+      summary: 'Update manufacturer',
+      description: 'Update manufacturer data',
+    },
+    params: {
+      name: 'manufacturerId',
+      type: String,
+      description: 'Manufacturer ID',
+      example: crypto.randomUUID(),
+    },
+    okResponse: {
+      description: 'Manufacturer updated',
+      type: ManufacturerDto,
+    },
+  })
+  @Patch(':manufacturerId')
   async updateManufacturer(
-    @Param('id') id: string,
+    @Param('manufacturerId') manufacturerId: string,
     @Body() updateManufacturerDto: UpdateManufacturerDto,
     @Req() request: Request,
-  ) {
-    const user: Payload = request['user'];
+  ): Promise<ManufacturerDto> {
+    const user = request.user;
 
     if (user.role !== 'admin') {
       throw new UnauthorizedException();
     }
 
-    return this.manufacturersService.update(user.id, id, updateManufacturerDto);
+    return this.manufacturersService.update(
+      user.id,
+      manufacturerId,
+      updateManufacturerDto,
+    );
   }
 
-  @UseGuards(JwtGuard)
-  @Delete(':id')
-  async deleteManufacturer(@Param('id') id: string, @Req() request: Request) {
-    const user: Payload = request['user'];
+  @ApiDocumentation({
+    operation: {
+      summary: 'Delete manufacturer',
+      description: 'Delete manufacturer data',
+    },
+    params: {
+      name: 'manufacturerId',
+      type: String,
+      description: 'Manufacturer ID',
+      example: crypto.randomUUID(),
+    },
+    notFoundResponse: {
+      description: 'Manufacturer not found',
+    },
+    conflictResponse: {
+      description: 'Manufacturer is being used by a device',
+    },
+    okResponse: {
+      description: 'Manufacturer deleted',
+      type: ManufacturerDto,
+    },
+  })
+  @Delete(':manufacturerId')
+  async deleteManufacturer(
+    @Param('manufacturerId') manufacturerId: string,
+    @Req() request: Request,
+  ): Promise<ManufacturerDto> {
+    const user = request.user;
 
     if (!user.isSuperAdmin) {
       throw new UnauthorizedException();
     }
 
-    return this.manufacturersService.delete(user.id, id);
+    return this.manufacturersService.delete(user.id, manufacturerId);
   }
 }

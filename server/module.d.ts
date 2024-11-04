@@ -4,6 +4,10 @@ declare namespace NodeJS {
     JWT_SECRET_KEY: string;
     JWT_REFRESH_TOKEN_KEY: string;
     SWAGGER_PASSWORD: string;
+    SWAGGER_CONTACT_NAME: string;
+    SWAGGER_CONTACT_URL: string;
+    SWAGGER_CONTACT_EMAIL: string;
+    SWAGGER_FAV_ICON_URL: string;
     SENDGRID_API_KEY: string;
     TWILIO_AUTH_TOKEN: string;
     TWILIO_ACCOUNT_SID: string;

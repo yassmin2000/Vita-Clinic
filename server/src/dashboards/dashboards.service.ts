@@ -1,4 +1,5 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Role } from '@prisma/client';
 
 import { PrismaService } from 'src/prisma.service';
 
@@ -9,16 +10,24 @@ import {
 } from './utils';
 
 import {
+  AdminDashboardGeneralStatisticsDto,
+  DashboardAppointmentsDataDto,
+  DashboardDoctorsAppointmentsDataDto,
+  DashboardDoctorsSexDataDto,
+  DashboardInvoicseDataDto,
+  DashboardMedicalInsightsDto,
+  DashboardMedicalServicesInsightsDto,
+  DashboardPatientsAgeSexDataDto,
+  DoctorDashboardGeneralStatisticsDto,
   GetAppointmentsDataQuery,
   GetInvoicesDataQuery,
 } from './dto/dashboards.dto';
-import { Role } from '@prisma/client';
 
 @Injectable()
 export class DashboardsService {
   constructor(private prisma: PrismaService) {}
 
-  async getStatistics(userId: string, role: Role) {
+  async getAdminGeneralStatistics(): Promise<AdminDashboardGeneralStatisticsDto> {
     const patientsCount = await this.prisma.user.count({
       where: {
         role: 'patient',
@@ -28,65 +37,72 @@ export class DashboardsService {
 
     const devicesCount = await this.prisma.device.count();
 
-    if (role === 'admin') {
-      const doctorsCount = await this.prisma.user.count({
-        where: {
-          role: 'doctor',
-          isActive: true,
-        },
-      });
+    const doctorsCount = await this.prisma.user.count({
+      where: {
+        role: 'doctor',
+        isActive: true,
+      },
+    });
 
-      const appointmentsCountByStatus = await this.prisma.appointment.groupBy({
-        by: 'status',
-        _count: true,
-      });
+    const appointmentsCountByStatus = await this.prisma.appointment.groupBy({
+      by: 'status',
+      _count: true,
+    });
 
-      const appointmentsCount = {
-        all: appointmentsCountByStatus.reduce((acc, item) => {
-          acc += item._count;
-          return acc;
-        }, 0),
-        completed:
-          appointmentsCountByStatus.find(
-            (count) => count.status === 'completed',
-          )?._count || 0,
-        approved:
-          appointmentsCountByStatus.find((count) => count.status === 'approved')
-            ?._count || 0,
-        pending:
-          appointmentsCountByStatus.find((count) => count.status === 'pending')
-            ?._count || 0,
-        cancelled:
-          appointmentsCountByStatus.find(
-            (count) => count.status === 'cancelled',
-          )?._count || 0,
-        rejected:
-          appointmentsCountByStatus.find((count) => count.status === 'rejected')
-            ?._count || 0,
-      };
+    const appointmentsCount = {
+      all: appointmentsCountByStatus.reduce((acc, item) => {
+        acc += item._count;
+        return acc;
+      }, 0),
+      completed:
+        appointmentsCountByStatus.find((count) => count.status === 'completed')
+          ?._count || 0,
+      approved:
+        appointmentsCountByStatus.find((count) => count.status === 'approved')
+          ?._count || 0,
+      pending:
+        appointmentsCountByStatus.find((count) => count.status === 'pending')
+          ?._count || 0,
+      cancelled:
+        appointmentsCountByStatus.find((count) => count.status === 'cancelled')
+          ?._count || 0,
+      rejected:
+        appointmentsCountByStatus.find((count) => count.status === 'rejected')
+          ?._count || 0,
+    };
 
-      return {
-        patientsCount,
-        doctorsCount,
-        appointmentsCount,
-        devicesCount,
-      };
-    } else if (role === 'doctor') {
-      const doctorAppointmentsCount = await this.prisma.appointment.count({
-        where: {
-          status: 'approved',
-          doctorId: userId,
-        },
-      });
+    return {
+      patientsCount,
+      doctorsCount,
+      appointmentsCount,
+      devicesCount,
+    };
+  }
 
-      return {
-        patientsCount,
-        appointmentsCount: doctorAppointmentsCount,
-        devicesCount,
-      };
-    }
+  async getDoctorGeneralStatistics(
+    userId: string,
+  ): Promise<DoctorDashboardGeneralStatisticsDto> {
+    const patientsCount = await this.prisma.user.count({
+      where: {
+        role: 'patient',
+        isActive: true,
+      },
+    });
 
-    throw new UnauthorizedException();
+    const devicesCount = await this.prisma.device.count();
+
+    const doctorAppointmentsCount = await this.prisma.appointment.count({
+      where: {
+        status: 'approved',
+        doctorId: userId,
+      },
+    });
+
+    return {
+      patientsCount,
+      appointmentsCount: doctorAppointmentsCount,
+      devicesCount,
+    };
   }
 
   async getInvoicesData({
@@ -94,7 +110,7 @@ export class DashboardsService {
     endDate = new Date(
       new Date().getTime() + 7 * 24 * 60 * 60 * 1000,
     ).toISOString(),
-  }: GetInvoicesDataQuery) {
+  }: GetInvoicesDataQuery): Promise<DashboardInvoicseDataDto[]> {
     const startDateObj = new Date(startDate);
     startDateObj.setHours(0, 0, 0, 0);
     const endDateObj = new Date(endDate);
@@ -189,7 +205,7 @@ export class DashboardsService {
   async getAppointmentsData({
     year = new Date().getFullYear(),
     status = 'completed',
-  }: GetAppointmentsDataQuery) {
+  }: GetAppointmentsDataQuery): Promise<DashboardAppointmentsDataDto[]> {
     const startDate = new Date(year, 0, 1);
     const endDate = new Date(year + 1, 0, 1);
 
@@ -211,7 +227,7 @@ export class DashboardsService {
     return processAppointmentsData(rawData);
   }
 
-  async getPatientsAgeSexData() {
+  async getPatientsAgeSexData(): Promise<DashboardPatientsAgeSexDataDto[]> {
     const rawData = await this.prisma.user.findMany({
       where: {
         role: 'patient',
@@ -226,7 +242,7 @@ export class DashboardsService {
     return processPatientsData(rawData);
   }
 
-  async getDoctorsSexData() {
+  async getDoctorsSexData(): Promise<DashboardDoctorsSexDataDto[]> {
     const data = await this.prisma.user.groupBy({
       by: 'sex',
       where: {
@@ -247,7 +263,7 @@ export class DashboardsService {
     endDate = new Date(
       new Date().getTime() + 7 * 24 * 60 * 60 * 1000,
     ).toISOString(),
-  }: GetInvoicesDataQuery) {
+  }: GetInvoicesDataQuery): Promise<DashboardDoctorsAppointmentsDataDto[]> {
     const startDateObj = new Date(startDate);
     startDateObj.setHours(0, 0, 0, 0);
     const endDateObj = new Date(endDate);
@@ -295,7 +311,7 @@ export class DashboardsService {
     return result;
   }
 
-  async getDiagnosesData() {
+  async _getDiagnosesData() {
     const data = await this.prisma.diagnosis.findMany({
       select: {
         name: true,
@@ -319,7 +335,7 @@ export class DashboardsService {
     }));
   }
 
-  async getMedicationsData() {
+  async _getMedicationsData() {
     const data = await this.prisma.medication.findMany({
       select: {
         name: true,
@@ -351,7 +367,7 @@ export class DashboardsService {
     }));
   }
 
-  async getSurgeriesData() {
+  async _getSurgeriesData() {
     const data = await this.prisma.surgery.findMany({
       select: {
         name: true,
@@ -375,7 +391,7 @@ export class DashboardsService {
     }));
   }
 
-  async getAllergiesData() {
+  async _getAllergiesData() {
     const data = await this.prisma.allergy.findMany({
       select: {
         name: true,
@@ -399,11 +415,11 @@ export class DashboardsService {
     }));
   }
 
-  async getMedicalInsights() {
-    const diagnoses = await this.getDiagnosesData();
-    const medications = await this.getMedicationsData();
-    const surgeries = await this.getSurgeriesData();
-    const allergies = await this.getAllergiesData();
+  async getMedicalInsights(): Promise<DashboardMedicalInsightsDto> {
+    const diagnoses = await this._getDiagnosesData();
+    const medications = await this._getMedicationsData();
+    const surgeries = await this._getSurgeriesData();
+    const allergies = await this._getAllergiesData();
 
     return {
       diagnoses,
@@ -413,7 +429,7 @@ export class DashboardsService {
     };
   }
 
-  async getServicesData() {
+  async _getServicesData() {
     const data = await this.prisma.service.findMany({
       select: {
         name: true,
@@ -437,7 +453,7 @@ export class DashboardsService {
     }));
   }
 
-  async getTherapiesData() {
+  async _getTherapiesData() {
     const data = await this.prisma.therapy.findMany({
       select: {
         name: true,
@@ -461,7 +477,7 @@ export class DashboardsService {
     }));
   }
 
-  async getScansData() {
+  async _getScansData() {
     const data = await this.prisma.modality.findMany({
       select: {
         name: true,
@@ -485,7 +501,7 @@ export class DashboardsService {
     }));
   }
 
-  async getLaboratoryTestsData() {
+  async _getLaboratoryTestsData() {
     const data = await this.prisma.laboratoryTest.findMany({
       select: {
         name: true,
@@ -509,11 +525,11 @@ export class DashboardsService {
     }));
   }
 
-  async getMedicalServicesInsights() {
-    const services = await this.getServicesData();
-    const therapies = await this.getTherapiesData();
-    const scans = await this.getScansData();
-    const laboratoryTests = await this.getLaboratoryTestsData();
+  async getMedicalServicesInsights(): Promise<DashboardMedicalServicesInsightsDto> {
+    const services = await this._getServicesData();
+    const therapies = await this._getTherapiesData();
+    const scans = await this._getScansData();
+    const laboratoryTests = await this._getLaboratoryTestsData();
 
     return {
       services,

@@ -8,9 +8,12 @@ import { PrismaService } from 'src/prisma.service';
 import { LogService } from 'src/log/log.service';
 
 import {
+  BasicReportDto,
   CreateMessageDto,
   CreateReportDto,
   GetPatientReportsQuery,
+  MessageDto,
+  ReportDto,
   UpdateReportDto,
 } from './dto/reports.dto';
 
@@ -21,7 +24,7 @@ export class ReportsService {
     private readonly logService: LogService,
   ) {}
 
-  async findAllByAppointmentId(appointmentId: string) {
+  async findAllByAppointmentId(appointmentId: string): Promise<ReportDto[]> {
     return this.prisma.report.findMany({
       where: { appointmentId },
       include: {
@@ -38,7 +41,7 @@ export class ReportsService {
       value = '',
       sort = 'createdAt-desc',
     }: GetPatientReportsQuery,
-  ) {
+  ): Promise<BasicReportDto[]> {
     const [sortField, sortOrder] = sort.split('-') as [string, 'desc' | 'asc'];
 
     return this.prisma.report.findMany({
@@ -59,7 +62,7 @@ export class ReportsService {
     });
   }
 
-  async findById(id: string) {
+  async findById(id: string): Promise<ReportDto> {
     const report = await this.prisma.report.findUnique({
       where: { id },
       include: {
@@ -74,7 +77,10 @@ export class ReportsService {
     return report;
   }
 
-  async create(createReportDto: CreateReportDto, userId: string) {
+  async create(
+    createReportDto: CreateReportDto,
+    userId: string,
+  ): Promise<BasicReportDto> {
     const appointment = await this.prisma.appointment.findUnique({
       where: { id: createReportDto.appointmentId },
     });
@@ -99,7 +105,11 @@ export class ReportsService {
     return report;
   }
 
-  async update(id: string, updateReportDto: UpdateReportDto, userId: string) {
+  async update(
+    id: string,
+    updateReportDto: UpdateReportDto,
+    userId: string,
+  ): Promise<BasicReportDto> {
     const existingReport = await this.prisma.report.findUnique({
       where: { id },
     });
@@ -134,7 +144,10 @@ export class ReportsService {
     return report;
   }
 
-  async updateStatus(id: string, status: 'processed' | 'failed') {
+  async updateStatus(
+    id: string,
+    status: 'processed' | 'failed',
+  ): Promise<BasicReportDto> {
     const report = await this.prisma.report.findUnique({
       where: { id },
     });
@@ -153,7 +166,7 @@ export class ReportsService {
     });
   }
 
-  async getMessages(reportId: string, userId: string) {
+  async getMessages(reportId: string, userId: string): Promise<MessageDto[]> {
     return this.prisma.message.findMany({
       where: { reportId, userId },
       orderBy: { createdAt: 'asc' },
@@ -164,7 +177,7 @@ export class ReportsService {
     reportId: string,
     userId: string,
     createMessageDto: CreateMessageDto,
-  ) {
+  ): Promise<MessageDto> {
     const report = await this.prisma.report.findUnique({
       where: { id: reportId },
     });

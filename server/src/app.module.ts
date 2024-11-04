@@ -11,12 +11,12 @@ import { SettingsModule } from './settings/settings.module';
 import { UsersModule } from './users/users.module';
 import { LogModule } from './log/log.module';
 import { DashboardsModule } from './dashboards/dashboards.module';
+import { EmailOtpModule } from './email-otp/email-otp.module';
+import { PhoneOtpModule } from './phone-otp/phone-otp.module';
 
 import { AppController } from './app.controller';
 
 import { AppService } from './app.service';
-import { EmailOtpModule } from './email-otp/email-otp.module';
-import { PhoneOtpModule } from './phone-otp/phone-otp.module';
 import { TasksService } from './tasks.service';
 
 @Module({

@@ -5,8 +5,13 @@ import {
 } from '@nestjs/common';
 
 import { PrismaService } from 'src/prisma.service';
-import { CreateBiomarkerDto, UpdateBiomarkerDto } from './dto/biomarkers.dto';
 import { LogService } from 'src/log/log.service';
+
+import {
+  BiomarkerDto,
+  CreateBiomarkerDto,
+  UpdateBiomarkerDto,
+} from './dto/biomarkers.dto';
 
 @Injectable()
 export class BiomarkersService {
@@ -15,11 +20,11 @@ export class BiomarkersService {
     private logService: LogService,
   ) {}
 
-  async findAll() {
+  async findAll(): Promise<BiomarkerDto[]> {
     return this.prisma.biomarker.findMany();
   }
 
-  async findById(id: string) {
+  async findById(id: string): Promise<BiomarkerDto> {
     const biomarker = await this.prisma.biomarker.findUnique({
       where: { id },
     });
@@ -31,7 +36,10 @@ export class BiomarkersService {
     return biomarker;
   }
 
-  async create(userId: string, createBiomarkerDto: CreateBiomarkerDto) {
+  async create(
+    userId: string,
+    createBiomarkerDto: CreateBiomarkerDto,
+  ): Promise<BiomarkerDto> {
     const createdBiomarker = await this.prisma.biomarker.create({
       data: createBiomarkerDto,
     });
@@ -50,7 +58,7 @@ export class BiomarkersService {
     userId: string,
     id: string,
     updateBiomarkerDto: UpdateBiomarkerDto,
-  ) {
+  ): Promise<BiomarkerDto> {
     const existingBiomarker = await this.prisma.biomarker.findUnique({
       where: { id },
     });
@@ -75,7 +83,7 @@ export class BiomarkersService {
     return updatedBiomarker;
   }
 
-  async delete(userId: string, id: string) {
+  async delete(userId: string, id: string): Promise<BiomarkerDto> {
     const existingBiomarker = await this.prisma.biomarker.findUnique({
       where: { id },
     });

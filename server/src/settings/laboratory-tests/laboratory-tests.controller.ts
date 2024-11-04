@@ -1,4 +1,4 @@
-import { Request } from 'express';
+import type { Request } from 'express';
 import {
   Controller,
   Post,
@@ -18,44 +18,92 @@ import { JwtGuard } from 'src/auth/guards/jwt.guard';
 
 import {
   CreateLaboratoryTestDto,
+  LaboratoryTestDto,
   UpdateLaboratoryTestDto,
 } from './dto/laboratory-test.dto';
-import type { Payload } from 'src/types/payload.type';
+import { ApiDocumentation } from 'src/decorators/documentation.decorator';
 
+@ApiDocumentation({
+  tags: 'Laboratory Tests',
+  security: 'bearer',
+  unauthorizedResponse: {
+    description: 'Unauthorized',
+  },
+  badRequestResponse: {
+    description: 'Bad Request',
+  },
+})
+@UseGuards(JwtGuard)
 @Controller('settings/laboratory-tests')
 export class LaboratoryTestsController {
   constructor(
     private readonly laboratoryTestsService: LaboratoryTestsService,
   ) {}
 
-  @UseGuards(JwtGuard)
+  @ApiDocumentation({
+    operation: {
+      summary: 'Get all laboratory tests',
+      description: 'Get all laboratory tests data',
+    },
+    okResponse: {
+      description: 'Laboratory tests data',
+      type: [LaboratoryTestDto],
+    },
+  })
   @Get()
-  async getAllLaboratoryTests() {
+  async getAllLaboratoryTests(): Promise<LaboratoryTestDto[]> {
     return this.laboratoryTestsService.findAll();
   }
 
-  @UseGuards(JwtGuard)
-  @Get(':id')
+  @ApiDocumentation({
+    operation: {
+      summary: 'Get laboratory test by ID',
+      description: 'Get laboratory test data by ID',
+    },
+    params: {
+      name: 'laboratoryTestId',
+      type: String,
+      description: 'Laboratory test ID',
+      example: crypto.randomUUID(),
+    },
+    notFoundResponse: {
+      description: 'Laboratory test not found',
+    },
+    okResponse: {
+      description: 'Laboratory test data',
+      type: LaboratoryTestDto,
+    },
+  })
+  @Get(':laboratoryTestId')
   async getLaboratoryTestById(
-    @Param('id') id: string,
+    @Param('laboratoryTestId') laboratoryTestId: string,
     @Req() request: Request,
-  ) {
-    const user: Payload = request['user'];
+  ): Promise<LaboratoryTestDto> {
+    const user = request.user;
 
     if (user.role === 'patient') {
       throw new UnauthorizedException();
     }
 
-    return this.laboratoryTestsService.findById(id);
+    return this.laboratoryTestsService.findById(laboratoryTestId);
   }
 
-  @UseGuards(JwtGuard)
+  @ApiDocumentation({
+    operation: {
+      summary: 'Create laboratory test',
+      description: 'Create new laboratory test',
+    },
+    createdResponse: {
+      description: 'Laboratory test created',
+      type: LaboratoryTestDto,
+    },
+  })
   @Post()
   async createLaboratoryTest(
     @Body(ValidationPipe) dto: CreateLaboratoryTestDto,
     @Req() request: Request,
-  ) {
-    const user: Payload = request['user'];
+  ): Promise<LaboratoryTestDto> {
+    const user = request.user;
 
     if (user.role === 'patient') {
       throw new UnauthorizedException();
@@ -63,31 +111,73 @@ export class LaboratoryTestsController {
     return this.laboratoryTestsService.create(user.id, dto);
   }
 
-  @UseGuards(JwtGuard)
-  @Patch(':id')
+  @ApiDocumentation({
+    operation: {
+      summary: 'Update laboratory test',
+      description: 'Update laboratory test data',
+    },
+    params: {
+      name: 'laboratoryTestId',
+      type: String,
+      description: 'Laboratory test ID',
+      example: crypto.randomUUID(),
+    },
+    notFoundResponse: {
+      description: 'Laboratory test not found',
+    },
+    okResponse: {
+      description: 'Laboratory test updated',
+      type: LaboratoryTestDto,
+    },
+  })
+  @Patch(':laboratoryTestId')
   async updateLaboratoryTest(
-    @Param('id') id: string,
+    @Param('laboratoryTestId') laboratoryTestId: string,
     @Body(ValidationPipe) dto: UpdateLaboratoryTestDto,
     @Req() request: Request,
-  ) {
-    const user: Payload = request['user'];
+  ): Promise<LaboratoryTestDto> {
+    const user = request.user;
 
     if (user.role === 'patient') {
       throw new UnauthorizedException();
     }
 
-    return this.laboratoryTestsService.update(user.id,id, dto);
+    return this.laboratoryTestsService.update(user.id, laboratoryTestId, dto);
   }
 
-  @UseGuards(JwtGuard)
-  @Delete(':id')
-  async deleteLaboratoryTest(@Param('id') id: string, @Req() request: Request) {
-    const user: Payload = request['user'];
+  @ApiDocumentation({
+    operation: {
+      summary: 'Delete laboratory test',
+      description: 'Delete laboratory test data',
+    },
+    params: {
+      name: 'laboratoryTestId',
+      type: String,
+      description: 'Laboratory test ID',
+      example: crypto.randomUUID(),
+    },
+    notFoundResponse: {
+      description: 'Laboratory test not found',
+    },
+    conflictResponse: {
+      description: 'Laboratory test is being used',
+    },
+    okResponse: {
+      description: 'Laboratory test deleted',
+      type: LaboratoryTestDto,
+    },
+  })
+  @Delete(':laboratoryTestId')
+  async deleteLaboratoryTest(
+    @Param('laboratoryTestId') laboratoryTestId: string,
+    @Req() request: Request,
+  ): Promise<LaboratoryTestDto> {
+    const user = request.user;
 
     if (!user.isSuperAdmin) {
       throw new UnauthorizedException();
     }
 
-    return this.laboratoryTestsService.delete(user.id,id);
+    return this.laboratoryTestsService.delete(user.id, laboratoryTestId);
   }
 }

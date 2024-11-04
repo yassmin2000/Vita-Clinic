@@ -1,4 +1,4 @@
-import { Request } from 'express';
+import type { Request } from 'express';
 import {
   Body,
   Controller,
@@ -14,39 +14,85 @@ import {
 import { EmrService } from './emr.service';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
 
-import { EmrDto } from './dto/emr.dto';
-import type { Payload } from 'src/types/payload.type';
+import { EmrDto, UpdateEmrDto } from './dto/emr.dto';
+import { ApiDocumentation } from 'src/decorators/documentation.decorator';
 
+@ApiDocumentation({
+  tags: 'EMR',
+  security: 'bearer',
+  unauthorizedResponse: { description: 'Unauthorized' },
+  badRequestResponse: { description: 'Bad Request' },
+})
+@UseGuards(JwtGuard)
 @Controller('emr')
 export class EmrController {
   constructor(private emrService: EmrService) {}
 
-  @UseGuards(JwtGuard)
-  @Get(':id')
-  async getById(@Param('id') id: string, @Req() request: Request) {
-    const user: Payload = request['user'];
+  @ApiDocumentation({
+    operation: {
+      summary: 'Get patient EMR by ID',
+      description: 'Get certain patient EMR data',
+    },
+    params: {
+      name: 'patientId',
+      type: String,
+      description: 'Patient ID',
+      example: crypto.randomUUID(),
+    },
+    notFoundResponse: {
+      description: 'Patient/EMR not Found',
+    },
+    okResponse: {
+      description: 'Patient EMR data',
+      type: EmrDto,
+    },
+  })
+  @Get(':patientId')
+  async getById(
+    @Param('patientId') patientId: string,
+    @Req() request: Request,
+  ): Promise<EmrDto> {
+    const user = request.user;
 
-    if (user.role === 'patient' && user.id !== id) {
+    if (user.role === 'patient' && user.id !== patientId) {
       throw new UnauthorizedException();
     }
 
-    return this.emrService.getById(id);
+    return this.emrService.getById(patientId);
   }
 
-  @UseGuards(JwtGuard)
-  @Patch(':id')
+  @ApiDocumentation({
+    operation: {
+      summary: 'Update patient EMR by ID',
+      description: 'Update certain patient EMR data',
+    },
+    params: {
+      name: 'patientId',
+      type: String,
+      description: 'Patient ID',
+      example: crypto.randomUUID(),
+    },
+    notFoundResponse: {
+      description: 'Patient not Found',
+    },
+    okResponse: {
+      description: 'Patient EMR data updated',
+      type: EmrDto,
+    },
+  })
+  @Patch(':patientId')
   async update(
-    @Param('id') id: string,
+    @Param('patientId') patientId: string,
     @Body(new ValidationPipe())
-    emrDto: EmrDto,
+    emrDto: UpdateEmrDto,
     @Req() request: Request,
-  ) {
-    const user: Payload = request['user'];
+  ): Promise<EmrDto> {
+    const user = request.user;
 
     if (user.role !== 'doctor') {
       throw new UnauthorizedException();
     }
 
-    return this.emrService.update(id, emrDto, user.id);
+    return this.emrService.update(patientId, emrDto, user.id);
   }
 }

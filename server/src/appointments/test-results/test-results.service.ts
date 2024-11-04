@@ -1,10 +1,14 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+
 import { PrismaService } from 'src/prisma.service';
 import { LogService } from 'src/log/log.service';
 
 import {
+  BasicLaboratoryTestResultDto,
   CreateLaboratoryTestResultDto,
+  FullLaboratoryTestResultDto,
   GetPatientTestResultsQuery,
+  LaboratoryTestResultDto,
   UpdateLaboratoryTestResultDto,
 } from './dto/test-results.dto';
 
@@ -15,7 +19,9 @@ export class TestResultsService {
     private readonly logService: LogService,
   ) {}
 
-  async findAllByAppointmentId(appointmentId: string) {
+  async findAllByAppointmentId(
+    appointmentId: string,
+  ): Promise<FullLaboratoryTestResultDto[]> {
     return await this.prisma.laboratoryTestResult.findMany({
       where: { appointmentId },
       include: {
@@ -41,7 +47,7 @@ export class TestResultsService {
       limit = 10,
       sort = 'createdAt-desc',
     }: GetPatientTestResultsQuery,
-  ) {
+  ): Promise<LaboratoryTestResultDto[]> {
     const [sortField, sortOrder] = sort.split('-') as [string, 'desc' | 'asc'];
 
     return this.prisma.laboratoryTestResult.findMany({
@@ -73,7 +79,7 @@ export class TestResultsService {
   async create(
     createLaboratoryTestResultDto: CreateLaboratoryTestResultDto,
     userId: string,
-  ) {
+  ): Promise<BasicLaboratoryTestResultDto> {
     const appointment = await this.prisma.appointment.findUnique({
       where: { id: createLaboratoryTestResultDto.appointmentId },
     });
@@ -137,7 +143,7 @@ export class TestResultsService {
     id: string,
     updateLaboratoryTestResultDto: UpdateLaboratoryTestResultDto,
     userId: string,
-  ) {
+  ): Promise<BasicLaboratoryTestResultDto> {
     const existingLaboratoryTestResult =
       await this.prisma.laboratoryTestResult.findUnique({
         where: { id },

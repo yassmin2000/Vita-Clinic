@@ -5,8 +5,13 @@ import {
 } from '@nestjs/common';
 
 import { PrismaService } from 'src/prisma.service';
-import { CreateDiagnosisDto, UpdateDiagnosisDto } from './dto/diagnoses.dto';
 import { LogService } from 'src/log/log.service';
+
+import {
+  CreateDiagnosisDto,
+  DiagnosisDto,
+  UpdateDiagnosisDto,
+} from './dto/diagnoses.dto';
 
 @Injectable()
 export class DiagnosesService {
@@ -15,11 +20,11 @@ export class DiagnosesService {
     private logService: LogService,
   ) {}
 
-  async findAll() {
+  async findAll(): Promise<DiagnosisDto[]> {
     return this.prisma.diagnosis.findMany();
   }
 
-  async findById(id: string) {
+  async findById(id: string): Promise<DiagnosisDto> {
     const diagnosis = await this.prisma.diagnosis.findUnique({
       where: { id },
     });
@@ -31,7 +36,10 @@ export class DiagnosesService {
     return diagnosis;
   }
 
-  async create(userId: string, createDiagnosisDto: CreateDiagnosisDto) {
+  async create(
+    userId: string,
+    createDiagnosisDto: CreateDiagnosisDto,
+  ): Promise<DiagnosisDto> {
     const createdDiagnosis = await this.prisma.diagnosis.create({
       data: createDiagnosisDto,
     });
@@ -50,7 +58,7 @@ export class DiagnosesService {
     userId: string,
     id: string,
     updateDiagnosisDto: UpdateDiagnosisDto,
-  ) {
+  ): Promise<DiagnosisDto> {
     const existingDiagnosis = await this.prisma.diagnosis.findUnique({
       where: { id },
     });
@@ -75,7 +83,7 @@ export class DiagnosesService {
     return updateDiagnosis;
   }
 
-  async delete(userId: string, id: string) {
+  async delete(userId: string, id: string): Promise<DiagnosisDto> {
     const existingDiagnosis = await this.prisma.diagnosis.findUnique({
       where: { id },
     });

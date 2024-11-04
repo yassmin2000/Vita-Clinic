@@ -9,6 +9,7 @@ import { LogService } from 'src/log/log.service';
 
 import {
   CreateDeviceDto,
+  DeviceDto,
   GetAllDevicesQuery,
   UpdateDeviceDto,
 } from './dto/devices.dto';
@@ -26,7 +27,7 @@ export class DevicesService {
     status = 'all',
     value = '',
     sort = 'purchaseDate-desc',
-  }: GetAllDevicesQuery) {
+  }: GetAllDevicesQuery): Promise<DeviceDto[]> {
     const [sortField, sortOrder] = sort.split('-') as [string, 'desc' | 'asc'];
 
     return this.prisma.device.findMany({
@@ -38,12 +39,7 @@ export class DevicesService {
         status: status === 'all' ? undefined : status,
       },
       include: {
-        manufacturer: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
+        manufacturer: true,
       },
       skip: (page - 1) * limit,
       take: limit,
@@ -54,17 +50,11 @@ export class DevicesService {
     });
   }
 
-  async findById(id: string) {
+  async findById(id: string): Promise<DeviceDto> {
     const device = await this.prisma.device.findUnique({
       where: { id },
       include: {
-        manufacturer: {
-          select: {
-            id: true,
-            name: true,
-            description: true,
-          },
-        },
+        manufacturer: true,
       },
     });
 
@@ -75,7 +65,10 @@ export class DevicesService {
     return device;
   }
 
-  async create(createDeviceDto: CreateDeviceDto, userId: string) {
+  async create(
+    createDeviceDto: CreateDeviceDto,
+    userId: string,
+  ): Promise<DeviceDto> {
     const existingSerialNumber = await this.prisma.device.findUnique({
       where: {
         serialNumber: createDeviceDto.serialNumber,
@@ -96,6 +89,9 @@ export class DevicesService {
 
     const device = await this.prisma.device.create({
       data: createDeviceDto,
+      include: {
+        manufacturer: true,
+      },
     });
 
     await this.logService.create({
@@ -109,7 +105,11 @@ export class DevicesService {
     return device;
   }
 
-  async update(id: string, updateDeviceDto: UpdateDeviceDto, userId: string) {
+  async update(
+    id: string,
+    updateDeviceDto: UpdateDeviceDto,
+    userId: string,
+  ): Promise<DeviceDto> {
     const existingDevice = await this.prisma.device.findUnique({
       where: { id },
     });
@@ -145,6 +145,9 @@ export class DevicesService {
     const updatedDevice = await this.prisma.device.update({
       where: { id },
       data: updateDeviceDto,
+      include: {
+        manufacturer: true,
+      },
     });
 
     await this.logService.create({
@@ -158,7 +161,7 @@ export class DevicesService {
     return updatedDevice;
   }
 
-  async delete(id: string, userId: string) {
+  async delete(id: string, userId: string): Promise<DeviceDto> {
     const existingDevice = await this.prisma.device.findUnique({
       where: { id },
     });
@@ -169,6 +172,9 @@ export class DevicesService {
 
     const deletedDevice = await this.prisma.device.delete({
       where: { id },
+      include: {
+        manufacturer: true,
+      },
     });
 
     await this.logService.create({

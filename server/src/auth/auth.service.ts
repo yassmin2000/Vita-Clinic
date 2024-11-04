@@ -3,10 +3,15 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { LoginDto } from './dto/auth.dto';
-import { UsersService } from 'src/users/users.service';
-import { compare } from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { compare } from 'bcrypt';
+
+import { UsersService } from 'src/users/users.service';
+
+import { LoginDto } from './dto/auth.dto';
+import { LoginResponseDto } from './dto/auth-response.dto';
+import { UserReturnDto } from 'src/users/dto/users-response.dto';
+
 import type { Payload } from 'src/types/payload.type';
 
 @Injectable()
@@ -16,7 +21,7 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async login(dto: LoginDto) {
+  async login(dto: LoginDto): Promise<LoginResponseDto> {
     const user = await this.validateUser(dto);
 
     const payload: Payload = {
@@ -48,7 +53,9 @@ export class AuthService {
     };
   }
 
-  private async validateUser(dto: LoginDto) {
+  private async validateUser(
+    dto: LoginDto,
+  ): Promise<Omit<UserReturnDto, 'isActive'>> {
     const user = await this.userService.findByEmail(dto.email);
 
     if (!user) {
@@ -73,7 +80,7 @@ export class AuthService {
     return result;
   }
 
-  async refreshToken(userId: string) {
+  async refreshToken(userId: string): Promise<LoginResponseDto> {
     const user = await this.userService.findById(userId);
 
     const payload: Payload = {

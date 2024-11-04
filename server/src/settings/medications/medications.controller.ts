@@ -1,4 +1,4 @@
-import { Request } from 'express';
+import type { Request } from 'express';
 import {
   Controller,
   Post,
@@ -19,17 +19,38 @@ import { JwtGuard } from 'src/auth/guards/jwt.guard';
 import {
   UpdateMedicationDto,
   CreateMedicationDto,
+  MedicationDto,
 } from './dto/medications.dto';
-import type { Payload } from 'src/types/payload.type';
+import { ApiDocumentation } from 'src/decorators/documentation.decorator';
 
+@ApiDocumentation({
+  tags: 'Medications',
+  security: 'bearer',
+  unauthorizedResponse: {
+    description: 'Unauthorized',
+  },
+  badRequestResponse: {
+    description: 'Bad request',
+  },
+})
+@UseGuards(JwtGuard)
 @Controller('settings/medications')
 export class MedicationsController {
   constructor(private readonly medicationsService: MedicationsService) {}
 
-  @UseGuards(JwtGuard)
+  @ApiDocumentation({
+    operation: {
+      summary: 'Get all medications',
+      description: 'Get all medications data',
+    },
+    okResponse: {
+      description: 'Medications data',
+      type: [MedicationDto],
+    },
+  })
   @Get()
-  async getAllMedications(@Req() request: Request) {
-    const user: Payload = request['user'];
+  async getAllMedications(@Req() request: Request): Promise<MedicationDto[]> {
+    const user = request.user;
 
     if (user.role === 'patient') {
       throw new UnauthorizedException();
@@ -38,25 +59,55 @@ export class MedicationsController {
     return this.medicationsService.findAll();
   }
 
-  @UseGuards(JwtGuard)
-  @Get(':id')
-  async getMedication(@Param('id') id: string, @Req() request: Request) {
-    const user: Payload = request['user'];
+  @ApiDocumentation({
+    operation: {
+      summary: 'Get medication by ID',
+      description: 'Get medication data by ID',
+    },
+    params: {
+      name: 'medicationId',
+      type: String,
+      description: 'Medication ID',
+      example: crypto.randomUUID(),
+    },
+    notFoundResponse: {
+      description: 'Medication not found',
+    },
+    okResponse: {
+      description: 'Medication data',
+      type: MedicationDto,
+    },
+  })
+  @Get(':medicationId')
+  async getMedication(
+    @Param('medicationId') medicationId: string,
+    @Req() request: Request,
+  ): Promise<MedicationDto> {
+    const user = request.user;
 
     if (user.role === 'patient') {
       throw new UnauthorizedException();
     }
 
-    return this.medicationsService.findById(id);
+    return this.medicationsService.findById(medicationId);
   }
 
-  @UseGuards(JwtGuard)
+  @ApiDocumentation({
+    operation: {
+      summary: 'Create medication',
+      description: 'Create medication data',
+    },
+    okResponse: {
+      description: 'Medication created',
+      type: MedicationDto,
+    },
+  })
   @Post()
   async create(
     @Body(ValidationPipe) createMeidicationDto: CreateMedicationDto,
     @Req() request: Request,
-  ) {
-    const user: Payload = request['user'];
+  ): Promise<MedicationDto> {
+    const user = request.user;
 
     if (user.role === 'patient') {
       throw new UnauthorizedException();
@@ -65,14 +116,32 @@ export class MedicationsController {
     return this.medicationsService.create(user.id, createMeidicationDto);
   }
 
-  @UseGuards(JwtGuard)
-  @Patch(':id')
+  @ApiDocumentation({
+    operation: {
+      summary: 'Update medication',
+      description: 'Update medication data',
+    },
+    params: {
+      name: 'medicationId',
+      type: String,
+      description: 'Medication ID',
+      example: crypto.randomUUID(),
+    },
+    notFoundResponse: {
+      description: 'Medication not found',
+    },
+    okResponse: {
+      description: 'Medication updated',
+      type: MedicationDto,
+    },
+  })
+  @Patch(':medicationId')
   async updateMedication(
-    @Param('id') id: string,
+    @Param('medicationId') medicationId: string,
     @Body(ValidationPipe) updateMedicationDto: UpdateMedicationDto,
     @Req() request: Request,
-  ) {
-    const user: Payload = request['user'];
+  ): Promise<MedicationDto> {
+    const user = request.user;
 
     if (user.role === 'patient') {
       throw new UnauthorizedException();
@@ -80,20 +149,44 @@ export class MedicationsController {
 
     return this.medicationsService.updateMedication(
       user.id,
-      id,
+      medicationId,
       updateMedicationDto,
     );
   }
 
-  @UseGuards(JwtGuard)
-  @Delete(':id')
-  async deleteMedication(@Param('id') id: string, @Req() request: Request) {
-    const user: Payload = request['user'];
+  @ApiDocumentation({
+    operation: {
+      summary: 'Delete medication',
+      description: 'Delete medication data',
+    },
+    params: {
+      name: 'medicationId',
+      type: String,
+      description: 'Medication ID',
+      example: crypto.randomUUID(),
+    },
+    notFoundResponse: {
+      description: 'Medication not found',
+    },
+    conflictResponse: {
+      description: 'Medication is being used in an EMR/prescription',
+    },
+    okResponse: {
+      description: 'Medication deleted',
+      type: MedicationDto,
+    },
+  })
+  @Delete(':medicationId')
+  async deleteMedication(
+    @Param('medicationId') medicationId: string,
+    @Req() request: Request,
+  ): Promise<MedicationDto> {
+    const user = request.user;
 
     if (!user.isSuperAdmin) {
       throw new UnauthorizedException();
     }
 
-    return this.medicationsService.deleteMedication(user.id, id);
+    return this.medicationsService.deleteMedication(user.id, medicationId);
   }
 }

@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+
 import { PrismaService } from 'src/prisma.service';
 import { LogService } from 'src/log/log.service';
 
@@ -6,6 +7,8 @@ import {
   CreatePrescriptionDto,
   UpdatePrescriptionDto,
   GetPatientPrescriptionsQuery,
+  PrescriptionDto,
+  BasicPrescriptionDto,
 } from './dto/prescriptions.dto';
 
 @Injectable()
@@ -15,7 +18,9 @@ export class PrescriptionsService {
     private readonly logService: LogService,
   ) {}
 
-  async findAllByAppointmentId(appointmentId: string) {
+  async findAllByAppointmentId(
+    appointmentId: string,
+  ): Promise<PrescriptionDto[]> {
     return this.prisma.prescription.findMany({
       where: { appointmentId },
       include: {
@@ -32,7 +37,7 @@ export class PrescriptionsService {
       limit = 10,
       sort = 'createdAt-desc',
     }: GetPatientPrescriptionsQuery,
-  ) {
+  ): Promise<BasicPrescriptionDto[]> {
     const [sortField, sortOrder] = sort.split('-') as [string, 'desc' | 'asc'];
 
     return this.prisma.prescription.findMany({
@@ -52,7 +57,10 @@ export class PrescriptionsService {
     });
   }
 
-  async create(createPrescriptionDto: CreatePrescriptionDto, userId: string) {
+  async create(
+    createPrescriptionDto: CreatePrescriptionDto,
+    userId: string,
+  ): Promise<BasicPrescriptionDto> {
     const appointment = await this.prisma.appointment.findUnique({
       where: { id: createPrescriptionDto.appointmentId },
     });
@@ -72,11 +80,7 @@ export class PrescriptionsService {
     const prescription = await this.prisma.prescription.create({
       data: createPrescriptionDto,
       include: {
-        medication: {
-          select: {
-            name: true,
-          },
-        },
+        medication: true,
       },
     });
 
@@ -96,7 +100,7 @@ export class PrescriptionsService {
     id: string,
     updatePrescriptionDto: UpdatePrescriptionDto,
     userId: string,
-  ) {
+  ): Promise<BasicPrescriptionDto> {
     const existingPrescription = await this.prisma.prescription.findUnique({
       where: { id },
     });
@@ -111,11 +115,7 @@ export class PrescriptionsService {
       where: { id },
       data: dto,
       include: {
-        medication: {
-          select: {
-            name: true,
-          },
-        },
+        medication: true,
         appointment: {
           select: {
             patientId: true,

@@ -1,4 +1,4 @@
-import { Request } from 'express';
+import type { Request } from 'express';
 import {
   Controller,
   Post,
@@ -16,17 +16,37 @@ import {
 import { AllergiesService } from './allergies.service';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
 
-import { CreateAllergyDto, UpdateAllergyDto } from './dto/allergies.dto';
-import type { Payload } from 'src/types/payload.type';
+import {
+  AllergyDto,
+  CreateAllergyDto,
+  UpdateAllergyDto,
+} from './dto/allergies.dto';
+import { ApiDocumentation } from 'src/decorators/documentation.decorator';
 
+@ApiDocumentation({
+  tags: 'Allergies',
+  security: 'bearer',
+  unauthorizedResponse: { description: 'Unauthorized' },
+  badRequestResponse: { description: 'Bad Request' },
+})
+@UseGuards(JwtGuard)
 @Controller('settings/allergies')
 export class AllergiesController {
   constructor(private readonly allergiesService: AllergiesService) {}
 
-  @UseGuards(JwtGuard)
+  @ApiDocumentation({
+    operation: {
+      summary: 'Get all allergies',
+      description: 'Get all allergies data',
+    },
+    okResponse: {
+      description: 'Allergies data',
+      type: [AllergyDto],
+    },
+  })
   @Get()
-  async getAllAllergies(@Req() request: Request) {
-    const user: Payload = request['user'];
+  async getAllAllergies(@Req() request: Request): Promise<AllergyDto[]> {
+    const user = request.user;
 
     if (user.role === 'patient') {
       throw new UnauthorizedException();
@@ -35,27 +55,57 @@ export class AllergiesController {
     return this.allergiesService.findAll();
   }
 
-  @UseGuards(JwtGuard)
-  @Get(':id')
-  async getAllergyById(@Param('id') id: string, @Req() request: Request) {
-    const user: Payload = request['user'];
+  @ApiDocumentation({
+    operation: {
+      summary: 'Get allergy by ID',
+      description: 'Get allergy data by ID',
+    },
+    params: {
+      name: 'allergyId',
+      type: String,
+      description: 'Allergy ID',
+      example: crypto.randomUUID(),
+    },
+    notFoundResponse: {
+      description: 'Allergy not found',
+    },
+    okResponse: {
+      description: 'Allergy data',
+      type: AllergyDto,
+    },
+  })
+  @Get(':allergyId')
+  async getAllergyById(
+    @Param('allergyId') allergyId: string,
+    @Req() request: Request,
+  ): Promise<AllergyDto> {
+    const user = request.user;
 
     if (user.role === 'patient') {
       throw new UnauthorizedException();
     }
 
-    const allergy = await this.allergiesService.findById(id);
+    const allergy = await this.allergiesService.findById(allergyId);
 
     return allergy;
   }
 
-  @UseGuards(JwtGuard)
+  @ApiDocumentation({
+    operation: {
+      summary: 'Create allergy',
+      description: 'Create a new allergy',
+    },
+    okResponse: {
+      description: 'Allergy created',
+      type: AllergyDto,
+    },
+  })
   @Post()
   async createAllergy(
     @Body(ValidationPipe) dto: CreateAllergyDto,
     @Req() request: Request,
-  ) {
-    const user: Payload = request['user'];
+  ): Promise<AllergyDto> {
+    const user = request.user;
 
     if (user.role === 'patient') {
       throw new UnauthorizedException();
@@ -63,31 +113,72 @@ export class AllergiesController {
     return this.allergiesService.create(user.id, dto);
   }
 
-  @UseGuards(JwtGuard)
-  @Patch(':id')
+  @ApiDocumentation({
+    operation: {
+      summary: 'Update allergy',
+      description: 'Update allergy by ID',
+    },
+    params: {
+      name: 'allergyId',
+      type: String,
+      description: 'Allergy ID',
+      example: crypto.randomUUID(),
+    },
+    notFoundResponse: {
+      description: 'Allergy not found',
+    },
+    okResponse: {
+      description: 'Allergy updated',
+    },
+  })
+  @Patch(':allergyId')
   async updateAllergy(
-    @Param('id') id: string,
+    @Param('allergyId') allergyId: string,
     @Body(ValidationPipe) updateAllergyDto: UpdateAllergyDto,
     @Req() request: Request,
-  ) {
-    const user: Payload = request['user'];
+  ): Promise<AllergyDto> {
+    const user = request.user;
 
     if (user.role === 'patient') {
       throw new UnauthorizedException();
     }
 
-    return this.allergiesService.update(user.id, id, updateAllergyDto);
+    return this.allergiesService.update(user.id, allergyId, updateAllergyDto);
   }
 
-  @UseGuards(JwtGuard)
-  @Delete(':id')
-  async deleteAllergy(@Param('id') id: string, @Req() request: Request) {
-    const user: Payload = request['user'];
+  @ApiDocumentation({
+    operation: {
+      summary: 'Delete allergy',
+      description: 'Delete allergy by ID',
+    },
+    params: {
+      name: 'allergyId',
+      type: String,
+      description: 'Allergy ID',
+      example: crypto.randomUUID(),
+    },
+    notFoundResponse: {
+      description: 'Allergy not found',
+    },
+    conflictResponse: {
+      description: 'Allergy is being used in an EMR',
+    },
+    okResponse: {
+      description: 'Allergy deleted',
+      type: AllergyDto,
+    },
+  })
+  @Delete(':allergyId')
+  async deleteAllergy(
+    @Param('allergyId') allergyId: string,
+    @Req() request: Request,
+  ): Promise<AllergyDto> {
+    const user = request.user;
 
     if (!user.isSuperAdmin) {
       throw new UnauthorizedException();
     }
 
-    return this.allergiesService.delete(user.id, id);
+    return this.allergiesService.delete(user.id, allergyId);
   }
 }

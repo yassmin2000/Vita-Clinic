@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+
 import { PrismaService } from 'src/prisma.service';
 import { LogService } from 'src/log/log.service';
 
@@ -6,6 +7,9 @@ import {
   CreateTreatmentDto,
   UpdateTreatmentDto,
   GetPatientTreatmentsQuery,
+  TreatmentDto,
+  FullTreatmentDto,
+  BasicTreatmentDto,
 } from './dto/treatments.dto';
 
 @Injectable()
@@ -15,7 +19,9 @@ export class TreatmentService {
     private readonly logService: LogService,
   ) {}
 
-  async findAllByAppointmentId(appointmentId: string) {
+  async findAllByAppointmentId(
+    appointmentId: string,
+  ): Promise<FullTreatmentDto[]> {
     return this.prisma.treatment.findMany({
       where: { appointmentId },
       include: {
@@ -33,7 +39,7 @@ export class TreatmentService {
       value = '',
       sort = 'createdAt-desc',
     }: GetPatientTreatmentsQuery,
-  ) {
+  ): Promise<TreatmentDto[]> {
     const [sortField, sortOrder] = sort.split('-') as [string, 'desc' | 'asc'];
 
     return this.prisma.treatment.findMany({
@@ -57,7 +63,10 @@ export class TreatmentService {
     });
   }
 
-  async create(createTreatmentDto: CreateTreatmentDto, userId: string) {
+  async create(
+    createTreatmentDto: CreateTreatmentDto,
+    userId: string,
+  ): Promise<BasicTreatmentDto> {
     const appointment = await this.prisma.appointment.findUnique({
       where: { id: createTreatmentDto.appointmentId },
     });
@@ -94,7 +103,7 @@ export class TreatmentService {
     id: string,
     updateTreatmentDto: UpdateTreatmentDto,
     userId: string,
-  ) {
+  ): Promise<BasicTreatmentDto> {
     const existingTreatment = await this.prisma.treatment.findUnique({
       where: { id },
     });

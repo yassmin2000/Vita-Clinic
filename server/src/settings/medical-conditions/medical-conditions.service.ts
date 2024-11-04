@@ -5,11 +5,13 @@ import {
 } from '@nestjs/common';
 
 import { PrismaService } from 'src/prisma.service';
+import { LogService } from 'src/log/log.service';
+
 import {
   CreateMedicalConditionDto,
+  MedicalConditionDto,
   UpdateMedicalConditionDto,
 } from './dto/medical-conditions.dto';
-import { LogService } from 'src/log/log.service';
 
 @Injectable()
 export class MedicalConditionsService {
@@ -18,11 +20,11 @@ export class MedicalConditionsService {
     private logService: LogService,
   ) {}
 
-  async findAll() {
+  async findAll(): Promise<MedicalConditionDto[]> {
     return this.prisma.medicalCondition.findMany();
   }
 
-  async findById(id: string) {
+  async findById(id: string): Promise<MedicalConditionDto> {
     const medicalCondition = await this.prisma.medicalCondition.findUnique({
       where: { id },
     });
@@ -37,7 +39,7 @@ export class MedicalConditionsService {
   async create(
     userId: string,
     createMedicalConditionDto: CreateMedicalConditionDto,
-  ) {
+  ): Promise<MedicalConditionDto> {
     const createdMedicalCondition = await this.prisma.medicalCondition.create({
       data: createMedicalConditionDto,
     });
@@ -57,7 +59,7 @@ export class MedicalConditionsService {
     userId: string,
     id: string,
     updateMedicalConditionDto: UpdateMedicalConditionDto,
-  ) {
+  ): Promise<MedicalConditionDto> {
     const existingMedicalCondition =
       await this.prisma.medicalCondition.findUnique({
         where: { id },
@@ -83,7 +85,7 @@ export class MedicalConditionsService {
     return updatedMedicalConditions;
   }
 
-  async delete(userId: string, id: string) {
+  async delete(userId: string, id: string): Promise<MedicalConditionDto> {
     const existingMedicalConditions =
       await this.prisma.medicalCondition.findUnique({
         where: { id },

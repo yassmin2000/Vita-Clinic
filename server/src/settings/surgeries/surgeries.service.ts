@@ -5,8 +5,13 @@ import {
 } from '@nestjs/common';
 
 import { PrismaService } from 'src/prisma.service';
-import { CreateSurgeryDto, UpdateSurgeryDto } from './dto/surgeries.dto';
 import { LogService } from 'src/log/log.service';
+
+import {
+  CreateSurgeryDto,
+  SurgeryDto,
+  UpdateSurgeryDto,
+} from './dto/surgeries.dto';
 
 @Injectable()
 export class SurgeriesService {
@@ -15,11 +20,11 @@ export class SurgeriesService {
     private logService: LogService,
   ) {}
 
-  async findAll() {
+  async findAll(): Promise<SurgeryDto[]> {
     return this.prisma.surgery.findMany();
   }
 
-  async findById(id: string) {
+  async findById(id: string): Promise<SurgeryDto> {
     const surgery = await this.prisma.surgery.findUnique({
       where: { id },
     });
@@ -31,7 +36,10 @@ export class SurgeriesService {
     return surgery;
   }
 
-  async create(userId: string, createSurgeryDto: CreateSurgeryDto) {
+  async create(
+    userId: string,
+    createSurgeryDto: CreateSurgeryDto,
+  ): Promise<SurgeryDto> {
     const createdSurgery = await this.prisma.surgery.create({
       data: createSurgeryDto,
     });
@@ -71,7 +79,7 @@ export class SurgeriesService {
     return updatedSurgery;
   }
 
-  async delete(userId: string, id: string) {
+  async delete(userId: string, id: string): Promise<SurgeryDto> {
     const existingSurgery = await this.prisma.surgery.findUnique({
       where: { id },
     });

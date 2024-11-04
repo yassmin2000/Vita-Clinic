@@ -5,8 +5,14 @@ import {
 } from '@nestjs/common';
 
 import { PrismaService } from 'src/prisma.service';
-import { CreateModalityDto, UpdateModalityDto } from './dto/modalities.dto';
 import { LogService } from 'src/log/log.service';
+
+import {
+  CreateModalityDto,
+  ModalityDto,
+  UpdateModalityDto,
+} from './dto/modalities.dto';
+
 @Injectable()
 export class ModalitiesService {
   constructor(
@@ -14,11 +20,11 @@ export class ModalitiesService {
     private logService: LogService,
   ) {}
 
-  async findAll() {
+  async findAll(): Promise<ModalityDto[]> {
     return this.prisma.modality.findMany();
   }
 
-  async findById(id: string) {
+  async findById(id: string): Promise<ModalityDto> {
     const modality = await this.prisma.modality.findUnique({
       where: { id },
     });
@@ -30,7 +36,10 @@ export class ModalitiesService {
     return modality;
   }
 
-  async create(userId: string, createModalityDto: CreateModalityDto) {
+  async create(
+    userId: string,
+    createModalityDto: CreateModalityDto,
+  ): Promise<ModalityDto> {
     const createdModality = await this.prisma.modality.create({
       data: createModalityDto,
     });
@@ -50,7 +59,7 @@ export class ModalitiesService {
     userId: string,
     id: string,
     updateModalityDto: UpdateModalityDto,
-  ) {
+  ): Promise<ModalityDto> {
     const existingModality = await this.prisma.modality.findUnique({
       where: { id },
     });
@@ -75,7 +84,7 @@ export class ModalitiesService {
     return updatedModality;
   }
 
-  async delete(userId: string, id: string) {
+  async delete(userId: string, id: string): Promise<ModalityDto> {
     const existingModality = await this.prisma.modality.findUnique({
       where: { id },
     });

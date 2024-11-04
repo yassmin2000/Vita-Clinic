@@ -21,6 +21,17 @@ import {
   VerifyUserEmailDto,
   VerifyUserPhoneDto,
 } from './dto/users.dto';
+import {
+  BasicUserDto,
+  UpdateUserAvatarResponseDto,
+  UpdateUserPasswordResponseDto,
+  UpdateUserRoleResponseDto,
+  UserDto,
+  UserListItemDto,
+  UserProfileDto,
+  UserReturnDto,
+  UserWithEmrDto,
+} from './dto/users-response.dto';
 
 @Injectable()
 export class UsersService {
@@ -41,9 +52,9 @@ export class UsersService {
       value = '',
       sort = 'createdAt-desc',
     }: GetAllUsersQuery,
-  ) {
+  ): Promise<UserListItemDto[]> {
     const names = value.split(' ');
-    const mode = 'insensitive' as 'insensitive';
+    const mode = 'insensitive' as const;
     const [sortField, sortOrder] = sort.split('-') as [string, 'desc' | 'asc'];
 
     const nameConditions = names.flatMap((name) => [
@@ -132,7 +143,7 @@ export class UsersService {
     });
   }
 
-  async findAllList(role: Role) {
+  async findAllList(role: Role): Promise<BasicUserDto[]> {
     return this.prisma.user.findMany({
       where: {
         role,
@@ -147,7 +158,7 @@ export class UsersService {
     });
   }
 
-  async findById(id: string) {
+  async findById(id: string): Promise<UserWithEmrDto> {
     const user = await this.prisma.user.findUnique({
       where: { id },
       include: {
@@ -162,7 +173,7 @@ export class UsersService {
     return user;
   }
 
-  async findByEmail(email: string, skipError?: boolean) {
+  async findByEmail(email: string, skipError?: boolean): Promise<UserDto> {
     const user = await this.prisma.user.findUnique({
       where: { email },
     });
@@ -194,7 +205,10 @@ export class UsersService {
     return user;
   }
 
-  async findProfileById(userId: string, isSuperAdmin: boolean) {
+  async findProfileById(
+    userId: string,
+    isSuperAdmin: boolean,
+  ): Promise<UserProfileDto> {
     const user = await this.prisma.user.findUnique({
       where: {
         id: userId,
@@ -307,7 +321,7 @@ export class UsersService {
     role: Role = 'patient',
     verified: boolean = false,
     userId?: string,
-  ) {
+  ): Promise<UserReturnDto> {
     const isEmailExist = await this.findByEmail(dto.email, true);
 
     if (isEmailExist) {
@@ -418,10 +432,15 @@ export class UsersService {
     return result;
   }
 
-  async deactivate(id: string, userId: string) {
+  async deactivate(id: string, userId: string): Promise<BasicUserDto> {
     const user = await this.prisma.user.update({
       where: { id },
       data: { isActive: false },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+      },
     });
 
     await this.logService.create({
@@ -435,10 +454,15 @@ export class UsersService {
     return user;
   }
 
-  async activate(id: string, userId: string) {
+  async activate(id: string, userId: string): Promise<BasicUserDto> {
     const user = await this.prisma.user.update({
       where: { id },
       data: { isActive: true },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+      },
     });
 
     await this.logService.create({
@@ -452,14 +476,18 @@ export class UsersService {
     return user;
   }
 
-  async changeRole(id: string, role: Role) {
+  async changeRole(id: string, role: Role): Promise<UpdateUserRoleResponseDto> {
     return this.prisma.user.update({
       where: { id },
       data: { role },
+      select: {
+        id: true,
+        role: true,
+      },
     });
   }
 
-  async verifyEmail(dto: VerifyUserEmailDto) {
+  async verifyEmail(dto: VerifyUserEmailDto): Promise<UserReturnDto> {
     const user = await this.findByEmail(dto.email);
 
     if (user.isEmailVerified) {
@@ -498,7 +526,9 @@ export class UsersService {
     return result;
   }
 
-  async resendEmailVerification(dto: ResendEmailVerificationDto) {
+  async resendEmailVerification(dto: ResendEmailVerificationDto): Promise<{
+    message: string;
+  }> {
     const user = await this.findByEmail(dto.email);
 
     if (user.isEmailVerified) {
@@ -516,7 +546,7 @@ export class UsersService {
     return { message: 'OTP sent successfully' };
   }
 
-  async verifyPhone(dto: VerifyUserPhoneDto) {
+  async verifyPhone(dto: VerifyUserPhoneDto): Promise<UserReturnDto> {
     const user = await this.findByPhone(dto.phoneNumber);
 
     if (user.isPhoneVerified) {
@@ -555,7 +585,9 @@ export class UsersService {
     return result;
   }
 
-  async resendPhoneVerification(dto: ResendPhoneVerificationDto) {
+  async resendPhoneVerification(dto: ResendPhoneVerificationDto): Promise<{
+    message: string;
+  }> {
     const user = await this.findByPhone(dto.phoneNumber);
 
     if (user.isPhoneVerified) {
@@ -573,7 +605,10 @@ export class UsersService {
     return { message: 'OTP sent successfully' };
   }
 
-  async updateAvatar(userId: string, updateAvatarDto: UpdateAvatarDto) {
+  async updateAvatar(
+    userId: string,
+    updateAvatarDto: UpdateAvatarDto,
+  ): Promise<UpdateUserAvatarResponseDto> {
     const user = await this.findById(userId);
 
     if (!user) {
@@ -592,7 +627,10 @@ export class UsersService {
     });
   }
 
-  async updatePassword(userId: string, updatePasswordDto: UpdatePasswordDto) {
+  async updatePassword(
+    userId: string,
+    updatePasswordDto: UpdatePasswordDto,
+  ): Promise<UpdateUserPasswordResponseDto> {
     const user = await this.findById(userId);
 
     if (!user) {

@@ -3,6 +3,13 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import type {
+  PatientAllergy,
+  PatientDiagnosis,
+  PatientMedicalCondition,
+  PatientMedication,
+  PatientSurgery,
+} from '@prisma/client';
 
 import { PrismaService } from 'src/prisma.service';
 import { AllergiesService } from 'src/settings/allergies/allergies.service';
@@ -13,6 +20,8 @@ import { MedicationsService } from 'src/settings/medications/medications.service
 import { LogService } from 'src/log/log.service';
 
 import {
+  BasicEmrDto,
+  UpdateEmrDto,
   EmrDto,
   PatientAllergiesDto,
   PatientDiagnosesDto,
@@ -20,13 +29,6 @@ import {
   PatientMedicationsDto,
   PatientSurgeriesDto,
 } from './dto/emr.dto';
-import type {
-  PatientAllergy,
-  PatientDiagnosis,
-  PatientMedicalCondition,
-  PatientMedication,
-  PatientSurgery,
-} from '@prisma/client';
 
 @Injectable()
 export class EmrService {
@@ -40,7 +42,7 @@ export class EmrService {
     private logService: LogService,
   ) {}
 
-  async getById(patientId: string) {
+  async getById(patientId: string): Promise<EmrDto> {
     const user = await this.prisma.user.findUnique({
       where: { id: patientId, role: 'patient' },
       include: {
@@ -71,62 +73,34 @@ export class EmrService {
         insurance: true,
         allergies: {
           include: {
-            allergy: {
-              select: {
-                name: true,
-                description: true,
-              },
-            },
+            allergy: true,
           },
         },
         diagnoses: {
           include: {
-            diagnosis: {
-              select: {
-                name: true,
-                description: true,
-              },
-            },
+            diagnosis: true,
           },
         },
         medicalConditions: {
           include: {
-            medicalCondition: {
-              select: {
-                name: true,
-                description: true,
-              },
-            },
+            medicalCondition: true,
           },
         },
         surgeries: {
           include: {
-            surgery: {
-              select: {
-                name: true,
-                description: true,
-              },
-            },
+            surgery: true,
           },
         },
         medications: {
           include: {
-            medication: {
-              select: {
-                name: true,
-                unit: true,
-                description: true,
-                dosageForm: true,
-                routeOfAdministration: true,
-              },
-            },
+            medication: true,
           },
         },
       },
     });
   }
 
-  async create(patientId: string) {
+  async create(patientId: string): Promise<BasicEmrDto> {
     const user = await this.prisma.user.findUnique({
       where: { id: patientId, role: 'patient' },
       include: {
@@ -142,14 +116,21 @@ export class EmrService {
       throw new ConflictException('EMR already exists');
     }
 
-    return await this.prisma.electronicMedicalRecord.create({
+    return this.prisma.electronicMedicalRecord.create({
       data: {
         patientId,
+      },
+      include: {
+        insurance: true,
       },
     });
   }
 
-  async update(patientId: string, emrDto: EmrDto, userId: string) {
+  async update(
+    patientId: string,
+    updateEmrDto: UpdateEmrDto,
+    userId: string,
+  ): Promise<EmrDto> {
     const patient = await this.prisma.user.findUnique({
       where: {
         id: patientId,
@@ -158,7 +139,7 @@ export class EmrService {
     });
 
     if (!patient) {
-      return new NotFoundException('Patient not found');
+      throw new NotFoundException('Patient not found');
     }
 
     const emr = await this.prisma.electronicMedicalRecord.findUnique({
@@ -185,7 +166,7 @@ export class EmrService {
       medicalConditions,
       surgeries,
       medications,
-    } = emrDto;
+    } = updateEmrDto;
 
     let emrId: string;
     if (!emr) {
@@ -228,7 +209,7 @@ export class EmrService {
     }
 
     if (allergies) {
-      await this.updateAllergies(
+      await this._updateAllergies(
         emrId,
         emr.allergies || [],
         allergies,
@@ -238,7 +219,7 @@ export class EmrService {
     }
 
     if (diagnoses) {
-      await this.updateDiagnoses(
+      await this._updateDiagnoses(
         emrId,
         emr.diagnoses || [],
         diagnoses,
@@ -248,7 +229,7 @@ export class EmrService {
     }
 
     if (medicalConditions) {
-      await this.updateMedicalConditions(
+      await this._updateMedicalConditions(
         emrId,
         emr.medicalConditions || [],
         medicalConditions,
@@ -258,7 +239,7 @@ export class EmrService {
     }
 
     if (surgeries) {
-      await this.updateSurgeries(
+      await this._updateSurgeries(
         emrId,
         emr.surgeries || [],
         surgeries,
@@ -268,7 +249,7 @@ export class EmrService {
     }
 
     if (medications) {
-      await this.updateMedications(
+      await this._updateMedications(
         emrId,
         emr.medications || [],
         medications,
@@ -277,10 +258,10 @@ export class EmrService {
       );
     }
 
-    return emr;
+    return this.getById(patientId);
   }
 
-  async updateAllergies(
+  async _updateAllergies(
     emrId: string,
     patientAllergies: PatientAllergy[],
     allergies: PatientAllergiesDto,
@@ -404,7 +385,7 @@ export class EmrService {
     }
   }
 
-  async updateDiagnoses(
+  async _updateDiagnoses(
     emrId: string,
     patientDiagnoses: PatientDiagnosis[],
     diagnoses: PatientDiagnosesDto,
@@ -527,7 +508,7 @@ export class EmrService {
     }
   }
 
-  async updateMedicalConditions(
+  async _updateMedicalConditions(
     emrId: string,
     patientMedicalConditions: PatientMedicalCondition[],
     medicalConditions: PatientMedicalConditionsDto,
@@ -656,7 +637,7 @@ export class EmrService {
     }
   }
 
-  async updateSurgeries(
+  async _updateSurgeries(
     emrId: string,
     patientSurgeries: PatientSurgery[],
     surgeries: PatientSurgeriesDto,
@@ -780,7 +761,7 @@ export class EmrService {
     }
   }
 
-  async updateMedications(
+  async _updateMedications(
     emrId: string,
     patientMedications: PatientMedication[],
     medications: PatientMedicationsDto,

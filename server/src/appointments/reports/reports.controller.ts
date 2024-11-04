@@ -1,4 +1,4 @@
-import { Request } from 'express';
+import type { Request } from 'express';
 import {
   Controller,
   Post,
@@ -9,7 +9,6 @@ import {
   UseGuards,
   Patch,
   Param,
-  Delete,
   ValidationPipe,
 } from '@nestjs/common';
 
@@ -17,22 +16,57 @@ import { ReportsService } from './reports.service';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
 
 import {
+  BasicReportDto,
   CreateMessageDto,
   CreateReportDto,
+  MessageDto,
+  ReportDto,
   UpdateReportDto,
 } from './dto/reports.dto';
-import type { Payload } from 'src/types/payload.type';
+import { ApiDocumentation } from 'src/decorators/documentation.decorator';
 
+@ApiDocumentation({
+  tags: 'Reports',
+  security: 'bearer',
+  unauthorizedResponse: {
+    description: 'Unauthorized',
+  },
+  badRequestResponse: {
+    description: 'Bad Request',
+  },
+})
+@UseGuards(JwtGuard)
 @Controller('reports')
 export class ReportsController {
   constructor(private readonly reportsService: ReportsService) {}
 
-  @UseGuards(JwtGuard)
-  @Get(':id')
-  async getReportById(@Param('id') id: string, @Req() request: Request) {
-    const user: Payload = request['user'];
+  @ApiDocumentation({
+    operation: {
+      summary: 'Get report by ID',
+      description: 'Get certain report data by ID',
+    },
+    params: {
+      name: 'reportId',
+      type: String,
+      description: 'Report ID',
+      example: crypto.randomUUID(),
+    },
+    notFoundResponse: {
+      description: 'Report not found',
+    },
+    okResponse: {
+      description: 'Report data',
+      type: [ReportDto],
+    },
+  })
+  @Get(':reportId')
+  async getReportById(
+    @Param('reportId') reportId: string,
+    @Req() request: Request,
+  ): Promise<ReportDto> {
+    const user = request.user;
 
-    const report = await this.reportsService.findById(id);
+    const report = await this.reportsService.findById(reportId);
 
     if (user.role === 'patient' && report.appointment.patientId !== user.id) {
       throw new UnauthorizedException();
@@ -41,13 +75,30 @@ export class ReportsController {
     return report;
   }
 
-  @UseGuards(JwtGuard)
+  @ApiDocumentation({
+    operation: {
+      summary: 'Create a report',
+      description: 'Create a report for an appointment',
+    },
+    body: {
+      description: 'Report data',
+      type: CreateReportDto,
+    },
+    consumes: 'application/json',
+    notFoundResponse: {
+      description: 'Appointment not found',
+    },
+    createdResponse: {
+      description: 'Report created',
+      type: BasicReportDto,
+    },
+  })
   @Post()
   async createReport(
     @Body(ValidationPipe) dto: CreateReportDto,
     @Req() request: Request,
-  ) {
-    const user: Payload = request['user'];
+  ): Promise<BasicReportDto> {
+    const user = request.user;
 
     if (user.role !== 'doctor') {
       throw new UnauthorizedException();
@@ -55,71 +106,180 @@ export class ReportsController {
     return this.reportsService.create(dto, user.id);
   }
 
-  @UseGuards(JwtGuard)
-  @Patch(':id')
+  @ApiDocumentation({
+    operation: {
+      summary: 'Update a report',
+      description: 'Update a report for an appointment',
+    },
+    params: {
+      name: 'reportId',
+      type: String,
+      description: 'Report ID',
+      example: crypto.randomUUID(),
+    },
+    body: {
+      description: 'Report data',
+      type: UpdateReportDto,
+    },
+    consumes: 'application/json',
+    notFoundResponse: {
+      description: 'Report not found',
+    },
+    okResponse: {
+      description: 'Report updated',
+      type: BasicReportDto,
+    },
+  })
+  @Patch(':reportId')
   async updateReport(
-    @Param('id') id: string,
+    @Param('reportId') reportId: string,
     @Body(ValidationPipe) updateReportDto: UpdateReportDto,
     @Req() request: Request,
-  ) {
-    const user: Payload = request['user'];
+  ): Promise<BasicReportDto> {
+    const user = request.user;
 
     if (user.role !== 'doctor') {
       throw new UnauthorizedException();
     }
 
-    return this.reportsService.update(id, updateReportDto, user.id);
+    return this.reportsService.update(reportId, updateReportDto, user.id);
   }
 
-  @UseGuards(JwtGuard)
-  @Patch(':id/process')
-  async processReport(@Param('id') id: string, @Req() request: Request) {
-    const user: Payload = request['user'];
+  @ApiDocumentation({
+    operation: {
+      summary: 'Process a report',
+      description: 'Set a report status to processed',
+    },
+    params: {
+      name: 'reportId',
+      type: String,
+      description: 'Report ID',
+      example: crypto.randomUUID(),
+    },
+    notFoundResponse: {
+      description: 'Report not found',
+    },
+    okResponse: {
+      description: 'Report processed',
+      type: BasicReportDto,
+    },
+  })
+  @Patch(':reportId/process')
+  async processReport(
+    @Param('reportId') reportId: string,
+    @Req() request: Request,
+  ): Promise<BasicReportDto> {
+    const user = request.user;
 
     if (user.role !== 'doctor') {
       throw new UnauthorizedException();
     }
 
-    return this.reportsService.updateStatus(id, 'processed');
+    return this.reportsService.updateStatus(reportId, 'processed');
   }
 
-  @UseGuards(JwtGuard)
-  @Patch(':id/fail')
-  async failProcessReport(@Param('id') id: string, @Req() request: Request) {
-    const user: Payload = request['user'];
+  @ApiDocumentation({
+    operation: {
+      summary: 'Fail a report',
+      description: 'Set a report status to failed',
+    },
+    params: {
+      name: 'reportId',
+      type: String,
+      description: 'Report ID',
+      example: crypto.randomUUID(),
+    },
+    notFoundResponse: {
+      description: 'Report not found',
+    },
+    okResponse: {
+      description: 'Report failed',
+      type: BasicReportDto,
+    },
+  })
+  @Patch(':reportId/fail')
+  async failProcessReport(
+    @Param('reportId') reportId: string,
+    @Req() request: Request,
+  ): Promise<BasicReportDto> {
+    const user = request.user;
 
     if (user.role !== 'doctor') {
       throw new UnauthorizedException();
     }
 
-    return this.reportsService.updateStatus(id, 'failed');
+    return this.reportsService.updateStatus(reportId, 'failed');
   }
 
-  @UseGuards(JwtGuard)
-  @Get(':id/messages')
-  async getMessages(@Param('id') id: string, @Req() request: Request) {
-    const user: Payload = request['user'];
+  @ApiDocumentation({
+    operation: {
+      summary: 'Get messages',
+      description: 'Get messages for a report',
+    },
+    params: {
+      name: 'reportId',
+      type: String,
+      description: 'Report ID',
+      example: crypto.randomUUID(),
+    },
+    notFoundResponse: {
+      description: 'Report not found',
+    },
+    okResponse: {
+      description: 'Messages',
+      type: [MessageDto],
+    },
+  })
+  @Get(':reportId/messages')
+  async getMessages(
+    @Param('reportId') reportId: string,
+    @Req() request: Request,
+  ): Promise<MessageDto[]> {
+    const user = request.user;
 
     if (user.role !== 'doctor') {
       throw new UnauthorizedException();
     }
 
-    return this.reportsService.getMessages(id, user.id);
+    return this.reportsService.getMessages(reportId, user.id);
   }
 
-  @UseGuards(JwtGuard)
-  @Post(':id/messages')
+  @ApiDocumentation({
+    operation: {
+      summary: 'Create a message',
+      description: 'Create a message for a report',
+    },
+    params: {
+      name: 'reportId',
+      type: String,
+      description: 'Report ID',
+      example: crypto.randomUUID(),
+    },
+    body: {
+      description: 'Message data',
+      type: CreateMessageDto,
+    },
+    consumes: 'application/json',
+    notFoundResponse: {
+      description: 'Report not found',
+    },
+    createdResponse: {
+      description: 'Message created',
+      type: MessageDto,
+    },
+  })
+  @Post(':reportId/messages')
   async createMessage(
-    @Param('id') id: string,
+    @Param('reportId') reportId: string,
     @Body(ValidationPipe) dto: CreateMessageDto,
     @Req() request: Request,
   ) {
-    const user: Payload = request['user'];
+    const user = request.user;
 
     if (user.role !== 'doctor') {
       throw new UnauthorizedException();
     }
 
-    return this.reportsService.createMessage(id, user.id, dto);
+    return this.reportsService.createMessage(reportId, user.id, dto);
   }
 }

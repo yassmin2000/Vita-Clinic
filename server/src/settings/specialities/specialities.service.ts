@@ -3,12 +3,15 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+
 import { PrismaService } from 'src/prisma.service';
+import { LogService } from 'src/log/log.service';
+
 import {
   UpdateSpecialityDto,
   CreateSpecialityDto,
+  SpecialityDto,
 } from './dto/specialities.dto';
-import { LogService } from 'src/log/log.service';
 
 @Injectable()
 export class SpecialitiesService {
@@ -17,11 +20,11 @@ export class SpecialitiesService {
     private logService: LogService,
   ) {}
 
-  async findAll() {
+  async findAll(): Promise<SpecialityDto[]> {
     return this.prisma.speciality.findMany();
   }
 
-  async findById(id: string) {
+  async findById(id: string): Promise<SpecialityDto> {
     const speciality = await this.prisma.speciality.findUnique({
       where: { id },
     });
@@ -33,7 +36,10 @@ export class SpecialitiesService {
     return speciality;
   }
 
-  async create(userId: string, createSpecialityDto: CreateSpecialityDto) {
+  async create(
+    userId: string,
+    createSpecialityDto: CreateSpecialityDto,
+  ): Promise<SpecialityDto> {
     const createdSpeciality = await this.prisma.speciality.create({
       data: createSpecialityDto,
     });
@@ -53,7 +59,7 @@ export class SpecialitiesService {
     userId: string,
     id: string,
     updateSpecialityDto: UpdateSpecialityDto,
-  ) {
+  ): Promise<SpecialityDto> {
     const existingSpeciality = await this.prisma.speciality.findUnique({
       where: { id },
     });
@@ -78,7 +84,7 @@ export class SpecialitiesService {
     return updatedSpeciality;
   }
 
-  async delete(userId: string, id: string) {
+  async delete(userId: string, id: string): Promise<SpecialityDto> {
     const existingSpeciality = await this.prisma.speciality.findUnique({
       where: { id },
     });

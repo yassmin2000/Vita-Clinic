@@ -5,8 +5,13 @@ import {
 } from '@nestjs/common';
 
 import { PrismaService } from 'src/prisma.service';
-import { CreateAllergyDto, UpdateAllergyDto } from './dto/allergies.dto';
 import { LogService } from 'src/log/log.service';
+
+import {
+  AllergyDto,
+  CreateAllergyDto,
+  UpdateAllergyDto,
+} from './dto/allergies.dto';
 
 @Injectable()
 export class AllergiesService {
@@ -15,11 +20,11 @@ export class AllergiesService {
     private logService: LogService,
   ) {}
 
-  async findAll() {
+  async findAll(): Promise<AllergyDto[]> {
     return this.prisma.allergy.findMany();
   }
 
-  async findById(id: string) {
+  async findById(id: string): Promise<AllergyDto> {
     const allergy = await this.prisma.allergy.findUnique({
       where: { id },
     });
@@ -31,7 +36,10 @@ export class AllergiesService {
     return allergy;
   }
 
-  async create(userId: string, createAllergyDto: CreateAllergyDto) {
+  async create(
+    userId: string,
+    createAllergyDto: CreateAllergyDto,
+  ): Promise<AllergyDto> {
     const createdAllergy = await this.prisma.allergy.create({
       data: createAllergyDto,
     });
@@ -47,7 +55,11 @@ export class AllergiesService {
     return createdAllergy;
   }
 
-  async update(userId: string, id: string, updateAllergyDto: UpdateAllergyDto) {
+  async update(
+    userId: string,
+    id: string,
+    updateAllergyDto: UpdateAllergyDto,
+  ): Promise<AllergyDto> {
     const existingAllergy = await this.prisma.allergy.findUnique({
       where: { id },
     });
@@ -72,7 +84,7 @@ export class AllergiesService {
     return updatedAllergy;
   }
 
-  async delete(userId: string, id: string) {
+  async delete(userId: string, id: string): Promise<AllergyDto> {
     const existingAllergy = await this.prisma.allergy.findUnique({
       where: { id },
     });

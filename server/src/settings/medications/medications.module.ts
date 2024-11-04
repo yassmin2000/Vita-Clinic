@@ -1,8 +1,10 @@
 import { Module } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+
 import { MedicationsController } from './medications.controller';
+
 import { MedicationsService } from './medications.service';
 import { PrismaService } from 'src/prisma.service';
-import { JwtService } from '@nestjs/jwt';
 import { LogService } from 'src/log/log.service';
 
 @Module({

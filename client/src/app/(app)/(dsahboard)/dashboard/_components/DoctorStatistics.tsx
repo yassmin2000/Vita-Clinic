@@ -39,7 +39,7 @@ export default function DoctorStatistics() {
     queryKey: [`statistics_general`],
     queryFn: async () => {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/dashboards/general`,
+        `${process.env.NEXT_PUBLIC_API_URL}/dashboards/general/doctor`,
         {
           headers: {
             authorization: `Bearer ${accessToken}`,

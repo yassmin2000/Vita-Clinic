@@ -1,9 +1,11 @@
 import { Module } from '@nestjs/common';
-import { TestResultsService } from './test-results.service';
+import { JwtService } from '@nestjs/jwt';
+
 import { TestResultsController } from './test-results.controller';
+
+import { TestResultsService } from './test-results.service';
 import { PrismaService } from 'src/prisma.service';
 import { LogService } from 'src/log/log.service';
-import { JwtService } from '@nestjs/jwt';
 
 @Module({
   controllers: [TestResultsController],

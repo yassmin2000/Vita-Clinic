@@ -6,12 +6,13 @@ import {
 
 import { PrismaService } from 'src/prisma.service';
 import { BiomarkersService } from '../biomarkers/biomarkers.service';
+import { LogService } from 'src/log/log.service';
 
 import {
   CreateLaboratoryTestDto,
+  LaboratoryTestDto,
   UpdateLaboratoryTestDto,
 } from './dto/laboratory-test.dto';
-import { LogService } from 'src/log/log.service';
 
 @Injectable()
 export class LaboratoryTestsService {
@@ -21,7 +22,7 @@ export class LaboratoryTestsService {
     private logService: LogService,
   ) {}
 
-  async findAll() {
+  async findAll(): Promise<LaboratoryTestDto[]> {
     return this.prisma.laboratoryTest.findMany({
       include: {
         biomarkers: true,
@@ -29,7 +30,7 @@ export class LaboratoryTestsService {
     });
   }
 
-  async findById(id: string) {
+  async findById(id: string): Promise<LaboratoryTestDto> {
     const laboratoryTest = await this.prisma.laboratoryTest.findUnique({
       where: { id },
       include: {
@@ -47,7 +48,7 @@ export class LaboratoryTestsService {
   async create(
     userId: string,
     createLaboratoryTestDto: CreateLaboratoryTestDto,
-  ) {
+  ): Promise<LaboratoryTestDto> {
     const { biomarkers, ...dto } = createLaboratoryTestDto;
 
     await Promise.all(
@@ -81,7 +82,7 @@ export class LaboratoryTestsService {
     userId: string,
     id: string,
     updateLabTest: UpdateLaboratoryTestDto,
-  ) {
+  ): Promise<LaboratoryTestDto> {
     const { biomarkers, ...dto } = updateLabTest;
 
     const laboratoryTest = await this.findById(id);
@@ -117,7 +118,7 @@ export class LaboratoryTestsService {
     return updateLaboratoryTest;
   }
 
-  async delete(userId: string, id: string) {
+  async delete(userId: string, id: string): Promise<LaboratoryTestDto> {
     await this.findById(id);
 
     const isLaboratoryTestUsed =
@@ -139,6 +140,7 @@ export class LaboratoryTestsService {
 
     const deletedLaboratoryTest = await this.prisma.laboratoryTest.delete({
       where: { id },
+      include: { biomarkers: true },
     });
 
     await this.logService.create({

@@ -5,11 +5,13 @@ import {
 } from '@nestjs/common';
 
 import { PrismaService } from 'src/prisma.service';
+import { LogService } from 'src/log/log.service';
+
 import {
   CreateManufacturerDto,
+  ManufacturerDto,
   UpdateManufacturerDto,
 } from './dto/manufacturers.dto';
-import { LogService } from 'src/log/log.service';
 
 @Injectable()
 export class ManufacturersService {
@@ -18,11 +20,11 @@ export class ManufacturersService {
     private logService: LogService,
   ) {}
 
-  async findAll() {
+  async findAll(): Promise<ManufacturerDto[]> {
     return this.prisma.manufacturer.findMany();
   }
 
-  async findById(id: string) {
+  async findById(id: string): Promise<ManufacturerDto> {
     const manufacturer = await this.prisma.manufacturer.findUnique({
       where: { id },
     });
@@ -34,7 +36,10 @@ export class ManufacturersService {
     return manufacturer;
   }
 
-  async create(userId: string, createManufacturerDto: CreateManufacturerDto) {
+  async create(
+    userId: string,
+    createManufacturerDto: CreateManufacturerDto,
+  ): Promise<ManufacturerDto> {
     const createdManufacturer = await this.prisma.manufacturer.create({
       data: createManufacturerDto,
     });
@@ -54,7 +59,7 @@ export class ManufacturersService {
     userId: string,
     id: string,
     updateManufacturerDto: UpdateManufacturerDto,
-  ) {
+  ): Promise<ManufacturerDto> {
     const existingManufacturer = await this.prisma.manufacturer.findUnique({
       where: { id },
     });
@@ -79,7 +84,7 @@ export class ManufacturersService {
     return updatedManufacturer;
   }
 
-  async delete(userId: string, id: string) {
+  async delete(userId: string, id: string): Promise<ManufacturerDto> {
     const existingManufacturers = await this.prisma.manufacturer.findUnique({
       where: { id },
     });

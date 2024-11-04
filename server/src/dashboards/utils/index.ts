@@ -1,5 +1,7 @@
-import { Sex } from '@prisma/client';
 import { differenceInYears, parseISO } from 'date-fns';
+import { Sex } from '@prisma/client';
+
+import { AgeGroup } from '../dto/dashboards.dto';
 
 export function processInvoicesData(
   startDate: Date,
@@ -11,12 +13,12 @@ export function processInvoicesData(
     };
   }[],
 ) {
-  const processedData = [];
+  const processedData: { x: string; y: number }[] = [];
   const currentDate = new Date(startDate);
 
   while (currentDate <= endDate) {
     const date = currentDate.toISOString().split('T')[0];
-    let entry = data.reduce(
+    const entry = data.reduce(
       (acc, item) => {
         const itemDate = item.date.toISOString().split('T')[0];
         if (itemDate === date) {
@@ -40,21 +42,26 @@ export function processAppointmentsData(
     _count: number;
   }[],
 ) {
-  const processedData = data.reduce((acc, item) => {
-    const date = item.date.toISOString().split('T')[0];
+  const processedData: { day: string; value: number }[] = data.reduce(
+    (acc, item) => {
+      const date = item.date.toISOString().split('T')[0];
 
-    let entry = acc.find((entry) => entry.day === date);
-    if (!entry) {
-      entry = {
-        day: date,
-        value: 0,
-      };
-      acc.push(entry);
-    }
-    entry.value += item._count;
+      let entry: { day: string; value: number } = acc.find(
+        (entry) => entry.day === date,
+      );
+      if (!entry) {
+        entry = {
+          day: date,
+          value: 0,
+        };
+        acc.push(entry);
+      }
+      entry.value += item._count;
 
-    return acc;
-  }, []);
+      return acc;
+    },
+    [],
+  );
 
   return processedData;
 }
@@ -73,7 +80,11 @@ export function processPatientsData(data: { sex: Sex; birthDate: Date }[]) {
     '+61',
   ];
 
-  const processedData = data
+  const processedData: {
+    ageGroup: AgeGroup;
+    male: number;
+    female: number;
+  }[] = data
     .reduce((acc, item) => {
       const birthDate = item.birthDate.toISOString();
       const age = differenceInYears(new Date(), parseISO(birthDate));
@@ -84,7 +95,9 @@ export function processPatientsData(data: { sex: Sex; birthDate: Date }[]) {
       if (!ageGroup) {
         ageGroup = '+61';
       }
-      let entry = acc.find((entry) => entry.ageGroup === ageGroup);
+      let entry: { ageGroup: string; male: number; female: number } = acc.find(
+        (entry) => entry.ageGroup === ageGroup,
+      );
       if (!entry) {
         entry = {
           ageGroup: ageGroup,

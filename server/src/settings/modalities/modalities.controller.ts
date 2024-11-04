@@ -1,4 +1,4 @@
-import { Request } from 'express';
+import type { Request } from 'express';
 import {
   Controller,
   Post,
@@ -16,40 +16,94 @@ import {
 import { ModalitiesService } from './modalities.service';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
 
-import { CreateModalityDto, UpdateModalityDto } from './dto/modalities.dto';
-import { Payload } from 'src/types/payload.type';
+import {
+  CreateModalityDto,
+  ModalityDto,
+  UpdateModalityDto,
+} from './dto/modalities.dto';
+import { ApiDocumentation } from 'src/decorators/documentation.decorator';
 
+@ApiDocumentation({
+  tags: 'Modalities',
+  security: 'bearer',
+  unauthorizedResponse: {
+    description: 'Unauthorized',
+  },
+  badRequestResponse: {
+    description: 'Bad request',
+  },
+})
+@UseGuards(JwtGuard)
 @Controller('settings/modalities')
 export class ModalitiesController {
   constructor(private readonly modalitiesService: ModalitiesService) {}
 
-  @UseGuards(JwtGuard)
+  @ApiDocumentation({
+    operation: {
+      summary: 'Get all modalities',
+      description: 'Get all modalities data',
+    },
+    okResponse: {
+      description: 'Modalities data',
+      type: [ModalityDto],
+    },
+  })
   @Get()
-  async getAllModalities() {
+  async getAllModalities(): Promise<ModalityDto[]> {
     return this.modalitiesService.findAll();
   }
 
-  @UseGuards(JwtGuard)
-  @Get(':id')
-  async getByID(@Param('id') id: string, @Req() request: Request) {
-    const user: Payload = request['user'];
+  @ApiDocumentation({
+    operation: {
+      summary: 'Get modality by ID',
+      description: 'Get modality data by ID',
+    },
+    params: {
+      name: 'modalityId',
+      type: String,
+      description: 'Modality ID',
+      example: crypto.randomUUID(),
+    },
+    notFoundResponse: {
+      description: 'Modality not found',
+    },
+    okResponse: {
+      description: 'Modality data',
+      type: ModalityDto,
+    },
+  })
+  @Get(':modalityId')
+  async getByID(
+    @Param('modalityId') modalityId: string,
+    @Req() request: Request,
+  ): Promise<ModalityDto> {
+    const user = request.user;
 
     if (user.role === 'patient') {
       throw new UnauthorizedException();
     }
 
-    const modality = await this.modalitiesService.findById(id);
+    const modality = await this.modalitiesService.findById(modalityId);
 
     return modality;
   }
 
-  @UseGuards(JwtGuard)
+  @ApiDocumentation({
+    operation: {
+      summary: 'Create modality',
+      description: 'Create a new modality',
+    },
+    okResponse: {
+      description: 'Modality created',
+      type: ModalityDto,
+    },
+  })
   @Post()
   async createModality(
     @Body(ValidationPipe) dto: CreateModalityDto,
     @Req() request: Request,
-  ) {
-    const user: Payload = request['user'];
+  ): Promise<ModalityDto> {
+    const user = request.user;
 
     if (user.role === 'patient') {
       throw new UnauthorizedException();
@@ -57,31 +111,77 @@ export class ModalitiesController {
     return this.modalitiesService.create(user.id, dto);
   }
 
-  @UseGuards(JwtGuard)
-  @Patch(':id')
+  @ApiDocumentation({
+    operation: {
+      summary: 'Update modality',
+      description: 'Update modality data',
+    },
+    params: {
+      name: 'modalityId',
+      type: String,
+      description: 'Modality ID',
+      example: crypto.randomUUID(),
+    },
+    notFoundResponse: {
+      description: 'Modality not found',
+    },
+    okResponse: {
+      description: 'Modality updated',
+      type: ModalityDto,
+    },
+  })
+  @Patch(':modalityId')
   async updateModality(
-    @Param('id') id: string,
+    @Param('modalityId') modalityId: string,
     @Body(ValidationPipe) updateModalityDto: UpdateModalityDto,
     @Req() request: Request,
-  ) {
-    const user: Payload = request['user'];
+  ): Promise<ModalityDto> {
+    const user = request.user;
 
     if (user.role === 'patient') {
       throw new UnauthorizedException();
     }
 
-    return this.modalitiesService.update(user.id, id, updateModalityDto);
+    return this.modalitiesService.update(
+      user.id,
+      modalityId,
+      updateModalityDto,
+    );
   }
 
-  @UseGuards(JwtGuard)
-  @Delete(':id')
-  async deleteModality(@Param('id') id: string, @Req() request: Request) {
-    const user: Payload = request['user'];
+  @ApiDocumentation({
+    operation: {
+      summary: 'Delete modality',
+      description: 'Delete modality data',
+    },
+    params: {
+      name: 'modalityId',
+      type: String,
+      description: 'Modality ID',
+      example: crypto.randomUUID(),
+    },
+    notFoundResponse: {
+      description: 'Modality not found',
+    },
+    conflictResponse: {
+      description: 'Modality is being used in a scan',
+    },
+    okResponse: {
+      description: 'Modality deleted',
+      type: ModalityDto,
+    },
+  })
+  @Delete(':modalityId')
+  async deleteModality(
+    @Param('modalityId') modalityId: string,
+    @Req() request: Request,
+  ): Promise<ModalityDto> {
+    const user = request.user;
 
     if (!user.isSuperAdmin) {
       throw new UnauthorizedException();
     }
 
-    return this.modalitiesService.delete(user.id, id);
+    return this.modalitiesService.delete(user.id, modalityId);
   }
 }

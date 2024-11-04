@@ -1,4 +1,4 @@
-import { Request } from 'express';
+import type { Request } from 'express';
 import {
   Controller,
   Post,
@@ -18,18 +18,39 @@ import { JwtGuard } from 'src/auth/guards/jwt.guard';
 
 import {
   CreateSpecialityDto,
+  SpecialityDto,
   UpdateSpecialityDto,
 } from './dto/specialities.dto';
-import type { Payload } from 'src/types/payload.type';
+import { ApiDocumentation } from 'src/decorators/documentation.decorator';
 
+@ApiDocumentation({
+  tags: 'Specialities',
+  security: 'bearer',
+  unauthorizedResponse: {
+    description: 'Unauthorized',
+  },
+  badRequestResponse: {
+    description: 'Bad request',
+  },
+})
+@UseGuards(JwtGuard)
 @Controller('settings/specialities')
 export class SpecialitiesController {
   constructor(private readonly specialitiesService: SpecialitiesService) {}
 
-  @UseGuards(JwtGuard)
+  @ApiDocumentation({
+    operation: {
+      summary: 'Get all specialities',
+      description: 'Get all specialities data',
+    },
+    okResponse: {
+      description: 'Specialities data',
+      type: [SpecialityDto],
+    },
+  })
   @Get()
   async getAllSpecialities(@Req() request: Request) {
-    const user: Payload = request['user'];
+    const user = request.user;
 
     if (user.role === 'patient') {
       throw new UnauthorizedException();
@@ -38,27 +59,57 @@ export class SpecialitiesController {
     return this.specialitiesService.findAll();
   }
 
-  @UseGuards(JwtGuard)
-  @Get(':id')
-  async getSpecialityById(@Param('id') id: string, @Req() request: Request) {
-    const user: Payload = request['user'];
+  @ApiDocumentation({
+    operation: {
+      summary: 'Get speciality by ID',
+      description: 'Get speciality data by ID',
+    },
+    params: {
+      name: 'specialityId',
+      type: String,
+      description: 'Speciality ID',
+      example: crypto.randomUUID(),
+    },
+    notFoundResponse: {
+      description: 'Speciality not found',
+    },
+    okResponse: {
+      description: 'Speciality data',
+      type: SpecialityDto,
+    },
+  })
+  @Get(':specialityId')
+  async getSpecialityById(
+    @Param('specialityId') specialityId: string,
+    @Req() request: Request,
+  ) {
+    const user = request.user;
 
     if (user.role === 'patient') {
       throw new UnauthorizedException();
     }
 
-    const speciality = await this.specialitiesService.findById(id);
+    const speciality = await this.specialitiesService.findById(specialityId);
 
     return speciality;
   }
 
-  @UseGuards(JwtGuard)
+  @ApiDocumentation({
+    operation: {
+      summary: 'Create speciality',
+      description: 'Create speciality data',
+    },
+    okResponse: {
+      description: 'Speciality created',
+      type: SpecialityDto,
+    },
+  })
   @Post()
   async createSpeciality(
     @Body(ValidationPipe) dto: CreateSpecialityDto,
     @Req() request: Request,
   ) {
-    const user: Payload = request['user'];
+    const user = request.user;
 
     if (user.role === 'patient') {
       throw new UnauthorizedException();
@@ -66,31 +117,77 @@ export class SpecialitiesController {
     return this.specialitiesService.create(user.id, dto);
   }
 
-  @UseGuards(JwtGuard)
-  @Patch(':id')
+  @ApiDocumentation({
+    operation: {
+      summary: 'Update speciality',
+      description: 'Update speciality data',
+    },
+    params: {
+      name: 'specialityId',
+      type: String,
+      description: 'Speciality ID',
+      example: crypto.randomUUID(),
+    },
+    notFoundResponse: {
+      description: 'Speciality not found',
+    },
+    okResponse: {
+      description: 'Speciality updated',
+      type: SpecialityDto,
+    },
+  })
+  @Patch(':specialityId')
   async updateSpeciality(
-    @Param('id') id: string,
+    @Param('specialityId') specialityId: string,
     @Body(ValidationPipe) updateSpecialityDto: UpdateSpecialityDto,
     @Req() request: Request,
   ) {
-    const user: Payload = request['user'];
+    const user = request.user;
 
     if (user.role === 'patient') {
       throw new UnauthorizedException();
     }
 
-    return this.specialitiesService.update(user.id, id, updateSpecialityDto);
+    return this.specialitiesService.update(
+      user.id,
+      specialityId,
+      updateSpecialityDto,
+    );
   }
 
-  @UseGuards(JwtGuard)
-  @Delete(':id')
-  async deleteSpeciality(@Param('id') id: string, @Req() request: Request) {
-    const user: Payload = request['user'];
+  @ApiDocumentation({
+    operation: {
+      summary: 'Delete speciality',
+      description: 'Delete speciality data',
+    },
+    params: {
+      name: 'specialityId',
+      type: String,
+      description: 'Speciality ID',
+      example: crypto.randomUUID(),
+    },
+    notFoundResponse: {
+      description: 'Speciality not found',
+    },
+    conflictResponse: {
+      description: 'Speciality is being used by a doctor',
+    },
+    okResponse: {
+      description: 'Speciality deleted',
+      type: SpecialityDto,
+    },
+  })
+  @Delete(':specialityId')
+  async deleteSpeciality(
+    @Param('specialityId') specialityId: string,
+    @Req() request: Request,
+  ) {
+    const user = request.user;
 
     if (!user.isSuperAdmin) {
       throw new UnauthorizedException();
     }
 
-    return this.specialitiesService.delete(user.id, id);
+    return this.specialitiesService.delete(user.id, specialityId);
   }
 }

@@ -1,4 +1,4 @@
-import { Request } from 'express';
+import type { Request } from 'express';
 import {
   Controller,
   Post,
@@ -14,20 +14,52 @@ import {
 import { TreatmentService } from './treatments.service';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
 
-import type { Payload } from 'src/types/payload.type';
-import { CreateTreatmentDto, UpdateTreatmentDto } from './dto/treatments.dto';
+import {
+  BasicTreatmentDto,
+  CreateTreatmentDto,
+  UpdateTreatmentDto,
+} from './dto/treatments.dto';
+import { ApiDocumentation } from 'src/decorators/documentation.decorator';
 
+@ApiDocumentation({
+  tags: 'Treatments',
+  security: 'bearer',
+  unauthorizedResponse: {
+    description: 'Unauthorized',
+  },
+  badRequestResponse: {
+    description: 'Bad Request',
+  },
+})
+@UseGuards(JwtGuard)
 @Controller('treatments')
 export class TreatmentController {
   constructor(private readonly treatmentService: TreatmentService) {}
 
-  @UseGuards(JwtGuard)
+  @ApiDocumentation({
+    operation: {
+      summary: 'Create a treatment',
+      description: 'Create a treatment for an appointment',
+    },
+    body: {
+      description: 'Treatment data',
+      type: CreateTreatmentDto,
+    },
+    consumes: 'application/json',
+    notFoundResponse: {
+      description: 'Appointment/Therapy not found',
+    },
+    createdResponse: {
+      description: 'Treatment created',
+      type: BasicTreatmentDto,
+    },
+  })
   @Post()
   async createTreatment(
     @Body(ValidationPipe) createTreatmentDto: CreateTreatmentDto,
     @Req() request: Request,
-  ) {
-    const user: Payload = request['user'];
+  ): Promise<BasicTreatmentDto> {
+    const user = request.user;
 
     if (user.role !== 'doctor') {
       throw new UnauthorizedException();
@@ -36,19 +68,46 @@ export class TreatmentController {
     return this.treatmentService.create(createTreatmentDto, user.id);
   }
 
-  @UseGuards(JwtGuard)
-  @Patch(':id')
+  @ApiDocumentation({
+    operation: {
+      summary: 'Update a treatment',
+      description: 'Update a treatment for an appointment',
+    },
+    params: {
+      name: 'treatmentId',
+      type: String,
+      description: 'Treatment ID',
+      example: crypto.randomUUID(),
+    },
+    body: {
+      description: 'Treatment data',
+      type: UpdateTreatmentDto,
+    },
+    consumes: 'application/json',
+    notFoundResponse: {
+      description: 'Treatment not found',
+    },
+    okResponse: {
+      description: 'Treatment updated',
+      type: BasicTreatmentDto,
+    },
+  })
+  @Patch(':treatmentId')
   async updateTreatment(
-    @Param('id') id: string,
+    @Param('treatmentId') treatmentId: string,
     @Body(ValidationPipe) updateTreatmentDto: UpdateTreatmentDto,
     @Req() request: Request,
-  ) {
-    const user: Payload = request['user'];
+  ): Promise<BasicTreatmentDto> {
+    const user = request.user;
 
     if (user.role !== 'doctor') {
       throw new UnauthorizedException();
     }
 
-    return this.treatmentService.update(id, updateTreatmentDto, user.id);
+    return this.treatmentService.update(
+      treatmentId,
+      updateTreatmentDto,
+      user.id,
+    );
   }
 }

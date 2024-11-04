@@ -1,9 +1,12 @@
 import { Module } from '@nestjs/common';
-import { TreatmentService } from './treatments.service';
+
 import { TreatmentController } from './treatments.controller';
-import { JwtService } from '@nestjs/jwt';
-import { PrismaService } from 'src/prisma.service';
+
+import { TreatmentService } from './treatments.service';
 import { LogService } from 'src/log/log.service';
+
+import { PrismaService } from 'src/prisma.service';
+import { JwtService } from '@nestjs/jwt';
 
 @Module({
   controllers: [TreatmentController],

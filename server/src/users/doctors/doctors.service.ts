@@ -3,6 +3,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { LogService } from 'src/log/log.service';
 
+import { UserReturnDto } from '../dto/users-response.dto';
+
 @Injectable()
 export class DoctorsService {
   constructor(
@@ -10,7 +12,11 @@ export class DoctorsService {
     private logService: LogService,
   ) {}
 
-  async updateSpeciality(id: string, specialityId: string, userId: string) {
+  async updateSpeciality(
+    id: string,
+    specialityId: string,
+    userId: string,
+  ): Promise<UserReturnDto> {
     const doctor = await this.prisma.user.findUnique({
       where: {
         id,

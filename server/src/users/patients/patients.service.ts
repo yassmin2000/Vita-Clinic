@@ -7,7 +7,8 @@ import {
 import { PrismaService } from 'src/prisma.service';
 import { LogService } from 'src/log/log.service';
 
-import { InsuranceDto, UpdateInsuranceDto } from '../dto/users.dto';
+import { CreateInsuranceDto, UpdateInsuranceDto } from '../dto/users.dto';
+import { InsuranceDto } from './dto/patients.dto';
 
 @Injectable()
 export class PatientsService {
@@ -16,7 +17,7 @@ export class PatientsService {
     private logService: LogService,
   ) {}
 
-  async getInsurance(id: string) {
+  async getInsurance(id: string): Promise<InsuranceDto> {
     const patient = await this.prisma.user.findUnique({
       where: {
         id,
@@ -51,9 +52,9 @@ export class PatientsService {
 
   async craeteInsurance(
     id: string,
-    insuranceDto: InsuranceDto,
+    insuranceDto: CreateInsuranceDto,
     userId: string,
-  ) {
+  ): Promise<InsuranceDto> {
     const patient = await this.prisma.user.findUnique({
       where: {
         id,
@@ -98,13 +99,15 @@ export class PatientsService {
       action: 'create',
       targetUserId: id,
     });
+
+    return insurance;
   }
 
   async updateInsurance(
     id: string,
     updateInsuranceDto: UpdateInsuranceDto,
     userId: string,
-  ) {
+  ): Promise<InsuranceDto> {
     const patient = await this.prisma.user.findUnique({
       where: {
         id,
@@ -153,7 +156,7 @@ export class PatientsService {
     return updatedInsurance;
   }
 
-  async deleteInsurance(id: string, userId: string) {
+  async deleteInsurance(id: string, userId: string): Promise<InsuranceDto> {
     const patient = await this.prisma.user.findUnique({
       where: {
         id,

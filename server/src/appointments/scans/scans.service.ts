@@ -1,12 +1,16 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+
 import { PrismaService } from 'src/prisma.service';
+import { LogService } from 'src/log/log.service';
 
 import {
+  BasicScanDto,
   CreateScanDto,
+  FullScanDto,
   GetPatientScansQuery,
+  ScanDto,
   UpdateScanDto,
 } from './dto/scans.dto';
-import { LogService } from 'src/log/log.service';
 
 @Injectable()
 export class ScansService {
@@ -23,7 +27,7 @@ export class ScansService {
       value = '',
       sort = 'createdAt-desc',
     }: GetPatientScansQuery,
-  ) {
+  ): Promise<ScanDto[]> {
     const [sortField, sortOrder] = sort.split('-') as [string, 'desc' | 'asc'];
 
     return this.prisma.scan.findMany({
@@ -38,7 +42,9 @@ export class ScansService {
         createdAt: true,
         updatedAt: true,
         modality: true,
+        modalityId: true,
         appointment: true,
+        appointmentId: true,
       },
       skip: (page - 1) * limit,
       take: limit,
@@ -53,7 +59,7 @@ export class ScansService {
     });
   }
 
-  async findAllByAppointmentId(appointmentId: string) {
+  async findAllByAppointmentId(appointmentId: string): Promise<ScanDto[]> {
     return this.prisma.scan.findMany({
       where: { appointmentId },
       select: {
@@ -63,12 +69,14 @@ export class ScansService {
         createdAt: true,
         updatedAt: true,
         modality: true,
+        modalityId: true,
         appointment: true,
+        appointmentId: true,
       },
     });
   }
 
-  async findById(id: string) {
+  async findById(id: string): Promise<FullScanDto> {
     const scan = await this.prisma.scan.findUnique({
       where: { id },
       include: {
@@ -84,7 +92,10 @@ export class ScansService {
     return scan;
   }
 
-  async create(createScanDto: CreateScanDto, userId: string) {
+  async create(
+    createScanDto: CreateScanDto,
+    userId: string,
+  ): Promise<BasicScanDto> {
     const { title, notes, modalityId, scanURLs, appointmentId } = createScanDto;
 
     const appointment = await this.prisma.appointment.findUnique({
@@ -121,7 +132,11 @@ export class ScansService {
     return scan;
   }
 
-  async update(id: string, updateScanDto: UpdateScanDto, userId: string) {
+  async update(
+    id: string,
+    updateScanDto: UpdateScanDto,
+    userId: string,
+  ): Promise<BasicScanDto> {
     const { title, notes } = updateScanDto;
 
     const existingScan = await this.prisma.scan.findUnique({
@@ -155,5 +170,7 @@ export class ScansService {
       action: 'update',
       targetUserId: scan.appointment.patientId,
     });
+
+    return scan;
   }
 }

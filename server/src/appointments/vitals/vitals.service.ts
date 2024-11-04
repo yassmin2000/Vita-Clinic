@@ -1,16 +1,22 @@
-import {
-  ConflictException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
-import { CreateVitalsDto, UpdateVitalsDto } from './dto/vitals.dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
+
 import { PrismaService } from 'src/prisma.service';
+
+import {
+  AllVitalsDataDto,
+  BasicVitalsDto,
+  UpdateVitalsDto,
+  VitalsDto,
+} from './dto/vitals.dto';
 
 @Injectable()
 export class VitalsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async update(id: string, updateVitalsDto: UpdateVitalsDto) {
+  async update(
+    id: string,
+    updateVitalsDto: UpdateVitalsDto,
+  ): Promise<VitalsDto> {
     const { appointmentId, ...vitalsData } = updateVitalsDto;
 
     const existingVitals = await this.prisma.vitals.findUnique({
@@ -27,7 +33,7 @@ export class VitalsService {
     });
   }
 
-  async getLatestByPatientId(patientId: string) {
+  async getLatestByPatientId(patientId: string): Promise<BasicVitalsDto> {
     const allVitals = await this.prisma.vitals.findMany({
       where: {
         appointment: {
@@ -64,7 +70,7 @@ export class VitalsService {
     return data;
   }
 
-  async getVitalsData(patientId: string) {
+  async getVitalsData(patientId: string): Promise<AllVitalsDataDto[]> {
     const vitals = await this.prisma.vitals.findMany({
       where: {
         appointment: {
