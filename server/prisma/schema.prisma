@@ -491,10 +491,53 @@ model Scan {
   modality   Modality @relation(fields: [modalityId], references: [id])
   modalityId String
 
-  scanURLs String[]
+  study Study?
 
   appointment   Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
   appointmentId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Study {
+  id               String   @id @default(uuid())
+  studyInstanceUID String
+  description      String?
+  modalities       String[]
+
+  scan   Scan     @relation(fields: [scanId], references: [id])
+  scanId String   @unique
+  series Series[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Series {
+  id                String  @id @default(uuid())
+  seriesInstanceUID String
+  seriesNumber      Int?
+  description       String?
+  modality          String?
+
+  study   Study  @relation(fields: [studyId], references: [id])
+  studyId String
+
+  instances Instance[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Instance {
+  id             String @id @default(uuid())
+  sopInstanceUID String
+  instanceNumber Int?
+  url            String
+
+  series   Series @relation(fields: [seriesId], references: [id])
+  seriesId String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

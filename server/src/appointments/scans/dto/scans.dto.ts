@@ -1,6 +1,8 @@
 import { Transform, Type } from 'class-transformer';
 import {
+  IsArray,
   IsDate,
+  IsEnum,
   IsIn,
   IsInt,
   IsNotEmpty,
@@ -67,7 +69,185 @@ export class CreateScanDto {
 }
 export class UpdateScanDto extends PartialType(CreateScanDto) {}
 
-export class BasicScanDto extends CreateScanDto {
+export class InstanceDto {
+  @ApiProperty({
+    description: 'Instance ID',
+    type: String,
+    example: crypto.randomUUID(),
+  })
+  @IsUUID()
+  id: string;
+
+  @ApiProperty({
+    description: 'SOP Instance UID',
+    type: String,
+    example: '1.3.6.1.4.1.14519.5.2.1.6919.4624.212211709210274480760196299870',
+  })
+  @IsString()
+  sopInstanceUID: string;
+
+  @ApiProperty({
+    description: 'Instance number',
+    type: Number,
+    example: 1,
+  })
+  @IsInt()
+  instanceNumber: number;
+
+  @ApiProperty({
+    description: 'Instance URL',
+    type: String,
+    example: 'https://example.com/left-breast-mlo.dcm',
+  })
+  @IsString()
+  url: string;
+
+  @ApiProperty({
+    description: 'Date and time the instance was created',
+    type: Date,
+    example: new Date(),
+  })
+  @IsDate()
+  createdAt: Date;
+
+  @ApiProperty({
+    description: 'Date and time the instance was last updated',
+    type: Date,
+    example: new Date(),
+  })
+  @IsDate()
+  updatedAt: Date;
+}
+
+export class SeriesDto {
+  @ApiProperty({
+    description: 'Series ID',
+    type: String,
+    example: crypto.randomUUID(),
+  })
+  @IsUUID()
+  id: string;
+
+  @ApiProperty({
+    description: 'Series Instance UID',
+    type: String,
+    example: '1.3.6.1.4.1.14519.5.2.1.6919.4624.277870064395307630151805987637',
+  })
+  @IsString()
+  seriesInstanceUID: string;
+
+  @ApiProperty({
+    description: 'Series number',
+    type: Number,
+    example: 1,
+  })
+  @IsInt()
+  seriesNumber: number;
+
+  @ApiPropertyOptional({
+    description: 'Modality',
+    type: String,
+    example: 'MG',
+  })
+  @IsString()
+  modality?: string;
+
+  @ApiPropertyOptional({
+    description: 'Series description',
+    type: String,
+    example: 'Left Breast MLO',
+  })
+  description?: string;
+
+  @ApiProperty({
+    description: 'Instances in the series',
+    isArray: true,
+    type: InstanceDto,
+  })
+  @IsArray()
+  @Type(() => InstanceDto)
+  instances: InstanceDto[];
+
+  @ApiProperty({
+    description: 'Date and time the series was created',
+    type: Date,
+    example: new Date(),
+  })
+  @IsDate()
+  createdAt: Date;
+
+  @ApiProperty({
+    description: 'Date and time the series was last updated',
+    type: Date,
+    example: new Date(),
+  })
+  @IsDate()
+  updatedAt: Date;
+}
+
+export class StudyDto {
+  @ApiProperty({
+    description: 'Study ID',
+    type: String,
+    example: crypto.randomUUID(),
+  })
+  @IsUUID()
+  id: string;
+
+  @ApiProperty({
+    description: 'Study Instance UID',
+    type: String,
+    example: '1.3.6.1.4.1.9590.100.1.2.110936445211379937514180548003449524345',
+  })
+  @IsString()
+  studyInstanceUID: string;
+
+  @ApiProperty({
+    description: 'Study modalities',
+    isArray: true,
+    type: String,
+    example: ['MG'],
+  })
+  @IsArray()
+  @IsString({ each: true })
+  modalities: string[];
+
+  @ApiPropertyOptional({
+    description: 'Study description',
+    type: String,
+    example: 'Routie Mamography',
+  })
+  description?: string;
+
+  @ApiProperty({
+    description: 'Date and time the study was created',
+    type: Date,
+    example: new Date(),
+  })
+  @IsDate()
+  createdAt: Date;
+
+  @ApiProperty({
+    description: 'Date and time the study was last updated',
+    type: Date,
+    example: new Date(),
+  })
+  @IsDate()
+  updatedAt: Date;
+}
+
+export class FullStudyDto extends StudyDto {
+  @ApiProperty({
+    description: 'Series in the study',
+    isArray: true,
+    type: SeriesDto,
+  })
+  @IsArray()
+  @Type(() => SeriesDto)
+  series: SeriesDto[];
+}
+
+export class BasicScanDto extends OmitType(CreateScanDto, ['scanURLs']) {
   @ApiProperty({
     description: 'Scan ID',
     type: String,
@@ -107,9 +287,16 @@ export class FullScanDto extends BasicScanDto {
   })
   @Type(() => BasicAppointmentDto)
   appointment: BasicAppointmentDto;
+
+  @ApiProperty({
+    description: 'Study data',
+    type: FullStudyDto,
+  })
+  @Type(() => FullStudyDto)
+  study: FullStudyDto;
 }
 
-export class ScanDto extends OmitType(FullScanDto, ['scanURLs']) {}
+export class ScanDto extends OmitType(FullScanDto, ['study']) {}
 
 export class GetPatientScansQuery {
   @ApiPropertyOptional({
