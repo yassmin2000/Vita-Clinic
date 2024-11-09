@@ -9,4 +9,8 @@ export type Payload = {
   role: Role;
   isSuperAdmin: boolean;
   avatar: string;
+  enableDicomCaching: boolean;
+  enableDicomCompression: boolean;
+  enableDicomCleanup: boolean;
+  cleanupDuration: number;
 };

@@ -171,6 +171,11 @@ model User {
 
   actions       Action[] @relation("actions")
   targetActions Action[] @relation("targetActions")
+
+  enableDicomCaching     Boolean @default(true)
+  enableDicomCompression Boolean @default(false)
+  enableDicomCleanup     Boolean @default(false)
+  cleanupDuration        Int     @default(7)
 }
 
 model ElectronicMedicalRecord {

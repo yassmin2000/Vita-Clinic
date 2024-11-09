@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsBoolean, IsDate, IsUUID } from 'class-validator';
+import { IsBoolean, IsDate, IsNumber, IsUUID } from 'class-validator';
 import {
   ApiProperty,
   ApiPropertyOptional,
@@ -70,6 +70,38 @@ export class UserDto extends OmitType(CreateUserDto, [
   isSuperAdmin: boolean;
 
   @ApiProperty({
+    description: 'User enabled DICOM files caching',
+    type: Boolean,
+    example: true,
+  })
+  @IsBoolean()
+  enableDicomCaching: boolean;
+
+  @ApiProperty({
+    description: 'User enabled DICOM files compression',
+    type: Boolean,
+    example: false,
+  })
+  @IsBoolean()
+  enableDicomCompression: boolean;
+
+  @ApiProperty({
+    description: 'User enabled DICOM files cleanup',
+    type: Boolean,
+    example: true,
+  })
+  @IsBoolean()
+  enableDicomCleanup: boolean;
+
+  @ApiProperty({
+    description: 'User DICOM files cleanup duration (In days)',
+    type: Number,
+    example: 7,
+  })
+  @IsNumber()
+  cleanupDuration: number;
+
+  @ApiProperty({
     description: 'The date and time the user was created',
     type: Date,
     example: new Date(),
@@ -96,6 +128,10 @@ export class UserProfileDto extends OmitType(UserDto, [
   'isEmailVerified',
   'isPhoneVerified',
   'updatedAt',
+  'enableDicomCaching',
+  'enableDicomCompression',
+  'enableDicomCleanup',
+  'cleanupDuration',
 ]) {
   @ApiPropertyOptional({
     description: 'User speciality (If doctor)',
@@ -185,7 +221,13 @@ class UserListItemSepcialityDto extends PickType(SpecialityDto, [
 
 class UserListItemEmrDto extends PickType(BasicEmrDto, ['id', 'bloodType']) {}
 
-export class UserListItemDto extends OmitType(UserReturnDto, ['specialityId']) {
+export class UserListItemDto extends OmitType(UserReturnDto, [
+  'specialityId',
+  'enableDicomCaching',
+  'enableDicomCompression',
+  'enableDicomCleanup',
+  'cleanupDuration',
+]) {
   @ApiPropertyOptional({
     description: 'User speciality (If doctor)',
     type: UserListItemSepcialityDto,
@@ -210,3 +252,9 @@ export class UpdateUserAvatarResponseDto extends PickType(UserDto, [
   'avatarURL',
 ]) {}
 export class UpdateUserPasswordResponseDto extends PickType(UserDto, ['id']) {}
+export class UpdateUserSettingsResponseDto extends PickType(UserDto, [
+  'enableDicomCaching',
+  'enableDicomCompression',
+  'enableDicomCleanup',
+  'cleanupDuration',
+]) {}

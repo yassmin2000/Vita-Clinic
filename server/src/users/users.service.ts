@@ -18,6 +18,7 @@ import {
   ResendPhoneVerificationDto,
   UpdateAvatarDto,
   UpdatePasswordDto,
+  UpdateSettingsDto,
   VerifyUserEmailDto,
   VerifyUserPhoneDto,
 } from './dto/users.dto';
@@ -26,6 +27,7 @@ import {
   UpdateUserAvatarResponseDto,
   UpdateUserPasswordResponseDto,
   UpdateUserRoleResponseDto,
+  UpdateUserSettingsResponseDto,
   UserDto,
   UserListItemDto,
   UserProfileDto,
@@ -653,6 +655,28 @@ export class UsersService {
       },
       select: {
         id: true,
+      },
+    });
+  }
+
+  async updateSettings(
+    userId: string,
+    updateSettingsDto: UpdateSettingsDto,
+  ): Promise<UpdateUserSettingsResponseDto> {
+    const user = await this.findById(userId);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: updateSettingsDto,
+      select: {
+        enableDicomCaching: true,
+        enableDicomCompression: true,
+        enableDicomCleanup: true,
+        cleanupDuration: true,
       },
     });
   }

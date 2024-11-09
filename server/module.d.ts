@@ -12,5 +12,7 @@ declare namespace NodeJS {
     TWILIO_AUTH_TOKEN: string;
     TWILIO_ACCOUNT_SID: string;
     TWILIO_PHONE_NUMBER: string;
+    FASTAPI_URL: string;
+    FASTAPI_API_KEY: string;
   }
 }
