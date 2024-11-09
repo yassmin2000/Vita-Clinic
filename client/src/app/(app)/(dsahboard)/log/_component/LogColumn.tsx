@@ -506,12 +506,12 @@ const actionsSchema = [
       {
         action: 'create',
         message: '%USER% created new scan %TARGET% for %USERTARGET%',
-        href: '/scans/:id',
+        href: '/viewer/:id',
       },
       {
         action: 'update',
         message: '%USER% updated scan %TARGET% details for %USERTARGET%',
-        href: '/scans/:id',
+        href: '/viewer/:id',
       },
     ],
   },

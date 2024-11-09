@@ -22,6 +22,7 @@ import {
   LayoutGrid,
   LayoutPanelLeft,
   LayoutPanelTop,
+  Menu,
   Move,
   Plus,
   RectangleHorizontal,
@@ -49,14 +50,16 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { cn } from '@/lib/utils';
-import useViewerStore from '@/hooks/useViewerStore';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { SidebarTrigger } from '@/components/ui/sidebar';
+
+import useViewerStore from '@/hooks/useViewerStore';
+import { cn } from '@/lib/utils';
 
 const tools = [
   // Navigation Tools
@@ -117,16 +120,43 @@ const tools = [
   [{ name: 'Eraser', tool: 'Eraser', icon: Eraser }],
 ];
 
+export const handleSetViewToRight = (viewerId: string) => {
+  const element = document.getElementById(viewerId);
+  const cornerstoneElement = cornerstone.getEnabledElement(element);
+  const viewport = cornerstoneElement.viewport;
+  const offsetLeft = cornerstoneElement.canvas.offsetLeft;
+  const offsetRight = offsetLeft + cornerstoneElement.canvas.width;
+  const position = cornerstone.pageToPixel(element, offsetRight, 0);
+  const translationX =
+    viewport.translation.x + position.x - cornerstoneElement.image.width;
+  viewport.translation.x = translationX;
+  viewport.translation.y = 0;
+  cornerstone.setViewport(element, viewport);
+};
+
+export const handleSetViewToLeft = (viewerId: string) => {
+  const element = document.getElementById(viewerId);
+  const cornerstoneElement = cornerstone.getEnabledElement(element);
+  const viewport = cornerstoneElement.viewport;
+  const offsetLeft = cornerstoneElement.canvas.offsetLeft;
+  const offsetRight = offsetLeft + cornerstoneElement.canvas.width;
+  const position = cornerstone.pageToPixel(element, offsetRight, 0);
+  const translationX =
+    viewport.translation.x + position.x - cornerstoneElement.image.width;
+  viewport.translation.x = -translationX;
+  viewport.translation.y = 0;
+  cornerstone.setViewport(element, viewport);
+};
+
+export const handleResetViewport = (viewerId: string) => {
+  const element = document.getElementById(viewerId);
+  cornerstone.reset(element);
+};
+
 export default function ViewerToolbar() {
   const [activeTool, setActiveTool] = useState<string>('Pan');
   const [mouseWheelTool, setMouseWheelTool] = useState('StackScroll');
-  const {
-    currentViewerId,
-    setCurrentViewerId,
-    setFirstViewportsCount,
-    setSecondViewportsCount,
-    setSplitViewportsBy,
-  } = useViewerStore();
+  const { currentViewerId, setLayoutType } = useViewerStore();
 
   const inputRef = useRef<HTMLInputElement | null>(null);
 
@@ -148,7 +178,7 @@ export default function ViewerToolbar() {
         cornerstoneTools.addToolState(element, 'stack', stack);
       });
 
-      handleResetViewport();
+      handleResetViewport(`viewer_${currentViewerId}`);
     }
   };
 
@@ -181,13 +211,36 @@ export default function ViewerToolbar() {
     cornerstone.updateImage(element);
   };
 
-  const handleResetViewport = () => {
-    const element = document.getElementById('viewer_' + currentViewerId);
-    cornerstone.reset(element);
+  const handleSetViewToRight = (viewerId: number) => {
+    const element = document.getElementById('viewer_' + viewerId);
+    const cornerstoneElement = cornerstone.getEnabledElement(element);
+    const viewport = cornerstoneElement.viewport;
+    const offsetLeft = cornerstoneElement.canvas.offsetLeft;
+    const offsetRight = offsetLeft + cornerstoneElement.canvas.width;
+    const position = cornerstone.pageToPixel(element, offsetRight, 0);
+    const translationX =
+      viewport.translation.x + position.x - cornerstoneElement.image.width;
+    viewport.translation.x = translationX;
+    viewport.translation.y = 0;
+    cornerstone.setViewport(element, viewport);
+  };
+
+  const handleSetViewToLeft = (viewerId: number) => {
+    const element = document.getElementById('viewer_' + viewerId);
+    const cornerstoneElement = cornerstone.getEnabledElement(element);
+    const viewport = cornerstoneElement.viewport;
+    const offsetLeft = cornerstoneElement.canvas.offsetLeft;
+    const offsetRight = offsetLeft + cornerstoneElement.canvas.width;
+    const position = cornerstone.pageToPixel(element, offsetRight, 0);
+    const translationX =
+      viewport.translation.x + position.x - cornerstoneElement.image.width;
+    viewport.translation.x = -translationX;
+    viewport.translation.y = 0;
+    cornerstone.setViewport(element, viewport);
   };
 
   return (
-    <div className="sticky left-0 top-0 w-full">
+    <div className="sticky left-0 top-0 h-[52px] w-full">
       <input
         ref={inputRef}
         id="fileInput"
@@ -199,6 +252,12 @@ export default function ViewerToolbar() {
       />
       <div className="flex w-full flex-wrap items-center justify-center rounded-md bg-background px-4 py-2 shadow-lg dark:shadow-white/10">
         <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger>
+              <SidebarTrigger />
+            </TooltipTrigger>
+            <TooltipContent side="bottom">Series List</TooltipContent>
+          </Tooltip>
           <Tooltip>
             <TooltipTrigger>
               <Button
@@ -317,7 +376,9 @@ export default function ViewerToolbar() {
                       <Button
                         size="xs"
                         variant="ghost"
-                        onClick={handleResetViewport}
+                        onClick={() =>
+                          handleResetViewport(`viewer_${currentViewerId}`)
+                        }
                       >
                         <p className="sr-only">Reset</p>
                         <RotateCcw className="h-4 w-4" />
@@ -351,76 +412,56 @@ export default function ViewerToolbar() {
             >
               <DropdownMenuItem
                 onClick={() => {
-                  setCurrentViewerId(0);
-                  setFirstViewportsCount(1);
-                  setSecondViewportsCount(0);
+                  setLayoutType('1_big');
                 }}
               >
                 <SquareIcon className="h-5 w-5" />
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => {
-                  setCurrentViewerId(0);
-                  setFirstViewportsCount(1);
-                  setSecondViewportsCount(1);
+                  setLayoutType('2_side_by_side');
                 }}
               >
                 <Columns2 className="h-5 w-5" />
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => {
-                  setCurrentViewerId(0);
-                  setFirstViewportsCount(2);
-                  setSecondViewportsCount(0);
+                  setLayoutType('2_top_to_bottom');
                 }}
               >
                 <Rows2 className="h-5 w-5" />
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => {
-                  setCurrentViewerId(0);
-                  setFirstViewportsCount(2);
-                  setSecondViewportsCount(2);
+                  setLayoutType('4_2x2');
                 }}
               >
                 <Grid2X2 className="h-5 w-5" />
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => {
-                  setCurrentViewerId(0);
-                  setFirstViewportsCount(1);
-                  setSecondViewportsCount(2);
-                  setSplitViewportsBy('cols');
+                  setLayoutType('1_big_2_small');
                 }}
               >
                 <LayoutPanelLeft className="h-5 w-5" />
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => {
-                  setCurrentViewerId(0);
-                  setFirstViewportsCount(2);
-                  setSecondViewportsCount(1);
-                  setSplitViewportsBy('cols');
+                  setLayoutType('2_small_1_big');
                 }}
               >
                 <LayoutPanelLeft className="h-5 w-5 rotate-180" />
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => {
-                  setCurrentViewerId(0);
-                  setFirstViewportsCount(1);
-                  setSecondViewportsCount(2);
-                  setSplitViewportsBy('rows');
+                  setLayoutType('1_big_top_2_small_bottom');
                 }}
               >
                 <LayoutPanelTop className="h-5 w-5" />
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => {
-                  setCurrentViewerId(0);
-                  setFirstViewportsCount(2);
-                  setSecondViewportsCount(1);
-                  setSplitViewportsBy('rows');
+                  setLayoutType('2_small_top_1_big_bottom');
                 }}
               >
                 <LayoutPanelTop className="h-5 w-5 rotate-180" />
