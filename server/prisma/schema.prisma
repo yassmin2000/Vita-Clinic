@@ -500,6 +500,16 @@ model Scan {
   updatedAt DateTime @updatedAt
 }
 
+enum BreastLaterality {
+  r
+  l
+}
+
+enum BreastView {
+  cc
+  mlo
+}
+
 model Study {
   id               String   @id @default(uuid())
   studyInstanceUID String
@@ -520,6 +530,9 @@ model Series {
   seriesNumber      Int?
   description       String?
   modality          String?
+
+  breastLaterality BreastLaterality?
+  breastView       BreastView?
 
   study   Study  @relation(fields: [studyId], references: [id])
   studyId String

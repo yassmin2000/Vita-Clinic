@@ -173,6 +173,10 @@ export class ScansService {
             seriesInstanceUID: series.seriesInstanceUID.replace(/\0/g, ''),
             seriesNumber: series.seriesNumber,
             description: series.description.replace(/\0/g, ''),
+            breastLaterality:
+              series.modality.toLowerCase() === 'mg' ? series.laterality : null,
+            breastView:
+              series.modality.toLowerCase() === 'mg' ? series.view : null,
             modality: series.modality,
             studyId: studyId,
           },

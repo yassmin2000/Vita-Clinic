@@ -19,6 +19,7 @@ import {
 
 import { ModalityDto } from 'src/settings/modalities/dto/modalities.dto';
 import { BasicAppointmentDto } from 'src/appointments/dto/appointments.dto';
+import { BreastLaterality, BreastView } from '@prisma/client';
 
 export class CreateScanDto {
   @ApiProperty({
@@ -158,6 +159,22 @@ export class SeriesDto {
     example: 'Left Breast MLO',
   })
   description?: string;
+
+  @ApiPropertyOptional({
+    description: 'Breast laterality',
+    enum: BreastLaterality,
+    example: 'l',
+  })
+  @IsEnum(BreastLaterality)
+  breastLaterality?: BreastLaterality;
+
+  @ApiPropertyOptional({
+    description: 'Breast laterality',
+    enum: BreastView,
+    example: 'l',
+  })
+  @IsEnum(BreastView)
+  breastView?: BreastView;
 
   @ApiProperty({
     description: 'Instances in the series',

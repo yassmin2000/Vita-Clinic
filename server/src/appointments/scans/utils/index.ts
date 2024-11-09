@@ -12,6 +12,8 @@ interface DicomSeries {
   seriesNumber: number;
   description?: string;
   modality?: string;
+  laterality?: 'r' | 'l';
+  view?: 'cc' | 'mlo';
   instances: DicomInstance[];
 }
 
@@ -69,11 +71,16 @@ export async function processDicomFiles(
       const study = studies.get(studyInstanceUID)!;
 
       if (!study.series.has(seriesInstanceUID)) {
+        const laterality = getMammogramLaterality(dicomData, seriesDescription);
+        const view = getMammogramView(dicomData, seriesDescription);
+
         study.series.set(seriesInstanceUID, {
           seriesInstanceUID,
           seriesNumber,
           description: seriesDescription,
           modality,
+          laterality,
+          view,
           instances: [],
         });
       }
@@ -108,6 +115,8 @@ export async function processDicomFiles(
       seriesNumber: series.seriesNumber,
       description: series.description,
       modality: series.modality,
+      laterality: series.laterality,
+      view: series.view,
       instances: series.instances,
     })),
   }));
@@ -138,4 +147,68 @@ async function downloadFromUrl(fileUrl: string): Promise<Buffer> {
   } catch (error) {
     throw new Error(`Failed to download file from URL: ${fileUrl}`);
   }
+}
+
+function getMammogramLaterality(
+  dicomData: any,
+  seriesDescription: string | undefined,
+): 'r' | 'l' | undefined {
+  const laterality: string | undefined = dicomData.dict['00200062']?.Value[0];
+  if (laterality && laterality !== 'undefined')
+    return laterality.toLowerCase() === 'r'
+      ? 'r'
+      : laterality.toLowerCase() === 'l'
+        ? 'l'
+        : undefined;
+
+  if (seriesDescription) {
+    const lowerDescription = seriesDescription.toLowerCase();
+    if (
+      lowerDescription.includes(' r ') ||
+      lowerDescription.includes('right') ||
+      lowerDescription.includes('_r') ||
+      lowerDescription.includes('-r') ||
+      lowerDescription.includes('r_') ||
+      lowerDescription.includes('r-') ||
+      lowerDescription.includes('r.') ||
+      lowerDescription.includes('.r') ||
+      lowerDescription.startsWith('r ') ||
+      lowerDescription.endsWith(' r')
+    )
+      return 'r';
+    if (
+      lowerDescription.includes(' l ') ||
+      lowerDescription.includes('left') ||
+      lowerDescription.includes('_l') ||
+      lowerDescription.includes('-l') ||
+      lowerDescription.includes('l_') ||
+      lowerDescription.includes('l-') ||
+      lowerDescription.includes('l.') ||
+      lowerDescription.includes('.l') ||
+      lowerDescription.startsWith('l ') ||
+      lowerDescription.endsWith(' l')
+    )
+      return 'l';
+  }
+  return undefined;
+}
+
+function getMammogramView(
+  dicomData: any,
+  seriesDescription: string | undefined,
+): 'cc' | 'mlo' | undefined {
+  const view: string | undefined = dicomData.dict['00185101']?.Value[0]; // View
+  if (view && view !== 'undefined')
+    return view.toLocaleLowerCase() === 'cc'
+      ? 'cc'
+      : view.toLocaleLowerCase() === 'mlo'
+        ? 'mlo'
+        : undefined;
+
+  if (seriesDescription) {
+    const lowerDescription = seriesDescription.toLowerCase();
+    if (lowerDescription.includes('cc')) return 'cc';
+    if (lowerDescription.includes('mlo')) return 'mlo';
+  }
+  return undefined;
 }
