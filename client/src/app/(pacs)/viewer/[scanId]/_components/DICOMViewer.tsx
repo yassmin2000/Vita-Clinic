@@ -11,6 +11,7 @@ import cornerstoneWADOImageLoader from 'cornerstone-wado-image-loader';
 import useViewerStore from '@/hooks/useViewerStore';
 import { handleSetViewToLeft, handleSetViewToRight } from './ViewerToolbar';
 import { cn } from '@/lib/utils';
+import CacheManager from '@/lib/CacheManager';
 import type { Series } from '@/types/appointments.type';
 
 interface DICOMViewerProps {
@@ -59,11 +60,13 @@ export default function DICOMViewer({
     for (let i = 0; i < series.instances.length; i++) {
       try {
         const instance = series.instances[i];
-        const response = await fetch(instance.url);
-        const blob = await response.blob();
-        const file = new File([blob], instance.sopInstanceUID, {
-          type: blob.type,
-        });
+
+        const file = await CacheManager.fetchAndStoreInstance(
+          studyId,
+          series.seriesInstanceUID,
+          instance.sopInstanceUID,
+          instance.url
+        );
 
         const image = cornerstoneWADOImageLoader.wadouri.fileManager.add(file);
 

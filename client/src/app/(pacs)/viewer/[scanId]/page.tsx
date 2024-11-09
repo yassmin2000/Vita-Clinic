@@ -8,6 +8,7 @@ import { SidebarProvider } from '@/components/ui/sidebar';
 import ViewerSidebar from './_components/ViewerSidebar';
 
 import useAccessToken from '@/hooks/useAccessToken';
+import DbManager from '@/lib/DbManager';
 import type { Scan } from '@/types/appointments.type';
 
 const ViewerToolbar = dynamic(() => import('./_components/ViewerToolbar'), {
@@ -41,6 +42,13 @@ export default function ViewerPage({ params: { scanId } }: ViewerPageProps) {
         series.instances.sort((a, b) => a.instanceNumber - b.instanceNumber);
       });
 
+      await DbManager.checkAndStoreStudy({
+        studyId: data.study.studyInstanceUID,
+        series: data.study.series.map((series) => ({
+          seriesId: series.seriesInstanceUID,
+          instances: series.instances.map((instance) => instance.url),
+        })),
+      });
       return data as Scan;
     },
     enabled: !!accessToken,

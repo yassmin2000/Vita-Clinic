@@ -5,6 +5,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 import useViewerStore from '@/hooks/useViewerStore';
 import { handleResetViewport } from './ViewerToolbar';
+import CacheManager from '@/lib/CacheManager';
 
 interface SeriesPreviewImageProps {
   seriesId: string;
@@ -22,10 +23,10 @@ export default function SeriesPreviewImage({
   useEffect(() => {
     const fetchImage = async () => {
       try {
-        const response = await fetch(url);
-        const blob = await response.blob();
-        const file = new File([blob], seriesId, { type: blob.type });
-
+        const file = await CacheManager.fetchAndStorePreviewSeriesImage(
+          seriesId,
+          url
+        );
         setImageFile(file);
         setLoading(false);
       } catch (error) {
