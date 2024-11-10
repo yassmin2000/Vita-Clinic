@@ -13,6 +13,10 @@ declare module 'next-auth' {
       sex: string;
       phoneNumber: string;
       address: string;
+      enableDicomCaching: boolean;
+      enableDicomCompression: boolean;
+      enableDicomCleanup: boolean;
+      cleanupDuration: number;
       createdAt: string;
       updatedAt: string;
     };
@@ -42,6 +46,10 @@ declare module 'next-auth/jwt' {
       sex: string;
       phoneNumber: string;
       address: string;
+      enableDicomCaching: boolean;
+      enableDicomCompression: boolean;
+      enableDicomCleanup: boolean;
+      cleanupDuration: number;
       createdAt: string;
       updatedAt: string;
     };
