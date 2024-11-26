@@ -8,7 +8,9 @@ import { SidebarProvider } from '@/components/ui/sidebar';
 import ViewerSidebar from './_components/ViewerSidebar';
 
 import useAccessToken from '@/hooks/useAccessToken';
+import useUserCachingSettings from '@/hooks/useUserCachingSettings';
 import DbManager from '@/lib/DbManager';
+
 import type { Scan } from '@/types/appointments.type';
 
 const ViewerToolbar = dynamic(() => import('./_components/ViewerToolbar'), {
@@ -23,6 +25,7 @@ interface ViewerPageProps {
 }
 export default function ViewerPage({ params: { scanId } }: ViewerPageProps) {
   const accessToken = useAccessToken();
+  const cachingSettings = useUserCachingSettings();
 
   const { data: scan, isLoading } = useQuery({
     queryKey: [`scan_${scanId}`],
@@ -42,24 +45,29 @@ export default function ViewerPage({ params: { scanId } }: ViewerPageProps) {
         series.instances.sort((a, b) => a.instanceNumber - b.instanceNumber);
       });
 
-      await DbManager.checkAndStoreStudy({
-        studyId: data.study.studyInstanceUID,
-        series: data.study.series.map((series) => ({
-          seriesId: series.seriesInstanceUID,
-          instances: series.instances.map((instance) => instance.url),
-        })),
-      });
+      if (cachingSettings && cachingSettings.enableDicomCaching) {
+        await DbManager.checkAndStoreStudy({
+          studyId: data.study.studyInstanceUID,
+          series: data.study.series.map((series) => ({
+            seriesId: series.seriesInstanceUID,
+            instances: series.instances.map((instance) => instance.url),
+          })),
+        });
+      }
       return data as Scan;
     },
-    enabled: !!accessToken,
+    enabled: !!accessToken && !!cachingSettings,
     refetchOnReconnect: false,
     refetchOnWindowFocus: false,
   });
 
   return (
-    <SidebarProvider className="h-full w-full overflow-x-hidden">
+    <SidebarProvider
+      // defaultOpen={false}
+      className="h-full w-full overflow-x-hidden"
+    >
       <ViewerSidebar isLoading={isLoading} series={scan?.study.series || []} />
-      <div className="w-full overflow-x-hidden overflow-y-hidden">
+      <div className="flex w-full flex-col overflow-x-hidden overflow-y-hidden">
         <ViewerToolbar />
         {!isLoading && scan && <Viewers study={scan.study} />}
       </div>

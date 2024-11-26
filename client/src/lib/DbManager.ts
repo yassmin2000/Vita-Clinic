@@ -8,6 +8,7 @@ export interface Study {
   cachedInstancesCount: number;
   originalSize: number;
   compressedSize: number;
+  cachedAt: Date;
 }
 
 export interface Series {
@@ -27,7 +28,7 @@ export interface Instance {
   file: File;
   originalSize: number;
   compressedSize: number;
-  cachedAt: Date;
+  isCompressed: boolean;
 }
 
 export interface SeriesInfo {
@@ -50,11 +51,11 @@ export const db = new Dexie('VitaDICOMCacheDB') as Dexie & {
 // Define the schema
 db.version(1).stores({
   study:
-    'id, seriesCount, instancesCount, cachedInstancesCount, originalSize, compressedSize',
+    'id, seriesCount, instancesCount, cachedInstancesCount, originalSize, compressedSize, cachedAt',
   series:
     'id, studyId, instancesCount, cachedInstancesCount, originalSize, compressedSize, previewImage',
   instance:
-    'id, seriesId, studyId, file, cachedAt, originalSize, compressedSize',
+    'id, seriesId, studyId, file, originalSize, compressedSize, isCompressed',
 });
 
 class DbManager {
@@ -72,7 +73,8 @@ class DbManager {
     studyId: string,
     seriesId: string,
     instanceId: string,
-    instanceFile: File
+    instanceFile: File,
+    enableCompression: boolean
   ): Promise<File> {
     try {
       // Check if the instance already exists
@@ -80,16 +82,37 @@ class DbManager {
 
       if (existingInstance) {
         // Instance exists, return the file
+        if (!existingInstance.isCompressed) {
+          return existingInstance.file;
+        }
+
+        // Decompress the file and return the original instance file
         const { file: existingInstanceFile } =
           await CompressionManager.decompressFile(existingInstance.file);
         return existingInstanceFile;
       }
 
-      const {
-        file: compressedFile,
-        originalSize,
-        compressedSize,
-      } = await CompressionManager.compressFile(instanceFile);
+      let finalFile = instanceFile;
+      let originalSize = 0;
+      let compressedSize = 0;
+
+      if (!enableCompression) {
+        const arrayBuffer = await instanceFile.arrayBuffer();
+        originalSize = arrayBuffer.byteLength;
+        compressedSize = originalSize;
+      }
+
+      if (enableCompression) {
+        const {
+          file: compressedFile,
+          originalSize: outputOriginalSize,
+          compressedSize: outputCompressedSize,
+        } = await CompressionManager.compressFile(instanceFile);
+
+        finalFile = compressedFile;
+        originalSize = outputOriginalSize;
+        compressedSize = outputCompressedSize;
+      }
 
       // Perform the database operations in a transaction
       await db.transaction('rw', db.study, db.series, db.instance, async () => {
@@ -120,10 +143,10 @@ class DbManager {
           id: instanceId,
           seriesId: seriesId,
           studyId: studyId,
-          file: compressedFile,
-          cachedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
+          file: finalFile,
           originalSize,
           compressedSize,
+          isCompressed: enableCompression,
         });
       });
 
@@ -163,6 +186,7 @@ class DbManager {
           cachedInstancesCount: 0,
           originalSize: 0,
           compressedSize: 0,
+          cachedAt: new Date(),
         });
       } else {
         // Update existing study entry with new metadata

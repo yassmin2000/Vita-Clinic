@@ -51,6 +51,7 @@ export class ScansService {
         modalityId: true,
         appointment: true,
         appointmentId: true,
+        study: true,
       },
       skip: (page - 1) * limit,
       take: limit,
@@ -78,6 +79,7 @@ export class ScansService {
         modalityId: true,
         appointment: true,
         appointmentId: true,
+        study: true,
       },
     });
   }

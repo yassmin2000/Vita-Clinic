@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { format } from 'date-fns';
-import { Info, Pencil, Plus } from 'lucide-react';
+import { AlertCircle, Info, Pencil, Plus, Trash } from 'lucide-react';
 
 import { Card } from '../ui/card';
 import { Button } from '../ui/button';
@@ -13,6 +13,14 @@ import { Separator } from '../ui/separator';
 
 import useUserRole from '@/hooks/useUserRole';
 import type { Scan } from '@/types/appointments.type';
+import CacheManager from '@/lib/CacheManager';
+import { useToast } from '../ui/use-toast';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '../ui/tooltip';
 
 interface ScanItemProps {
   scan: Scan;
@@ -22,6 +30,47 @@ export default function ScanItem({ scan }: ScanItemProps) {
   const { role } = useUserRole();
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [isClearingCache, setIsClearingCache] = useState(false);
+  const [cache, setCache] = useState<{
+    studyId: string;
+    cachedInstances: number;
+    instancesCount: number;
+    originalSize: number;
+    compressedSize: number;
+  } | null>(null);
+
+  const { toast } = useToast();
+
+  const handleClearStudyCache = async () => {
+    setIsClearingCache(true);
+    try {
+      await CacheManager.clearStudyCache(scan.study.studyInstanceUID);
+      setCache(null);
+      toast({
+        title: 'Cache Cleared',
+        description: 'The cache for this study has been cleared.',
+      });
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'An error occurred while clearing the cache.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsClearingCache(false);
+    }
+  };
+
+  useEffect(() => {
+    const fetchCache = async () => {
+      const cachedStudyInfo = await CacheManager.getCachedStudyInfo(
+        scan.study.studyInstanceUID
+      );
+      setCache(cachedStudyInfo);
+    };
+
+    fetchCache();
+  }, [scan]);
 
   return (
     <Card className="col-span-1 divide-y divide-accent rounded-lg transition-all hover:shadow-lg dark:shadow-white/10">
@@ -38,26 +87,78 @@ export default function ScanItem({ scan }: ScanItemProps) {
         </div>
       </Link>
 
-      <div className="mt-4 flex items-center justify-between gap-6 px-6 py-2 text-xs text-muted-foreground">
-        <div className="flex items-center gap-2">
-          <Plus className="h-4 w-4" />
-          {format(new Date(scan.createdAt), 'dd MMM yyyy')}
-        </div>
+      <div className="mt-4 flex items-center justify-between gap-1 px-6 py-2 text-xs text-muted-foreground">
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center gap-2">
+            <Plus className="h-4 w-4" />
+            {format(new Date(scan.createdAt), 'dd MMM yyyy')}
+          </div>
 
-        <span>{scan.modality.name}</span>
+          <div className="flex items-center gap-0.5">
+            <span className="font-medium">Modality:</span>
+            <span>{scan.modality.name}</span>
+          </div>
+        </div>
 
         <div className="flex gap-1">
           {role && role === 'doctor' && (
-            <Button size="sm" onClick={() => setIsEditing(true)}>
-              <Pencil className="h-4 w-4 sm:mr-2" />
-              <span className="sr-only sm:not-sr-only">Edit</span>
-            </Button>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  <Button size="sm" onClick={() => setIsEditing(true)}>
+                    <Pencil className="h-4 w-4" />
+                    <span className="sr-only ">Edit Scan</span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Edit Scan</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           )}
-          <Button size="sm" onClick={() => setIsDetailsOpen(true)}>
-            <Info className="h-4 w-4 sm:mr-2" />
-            <span className="sr-only sm:not-sr-only">Details</span>
-          </Button>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+                <Button size="sm" onClick={() => setIsDetailsOpen(true)}>
+                  <Info className="h-4 w-4" />
+                  <span className="sr-only ">View Scan Details</span>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>View Scan Details</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
+      </div>
+      <div className="mt-4 flex items-center justify-between gap-6 px-6 py-2 text-xs text-muted-foreground">
+        {cache ? (
+          <div className="flex flex-col gap-0">
+            <div className="flex w-full items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="font-medium">Cached Instances:</span>
+                <span>
+                  {cache.cachedInstances}/{cache.instancesCount}
+                </span>
+              </div>
+              <Button
+                size="sm"
+                variant="link"
+                onClick={handleClearStudyCache}
+                disabled={isClearingCache}
+                className="text-destructive"
+              >
+                <Trash className="mr-1 h-3.5 w-3.5" /> Clear
+              </Button>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="font-medium">Size:</span>
+              <span>{Math.round(cache.compressedSize / 1024 / 1024)}MB</span>
+            </div>
+          </div>
+        ) : (
+          <div className="flex items-center gap-2">
+            <span className="flex items-center font-medium">
+              <AlertCircle className="mr-1 h-3.5 w-3.5" /> Scan is not cached
+            </span>
+          </div>
+        )}
       </div>
 
       <Modal

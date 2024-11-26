@@ -11,13 +11,13 @@ import { Skeleton } from '@/components/ui/skeleton';
 import type { Series } from '@/types/appointments.type';
 
 interface ViewerSidebarProps {
-  isLoading: boolean;
   series: Series[];
+  isLoading: boolean;
 }
 
 export default function ViewerSidebar({
-  isLoading,
   series,
+  isLoading,
 }: ViewerSidebarProps) {
   return (
     <Sidebar>

@@ -240,7 +240,7 @@ export default function ViewerToolbar() {
   };
 
   return (
-    <div className="sticky left-0 top-0 h-[52px] w-full">
+    <div className="sticky left-0 top-0 w-full">
       <input
         ref={inputRef}
         id="fileInput"

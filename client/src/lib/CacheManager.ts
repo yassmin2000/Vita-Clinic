@@ -16,7 +16,9 @@ class CacheManager {
     studyId: string,
     seriesId: string,
     instanceId: string,
-    instanceURL: string
+    instanceURL: string,
+    enableCaching: boolean = true,
+    enableCompression: boolean = true
   ): Promise<File> {
     try {
       // Check if the instance already exists in the database
@@ -24,6 +26,10 @@ class CacheManager {
 
       if (existingInstance) {
         // Instance exists in the database, decompress and return it
+        if (!existingInstance.isCompressed) {
+          return existingInstance.file;
+        }
+
         const { file } = await CompressionManager.decompressFile(
           existingInstance.file
         );
@@ -38,12 +44,18 @@ class CacheManager {
         // Create a File object from the Blob, naming it using the instanceId
         const file = new File([blob], instanceId, { type: blob.type });
 
+        if (!enableCaching) {
+          // If caching is disabled, return the fetched file without storing it in the cache
+          return file;
+        }
+
         // Cache the new instance by uploading it to the database
         await DbManager.handleInstanceUpload(
           studyId,
           seriesId,
           instanceId,
-          file
+          file,
+          enableCompression
         );
 
         // Return the newly fetched instance file
@@ -63,23 +75,32 @@ class CacheManager {
    * @param url - The URL to fetch the preview image from if it is not cached.
    * @returns The preview image file (either from the cache or newly fetched from the network).
    */
-  static async fetchAndStorePreviewSeriesImage(seriesId: string, url: string) {
+  static async fetchAndStorePreviewSeriesImage(
+    seriesId: string,
+    url: string,
+    accessToken: string,
+    enableCaching: boolean = true
+  ) {
     try {
-      const series = await db.series.get(seriesId);
+      if (enableCaching) {
+        const series = await db.series.get(seriesId);
 
-      if (!series) {
-        throw new Error('Series not found in database');
+        if (series && series.previewImage) {
+          return series.previewImage;
+        }
       }
 
-      if (series.previewImage) {
-        return series.previewImage;
-      }
-
-      const response = await fetch(url);
+      const response = await fetch(url, {
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+      });
       const blob = await response.blob();
       const file = new File([blob], seriesId, { type: blob.type });
 
-      await DbManager.handleUpdateSeriesPreviewImage(seriesId, file);
+      if (enableCaching) {
+        await DbManager.handleUpdateSeriesPreviewImage(seriesId, file);
+      }
 
       return file;
     } catch (error) {
@@ -97,6 +118,7 @@ class CacheManager {
   static async getCachedStudyInfo(studyId: string): Promise<{
     studyId: string;
     cachedInstances: number;
+    instancesCount: number;
     originalSize: number;
     compressedSize: number;
   } | null> {
@@ -106,6 +128,7 @@ class CacheManager {
         return {
           studyId: study.id,
           cachedInstances: study.cachedInstancesCount,
+          instancesCount: study.instancesCount,
           originalSize: study.originalSize,
           compressedSize: study.compressedSize,
         };
@@ -190,6 +213,52 @@ class CacheManager {
       };
     } catch (error) {
       console.error('Error fetching study and series metadata:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Clears the cache for a specific study by deleting all associated series and instances.
+   *
+   * @param studyId - The ID of the study to clear the cache for.
+   * @returns A promise that resolves to true if the cache was successfully cleared.
+   */
+  static async clearStudyCache(studyId: string): Promise<boolean> {
+    try {
+      // Fetch all series associated with this study
+      const series = await db.series.where('studyId').equals(studyId).toArray();
+
+      // Delete all instances associated with each series
+      for (const s of series) {
+        await db.instance.where('seriesId').equals(s.id).delete();
+      }
+
+      // Delete all series associated with the study
+      await db.series.where('studyId').equals(studyId).delete();
+
+      // Delete the study itself
+      await db.study.delete(studyId);
+
+      return true;
+    } catch (error) {
+      console.error('Error clearing study cache:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Clears the entire cache by deleting all studies, series, and instances.
+   *
+   * @returns A promise that resolves to true if the cache was successfully cleared.
+   */
+  static async clearCache(): Promise<boolean> {
+    try {
+      await db.instance.clear();
+      await db.series.clear();
+      await db.study.clear();
+      return true;
+    } catch (error) {
+      console.error('Error clearing cache:', error);
       throw error;
     }
   }

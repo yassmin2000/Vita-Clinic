@@ -68,7 +68,7 @@ export default function Viewers({ study }: ViewersProps) {
 
   const { ref } = useResizeDetector({
     onResize: (_, __) => {
-      onResize();
+      setTimeout(onResize, 60);
     },
   });
 
@@ -190,13 +190,13 @@ export default function Viewers({ study }: ViewersProps) {
         return (
           <>
             {renderViewers(1)}
-            <div className="grid grid-rows-2">{renderViewers(2, 1)}</div>
+            <div className="flex flex-col gap-0">{renderViewers(2, 1)}</div>
           </>
         );
       case '2_small_1_big':
         return (
           <>
-            <div className="grid grid-rows-2">{renderViewers(2)}</div>
+            <div className="flex flex-col gap-0">{renderViewers(2)}</div>
             {renderViewers(1, 2)}
           </>
         );
@@ -204,13 +204,13 @@ export default function Viewers({ study }: ViewersProps) {
         return (
           <>
             {renderViewers(1)}
-            <div className="grid grid-cols-2">{renderViewers(2, 1)}</div>
+            <div className="grid flex-1 grid-cols-2">{renderViewers(2, 1)}</div>
           </>
         );
       case '2_small_top_1_big_bottom':
         return (
           <>
-            <div className="grid grid-cols-2">{renderViewers(2)}</div>
+            <div className="grid flex-1 grid-cols-2">{renderViewers(2)}</div>
             {renderViewers(1, 2)}
           </>
         );
@@ -223,7 +223,7 @@ export default function Viewers({ study }: ViewersProps) {
     <div
       ref={ref}
       className={cn(
-        'grid h-[calc(100vh-52px)]',
+        'grid h-full',
         layoutType === '1_big' && 'grid-cols-1',
         (layoutType === '2_side_by_side' ||
           layoutType === '1_big_2_small' ||
@@ -232,9 +232,9 @@ export default function Viewers({ study }: ViewersProps) {
         (layoutType === '2_top_to_bottom' ||
           layoutType === '1_big_top_2_small_bottom' ||
           layoutType === '2_small_top_1_big_bottom') &&
-          'grid-rows-2',
+          'flex flex-col gap-0',
         layoutType === '3_side_by_side' && 'grid-cols-3',
-        layoutType === '3_top_to_bottom' && 'grid-rows-3',
+        layoutType === '3_top_to_bottom' && 'flex flex-col gap-0',
         layoutType === '4_2x2' && 'grid-cols-2 grid-rows-2'
       )}
     >

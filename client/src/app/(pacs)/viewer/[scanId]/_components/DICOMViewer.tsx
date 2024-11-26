@@ -9,10 +9,13 @@ import cornerstoneTools from 'cornerstone-tools';
 import cornerstoneWADOImageLoader from 'cornerstone-wado-image-loader';
 
 import useViewerStore from '@/hooks/useViewerStore';
-import { handleSetViewToLeft, handleSetViewToRight } from './ViewerToolbar';
-import { cn } from '@/lib/utils';
+import useUserCachingSettings from '@/hooks/useUserCachingSettings';
 import CacheManager from '@/lib/CacheManager';
+import { cn } from '@/lib/utils';
+import { handleSetViewToLeft, handleSetViewToRight } from './ViewerToolbar';
+
 import type { Series } from '@/types/appointments.type';
+import type { CachingSettings } from '@/types/users.type';
 
 interface DICOMViewerProps {
   index: number;
@@ -29,6 +32,7 @@ export default function DICOMViewer({
     useViewerStore();
   const [isLoaded, setIsLoaded] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const cachingSettings = useUserCachingSettings();
 
   useEffect(() => {
     const element = document.getElementById('viewer_' + index);
@@ -37,9 +41,11 @@ export default function DICOMViewer({
     }
   }, [index, isLoaded]);
 
-  const loadImages = async () => {
-    if (!series) return;
-
+  const loadImages = async (
+    index: number,
+    series: Series,
+    cachingSettings: CachingSettings
+  ) => {
     setIsLoading(true);
     const element = document.getElementById('viewer_' + index);
 
@@ -65,7 +71,9 @@ export default function DICOMViewer({
           studyId,
           series.seriesInstanceUID,
           instance.sopInstanceUID,
-          instance.url
+          instance.url,
+          cachingSettings.enableDicomCaching,
+          cachingSettings.enableDicomCompression
         );
 
         const image = cornerstoneWADOImageLoader.wadouri.fileManager.add(file);
@@ -100,10 +108,23 @@ export default function DICOMViewer({
   };
 
   useEffect(() => {
-    if (isCornerstoneInitialized && !isLoaded && !isLoading) {
-      loadImages();
+    if (
+      isCornerstoneInitialized &&
+      cachingSettings &&
+      series &&
+      !isLoaded &&
+      !isLoading
+    ) {
+      loadImages(index, series, cachingSettings);
     }
-  }, [isCornerstoneInitialized, series, isLoaded, isLoading, index]);
+  }, [
+    index,
+    isCornerstoneInitialized,
+    series,
+    cachingSettings,
+    isLoaded,
+    isLoading,
+  ]);
 
   return (
     <div
@@ -112,7 +133,7 @@ export default function DICOMViewer({
       }}
       id={`viewer_${index}`}
       className={cn(
-        'relative w-full border',
+        'relative w-full flex-1 border',
         currentViewerId === index && 'border-primary'
       )}
     />

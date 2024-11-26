@@ -48,3 +48,10 @@ export type Profile = User & {
   treatments: number;
   laboratoryTestResults: number;
 };
+
+export type CachingSettings = {
+  enableDicomCaching: boolean;
+  enableDicomCompression: boolean;
+  enableDicomCleanup: boolean;
+  cleanupDuration: number;
+};
