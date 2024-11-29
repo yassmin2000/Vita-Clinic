@@ -19,3 +19,14 @@ export type Action = {
     lastName: string;
   };
 };
+
+export type Notification = {
+  id: string;
+  targetId: string;
+  targetName: string;
+  type: string;
+  isRead: boolean;
+  userId: string;
+  createdAt: string;
+  updatedAt: string;
+};
