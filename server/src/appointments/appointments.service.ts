@@ -11,6 +11,7 @@ import { ServicesService } from 'src/settings/services/services.service';
 import { TherapiesService } from 'src/settings/therapies/therapies.service';
 import { ModalitiesService } from 'src/settings/modalities/modalities.service';
 import { LaboratoryTestsService } from 'src/settings/laboratory-tests/laboratory-tests.service';
+import { NotificationsService } from 'src/notifications/notifications.service';
 import { LogService } from 'src/log/log.service';
 
 import {
@@ -31,6 +32,7 @@ export class AppointmentsService {
     private servicesService: ServicesService,
     private therapiesService: TherapiesService,
     private logService: LogService,
+    private notificationsService: NotificationsService,
   ) {}
 
   async findAll(
@@ -313,6 +315,20 @@ export class AppointmentsService {
       },
     });
 
+    await this.notificationsService.create({
+      userId: doctorId,
+      targetId: approvedAppointment.id,
+      targetName: `Appointment #${approvedAppointment.number}`,
+      type: 'appointment_assigned',
+    });
+
+    await this.notificationsService.create({
+      userId: approvedAppointment.patientId,
+      targetId: approvedAppointment.id,
+      targetName: `Appointment #${approvedAppointment.number}`,
+      type: 'appointment_approved',
+    });
+
     await this.logService.create({
       userId,
       targetId: appointment.id,
@@ -346,6 +362,13 @@ export class AppointmentsService {
       data: {
         status: 'rejected',
       },
+    });
+
+    await this.notificationsService.create({
+      userId: rejectedAppointment.patientId,
+      targetId: rejectedAppointment.id,
+      targetName: `Appointment #${rejectedAppointment.number}`,
+      type: 'appointment_rejected',
     });
 
     await this.logService.create({
@@ -390,6 +413,20 @@ export class AppointmentsService {
       data: {
         status: 'cancelled',
       },
+    });
+
+    await this.notificationsService.create({
+      userId: cancelledAppointment.doctorId,
+      targetId: cancelledAppointment.id,
+      targetName: `Appointment #${cancelledAppointment.number}`,
+      type: 'appointment_cancelled',
+    });
+
+    await this.notificationsService.create({
+      userId: cancelledAppointment.patientId,
+      targetId: cancelledAppointment.id,
+      targetName: `Appointment #${cancelledAppointment.number}`,
+      type: 'appointment_cancelled',
     });
 
     await this.logService.create({

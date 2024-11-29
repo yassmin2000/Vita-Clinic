@@ -14,6 +14,7 @@ import { DashboardsModule } from './dashboards/dashboards.module';
 import { EmailOtpModule } from './email-otp/email-otp.module';
 import { PhoneOtpModule } from './phone-otp/phone-otp.module';
 import { PacsModule } from './pacs/pacs.module';
+import { NotificationsModule } from './notifications/notifications.module';
 
 import { AppController } from './app.controller';
 
@@ -36,6 +37,7 @@ import { TasksService } from './tasks.service';
     LogModule,
     DashboardsModule,
     PacsModule,
+    NotificationsModule,
   ],
   controllers: [AppController],
   providers: [AppService, TasksService],
