@@ -1,0 +1,55 @@
+version: "3.8"
+
+services:
+  cdss:
+    build:
+      context: ./cdss
+      dockerfile: Dockerfile
+    container_name: vita_clinic_cdss
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./cdss:/app
+    env_file:
+      - ./cdss/.env
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+    depends_on:
+      - redis
+
+  redis:
+    image: "redis:alpine"
+    container_name: vita_clinic_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  celery:
+    build:
+      context: ./cdss
+      dockerfile: Dockerfile
+    container_name: vita_clinic_celery
+    command: celery -A src.models.celery_jobs worker --loglevel=info
+    depends_on:
+      - redis
+    volumes:
+      - ./cdss:/app
+    env_file:
+      - .env
+
+  flower:
+    image: mher/flower
+    container_name: vita_clinic_flower
+    ports:
+      - "5555:5555"
+    env_file:
+      - .env
+    depends_on:
+      - redis
+      - celery
+
+
+volumes:
+  redis_data:
