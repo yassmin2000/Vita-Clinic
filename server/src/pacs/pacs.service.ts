@@ -15,8 +15,8 @@ export class PacsService {
     let decodedFileURL = decodeURIComponent(fileURL);
     decodedFileURL = decodedFileURL.replace(/&/g, '%26');
 
-    const url = `${process.env.FASTAPI_URL}/dicom/preview?fileURL=${decodedFileURL}&extension=${extension}`;
-    const headers = { 'X-API-KEY': process.env.FASTAPI_API_KEY };
+    const url = `${process.env.CDSS_URL}/dicom/preview?fileURL=${decodedFileURL}&extension=${extension}`;
+    const headers = { 'X-API-KEY': process.env.CDSS_API_KEY };
 
     try {
       const response = await firstValueFrom(

@@ -141,6 +141,7 @@ enum NotificationType {
   appointment_cancelled
   appointment_rejected
   ai_result
+  ai_failed
 }
 
 model Notification {
@@ -188,6 +189,7 @@ model User {
   emr           ElectronicMedicalRecord?
   messages      Message[]
   notifications Notification[]
+  predictions   Prediction[]
 
   doctorAppointments  Appointment[] @relation("doctorAppointments")
   patientAppointments Appointment[] @relation("patientAppointments")
@@ -571,14 +573,44 @@ model Series {
   updatedAt DateTime @updatedAt
 }
 
+enum PredictionStatus {
+  pending
+  predicted
+  failed
+}
+
+enum PredictionModel {
+  mammography
+  lung_ct
+  brain_mri
+  chest_xray
+}
+
+model Prediction {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  instanceId String
+  instance   Instance @relation(fields: [instanceId], references: [id])
+
+  status      PredictionStatus @default(pending)
+  model       PredictionModel
+  result      String           @default("")
+  probability Float            @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model Instance {
   id             String @id @default(uuid())
   sopInstanceUID String
   instanceNumber Int?
   url            String
 
-  series   Series @relation(fields: [seriesId], references: [id])
-  seriesId String
+  series      Series       @relation(fields: [seriesId], references: [id])
+  seriesId    String
+  predictions Prediction[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

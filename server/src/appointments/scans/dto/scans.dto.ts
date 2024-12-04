@@ -313,7 +313,14 @@ export class FullScanDto extends BasicScanDto {
   study: FullStudyDto;
 }
 
-export class ScanDto extends OmitType(FullScanDto, ['study']) {}
+export class ScanDto extends OmitType(FullScanDto, ['study']) {
+  @ApiProperty({
+    description: 'Study data',
+    type: StudyDto,
+  })
+  @Type(() => StudyDto)
+  study: StudyDto;
+}
 
 export class GetPatientScansQuery {
   @ApiPropertyOptional({

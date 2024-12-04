@@ -31,7 +31,7 @@ services:
       context: ./cdss
       dockerfile: Dockerfile
     container_name: vita_clinic_celery
-    command: celery -A src.models.celery_jobs worker --loglevel=info
+    command: celery -A src.inference.celery_jobs worker --loglevel=info
     depends_on:
       - redis
     volumes:
