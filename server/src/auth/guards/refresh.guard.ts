@@ -53,6 +53,10 @@ export class RefreshJwtGuard implements CanActivate {
         role: user.role,
         isSuperAdmin: user.isSuperAdmin,
         avatar: user.avatarURL,
+        enableDicomCaching: user.enableDicomCaching,
+        enableDicomCompression: user.enableDicomCompression,
+        enableDicomCleanup: user.enableDicomCleanup,
+        cleanupDuration: user.cleanupDuration,
       };
     } catch (error) {
       throw new UnauthorizedException();

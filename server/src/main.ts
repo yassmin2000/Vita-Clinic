@@ -14,7 +14,7 @@ async function bootstrap() {
 
   const swaggerPassword = app.get(ConfigService).get('SWAGGER_PASSWORD');
   app.use(
-    ['/api/docs'],
+    ['/api/docs', '/api/docs-json', '/api/docs-yaml'],
     basicAuth({
       challenge: true,
       users: { admin: swaggerPassword },

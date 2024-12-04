@@ -21,6 +21,8 @@ import { TestResultsService } from 'src/appointments/test-results/test-results.s
 import { OtpService } from 'src/otp/otp.service';
 import { EmailOtpService } from 'src/email-otp/email-otp.service';
 import { PhoneOtpService } from 'src/phone-otp/phone-otp.service';
+import { NotificationsService } from 'src/notifications/notifications.service';
+import { NotificationsGateway } from 'src/notifications/notifications.gateway';
 
 @Module({
   controllers: [PatientsController],
@@ -44,6 +46,8 @@ import { PhoneOtpService } from 'src/phone-otp/phone-otp.service';
     OtpService,
     EmailOtpService,
     PhoneOtpService,
+    NotificationsService,
+    NotificationsGateway,
   ],
 })
 export class PatientsModule {}

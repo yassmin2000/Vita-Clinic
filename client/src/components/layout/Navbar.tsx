@@ -8,6 +8,7 @@ import { useTheme } from 'next-themes';
 
 import UserButton from './UserButton';
 import ModeToggle from './ModeToggle';
+import NotificationsButton from '../notifications/NotificationsButton';
 import MobileSidebar from './MobileSidebar';
 
 interface NavbarProps {
@@ -64,6 +65,7 @@ export default function Navbar({ role }: NavbarProps) {
       </div>
       <div className="flex items-center gap-x-3">
         <ModeToggle />
+        <NotificationsButton />
         {session?.user && (
           <UserButton
             user={{

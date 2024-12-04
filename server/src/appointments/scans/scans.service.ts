@@ -1,7 +1,13 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 
 import { PrismaService } from 'src/prisma.service';
 import { LogService } from 'src/log/log.service';
+
+import { processDicomFiles } from './utils';
 
 import {
   BasicScanDto,
@@ -45,6 +51,7 @@ export class ScansService {
         modalityId: true,
         appointment: true,
         appointmentId: true,
+        study: true,
       },
       skip: (page - 1) * limit,
       take: limit,
@@ -72,6 +79,7 @@ export class ScansService {
         modalityId: true,
         appointment: true,
         appointmentId: true,
+        study: true,
       },
     });
   }
@@ -82,6 +90,15 @@ export class ScansService {
       include: {
         appointment: true,
         modality: true,
+        study: {
+          include: {
+            series: {
+              include: {
+                instances: true,
+              },
+            },
+          },
+        },
       },
     });
 
@@ -110,26 +127,84 @@ export class ScansService {
       throw new NotFoundException('Appointment not found');
     }
 
-    const scan = await this.prisma.scan.create({
-      data: {
-        title,
-        notes,
-        modality: { connect: { id: modalityId } },
-        scanURLs,
-        appointment: { connect: { id: appointmentId } },
-      },
-    });
+    const sutdies = await processDicomFiles(scanURLs);
 
-    await this.logService.create({
-      userId,
-      targetId: scan.id,
-      targetName: scan.title,
-      type: 'scan',
-      action: 'create',
-      targetUserId: appointment.patientId,
-    });
+    if (sutdies.length === 0) {
+      throw new UnprocessableEntityException('No valid DICOM files found');
+    }
 
-    return scan;
+    if (sutdies.length > 1) {
+      throw new UnprocessableEntityException(
+        "Can't create multiple studies at once",
+      );
+    }
+
+    const [studyData] = sutdies;
+
+    const uniqueModalities = Array.from(
+      new Set(
+        studyData.series.filter((s) => s.modality).map((s) => s.modality),
+      ),
+    );
+
+    return await this.prisma.$transaction(async (prisma) => {
+      const scan = await prisma.scan.create({
+        data: {
+          title,
+          notes,
+          modality: { connect: { id: modalityId } },
+          appointment: { connect: { id: appointmentId } },
+          study: {
+            create: {
+              description: studyData.description.replace(/\0/g, ''),
+              studyInstanceUID: studyData.studyInstanceUID.replace(/\0/g, ''),
+              modalities: uniqueModalities,
+            },
+          },
+        },
+        include: {
+          study: true,
+        },
+      });
+
+      const studyId = scan.study.id;
+
+      for (const series of studyData.series) {
+        const createdSeries = await prisma.series.create({
+          data: {
+            seriesInstanceUID: series.seriesInstanceUID.replace(/\0/g, ''),
+            seriesNumber: series.seriesNumber,
+            description: series.description.replace(/\0/g, ''),
+            breastLaterality:
+              series.modality.toLowerCase() === 'mg' ? series.laterality : null,
+            breastView:
+              series.modality.toLowerCase() === 'mg' ? series.view : null,
+            modality: series.modality,
+            studyId: studyId,
+          },
+        });
+
+        await prisma.instance.createMany({
+          data: series.instances.map((instance) => ({
+            sopInstanceUID: instance.instanceUID.replace(/\0/g, ''),
+            instanceNumber: instance.instanceNumber,
+            url: instance.url,
+            seriesId: createdSeries.id,
+          })),
+        });
+      }
+
+      await this.logService.create({
+        userId,
+        targetId: scan.id,
+        targetName: scan.title,
+        type: 'scan',
+        action: 'create',
+        targetUserId: appointment.patientId,
+      });
+
+      return scan;
+    });
   }
 
   async update(

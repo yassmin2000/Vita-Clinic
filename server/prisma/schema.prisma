@@ -135,6 +135,29 @@ model Otp {
   updatedAt DateTime @updatedAt
 }
 
+enum NotificationType {
+  appointment_approved
+  appointment_assigned
+  appointment_cancelled
+  appointment_rejected
+  ai_result
+  ai_failed
+}
+
+model Notification {
+  id         String           @id @default(uuid())
+  targetId   String
+  targetName String
+  type       NotificationType
+  isRead     Boolean          @default(false)
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model User {
   id        String  @id @default(uuid())
   ssn       String? @unique @default(cuid())
@@ -163,14 +186,21 @@ model User {
   speciality   Speciality? @relation(fields: [specialityId], references: [id])
   specialityId String?
 
-  emr      ElectronicMedicalRecord?
-  messages Message[]
+  emr           ElectronicMedicalRecord?
+  messages      Message[]
+  notifications Notification[]
+  predictions   Prediction[]
 
   doctorAppointments  Appointment[] @relation("doctorAppointments")
   patientAppointments Appointment[] @relation("patientAppointments")
 
   actions       Action[] @relation("actions")
   targetActions Action[] @relation("targetActions")
+
+  enableDicomCaching     Boolean @default(true)
+  enableDicomCompression Boolean @default(false)
+  enableDicomCleanup     Boolean @default(false)
+  cleanupDuration        Int     @default(7)
 }
 
 model ElectronicMedicalRecord {
@@ -491,10 +521,99 @@ model Scan {
   modality   Modality @relation(fields: [modalityId], references: [id])
   modalityId String
 
-  scanURLs String[]
+  study Study?
 
   appointment   Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
   appointmentId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum BreastLaterality {
+  r
+  l
+}
+
+enum BreastView {
+  cc
+  mlo
+}
+
+model Study {
+  id               String   @id @default(uuid())
+  studyInstanceUID String
+  description      String?
+  modalities       String[]
+
+  scan   Scan     @relation(fields: [scanId], references: [id])
+  scanId String   @unique
+  series Series[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Series {
+  id                String  @id @default(uuid())
+  seriesInstanceUID String
+  seriesNumber      Int?
+  description       String?
+  modality          String?
+
+  breastLaterality BreastLaterality?
+  breastView       BreastView?
+
+  study   Study  @relation(fields: [studyId], references: [id])
+  studyId String
+
+  instances Instance[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum PredictionStatus {
+  pending
+  predicted
+  approved
+  rejected
+  failed
+}
+
+enum PredictionModel {
+  mammography
+  lung_ct
+  brain_mri
+  chest_xray
+}
+
+model Prediction {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  instanceId String
+  instance   Instance @relation(fields: [instanceId], references: [id])
+
+  status      PredictionStatus @default(pending)
+  comments    String?
+  model       PredictionModel
+  result      String           @default("")
+  probability Float            @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Instance {
+  id             String @id @default(uuid())
+  sopInstanceUID String
+  instanceNumber Int?
+  url            String
+
+  series      Series       @relation(fields: [seriesId], references: [id])
+  seriesId    String
+  predictions Prediction[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

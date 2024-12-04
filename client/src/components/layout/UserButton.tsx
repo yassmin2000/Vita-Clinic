@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { signOut } from 'next-auth/react';
-import { User } from 'lucide-react';
 
 import {
   DropdownMenu,
@@ -67,6 +66,10 @@ export default function UserButton({ user }: UserButtonProps) {
 
         <DropdownMenuItem asChild>
           <Link href="/profile/settings">Settings</Link>
+        </DropdownMenuItem>
+
+        <DropdownMenuItem asChild>
+          <Link href="/notifications">Notifications</Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
 

@@ -33,6 +33,10 @@ export class AuthService {
       role: user.role,
       isSuperAdmin: user.isSuperAdmin,
       avatar: user.avatarURL,
+      enableDicomCaching: user.enableDicomCaching,
+      enableDicomCompression: user.enableDicomCompression,
+      enableDicomCleanup: user.enableDicomCleanup,
+      cleanupDuration: user.cleanupDuration,
     };
 
     const EXPIRE_TIME = 5 * 60 * 60 * 1000;
@@ -92,6 +96,10 @@ export class AuthService {
       role: user.role,
       isSuperAdmin: user.isSuperAdmin,
       avatar: user.avatarURL,
+      enableDicomCaching: user.enableDicomCaching,
+      enableDicomCompression: user.enableDicomCompression,
+      enableDicomCleanup: user.enableDicomCleanup,
+      cleanupDuration: user.cleanupDuration,
     };
 
     const EXPIRE_TIME = 5 * 60 * 60 * 1000;

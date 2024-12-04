@@ -1,6 +1,7 @@
 import ProfileCard from './_components/ProfileCard';
 import UpdateAvatarForm from './settings/_component/UpdateAvatarForm';
 import UpdatePasswordForm from './settings/_component/UpdatePasswordForm';
+import UpdateCachingSettingsForm from './settings/_component/UpdateCachingSettingsForm';
 import { Separator } from '@/components/ui/separator';
 
 import { getAuthSession } from '@/lib/auth';
@@ -36,6 +37,15 @@ export default async function page() {
           />
 
           <UpdatePasswordForm />
+
+          <UpdateCachingSettingsForm
+            settings={{
+              enableDicomCaching: user.enableDicomCaching,
+              enableDicomCompression: user.enableDicomCompression,
+              enableDicomCleanup: user.enableDicomCleanup,
+              cleanupDuration: user.cleanupDuration,
+            }}
+          />
         </div>
       </div>
     </section>

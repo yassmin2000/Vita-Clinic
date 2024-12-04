@@ -57,14 +57,49 @@ export type Message = {
   createdAt: string;
 };
 
+export type Study = {
+  id: string;
+  studyInstanceUID: string;
+  description: string;
+  modalities: string[];
+  scanId: string;
+  createdAt: string;
+  updatedAt: string;
+  series: Series[];
+};
+
+export type Series = {
+  id: string;
+  seriesInstanceUID: string;
+  seriesNumber: number;
+  modality?: string;
+  description: string;
+  breastLaterality?: 'r' | 'l';
+  breastView?: 'cc' | 'mlo';
+  studyId: string;
+  createdAt: string;
+  updatedAt: string;
+  instances: Instance[];
+};
+
+export type Instance = {
+  id: string;
+  sopInstanceUID: string;
+  instanceNumber: number;
+  url: string;
+  seriesId: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type Scan = {
   id: string;
   appointmentId: string;
   title: string;
   notes: string;
   modality: PriceLookup;
-  scanURLs: string[];
   createdAt: string;
+  study: Study;
 };
 
 export type Prescription = PatientMedication & {

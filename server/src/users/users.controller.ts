@@ -19,10 +19,12 @@ import {
   CreateUserDto,
   UpdateAvatarDto,
   UpdatePasswordDto,
+  UpdateSettingsDto,
 } from './dto/users.dto';
 import {
   BasicUserDto,
   UpdateUserAvatarResponseDto,
+  UpdateUserSettingsResponseDto,
   UserProfileDto,
   UserReturnDto,
 } from './dto/users-response.dto';
@@ -253,5 +255,30 @@ export class UsersController {
     const user = request.user;
 
     return this.userService.updatePassword(user.id, dto);
+  }
+
+  @ApiDocumentation({
+    operation: {
+      summary: 'Update current user settings',
+      description: 'Update current user settings',
+    },
+    body: {
+      description: 'User settings data',
+      type: UpdateSettingsDto,
+    },
+    consumes: 'application/json',
+    okResponse: {
+      description: 'User settings updated',
+      type: UpdateUserSettingsResponseDto,
+    },
+  })
+  @Patch('settings')
+  async updateUserSettings(
+    @Req() request: Request,
+    @Body(ValidationPipe) dto: UpdateSettingsDto,
+  ): Promise<UpdateUserSettingsResponseDto> {
+    const user = request.user;
+
+    return this.userService.updateSettings(user.id, dto);
   }
 }

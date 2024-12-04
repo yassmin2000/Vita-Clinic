@@ -19,6 +19,8 @@ type FiltersStore = {
   setCurrentAppointmentStatus: (status: 'all' | AppointmentStatus) => void;
   currentVisibleAppointments: 'all' | 'yours';
   setCurrentVisibleAppointments: (status: 'all' | 'yours') => void;
+  currentNotificationStatus: 'all' | 'unread';
+  setCurrentNotificationStatus: (status: 'all' | 'unread') => void;
   reset: () => void;
 };
 
@@ -41,6 +43,9 @@ export const useFiltersStore = create<FiltersStore>((set) => ({
   currentVisibleAppointments: 'all',
   setCurrentVisibleAppointments: (status) =>
     set({ currentVisibleAppointments: status }),
+  currentNotificationStatus: 'all',
+  setCurrentNotificationStatus: (status) =>
+    set({ currentNotificationStatus: status }),
   reset: () =>
     set({
       currentPage: 1,
@@ -51,5 +56,6 @@ export const useFiltersStore = create<FiltersStore>((set) => ({
       currentStatus: 'all',
       currentAppointmentStatus: 'all',
       currentVisibleAppointments: 'all',
+      currentNotificationStatus: 'all',
     }),
 }));

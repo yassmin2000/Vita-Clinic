@@ -23,6 +23,8 @@ import { TreatmentService } from './treatments/treatments.service';
 import { PrescriptionsService } from './prescriptions/prescriptions.service';
 import { TestResultsModule } from './test-results/test-results.module';
 import { TestResultsService } from './test-results/test-results.service';
+import { NotificationsService } from 'src/notifications/notifications.service';
+import { NotificationsGateway } from 'src/notifications/notifications.gateway';
 
 @Module({
   imports: [
@@ -39,6 +41,8 @@ import { TestResultsService } from './test-results/test-results.service';
     PrismaService,
     JwtService,
     LogService,
+    NotificationsService,
+    NotificationsGateway,
 
     ReportsService,
     ScansService,

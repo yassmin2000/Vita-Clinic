@@ -1,5 +1,6 @@
 import { Transform, Type } from 'class-transformer';
 import {
+  IsBoolean,
   IsDateString,
   IsEmail,
   IsEnum,
@@ -391,6 +392,40 @@ export class UpdateAvatarDto {
   @IsOptional()
   @IsString()
   avatarURL?: string;
+}
+
+export class UpdateSettingsDto {
+  @ApiProperty({
+    description: 'User enabled DICOM files caching',
+    type: Boolean,
+    example: true,
+  })
+  @IsBoolean()
+  enableDicomCaching: boolean;
+
+  @ApiProperty({
+    description: 'User enabled DICOM files compression',
+    type: Boolean,
+    example: false,
+  })
+  @IsBoolean()
+  enableDicomCompression: boolean;
+
+  @ApiProperty({
+    description: 'User enabled DICOM files cleanup',
+    type: Boolean,
+    example: true,
+  })
+  @IsBoolean()
+  enableDicomCleanup: boolean;
+
+  @ApiProperty({
+    description: 'User DICOM files cleanup duration (In days)',
+    type: Number,
+    example: 7,
+  })
+  @IsNumber()
+  cleanupDuration: number;
 }
 
 export class UpdatePasswordDto {

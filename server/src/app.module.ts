@@ -13,6 +13,9 @@ import { LogModule } from './log/log.module';
 import { DashboardsModule } from './dashboards/dashboards.module';
 import { EmailOtpModule } from './email-otp/email-otp.module';
 import { PhoneOtpModule } from './phone-otp/phone-otp.module';
+import { PacsModule } from './pacs/pacs.module';
+import { CdssModule } from './cdss/cdss.module';
+import { NotificationsModule } from './notifications/notifications.module';
 
 import { AppController } from './app.controller';
 
@@ -34,6 +37,9 @@ import { TasksService } from './tasks.service';
     PhoneOtpModule,
     LogModule,
     DashboardsModule,
+    PacsModule,
+    NotificationsModule,
+    CdssModule,
   ],
   controllers: [AppController],
   providers: [AppService, TasksService],

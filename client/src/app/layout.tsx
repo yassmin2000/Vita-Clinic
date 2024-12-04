@@ -8,6 +8,7 @@ import 'simplebar-react/dist/simplebar.min.css';
 import Providers from '@/components/Providers';
 import { cn } from '@/lib/utils';
 import { Toaster } from '@/components/ui/toaster';
+import { Toaster as Sonner } from '@/components/ui/sonner';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -29,6 +30,7 @@ export default function RootLayout({
           <NextTopLoader color="#2563eb" />
           {children}
           <Toaster />
+          <Sonner />
         </Providers>
       </body>
     </html>
