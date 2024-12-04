@@ -3,10 +3,15 @@ import {
   IsEnum,
   IsNotEmpty,
   IsNumber,
+  IsOptional,
   IsString,
   IsUUID,
 } from 'class-validator';
-import { ApiProperty, IntersectionType } from '@nestjs/swagger';
+import {
+  ApiProperty,
+  ApiPropertyOptional,
+  IntersectionType,
+} from '@nestjs/swagger';
 import { PredictionModel } from '@prisma/client';
 import { InstanceDto } from 'src/appointments/scans/dto/scans.dto';
 import { Type } from 'class-transformer';
@@ -32,18 +37,51 @@ export class CreatePredictionDto {
 }
 
 export class UpdatePredictionResultDto {
+  @ApiProperty({
+    description: 'Prediction result',
+    type: String,
+    example: 'normal',
+  })
   @IsNotEmpty()
   @IsString()
   result: string;
 
+  @ApiProperty({
+    description: 'Prediction probability',
+    type: Number,
+    example: 0.8,
+  })
   @IsNotEmpty()
   @IsNumber()
   probability: number;
 }
 
+export class ApprovePredictionDto {
+  @ApiPropertyOptional({
+    description: 'Comments',
+    type: String,
+    example: 'Looks good',
+  })
+  @IsOptional()
+  @IsString()
+  comments?: string;
+}
+
+export class RejectPredictionDto {
+  @ApiProperty({
+    description: 'Comments',
+    type: String,
+    example: 'Not good',
+  })
+  @IsNotEmpty()
+  @IsString()
+  comments: string;
+}
+
 export class PredictionDto extends IntersectionType(
   CreatePredictionDto,
   UpdatePredictionResultDto,
+  ApprovePredictionDto,
 ) {
   @ApiProperty({
     description: 'Prediction ID',

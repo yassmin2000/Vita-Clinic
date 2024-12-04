@@ -576,6 +576,8 @@ model Series {
 enum PredictionStatus {
   pending
   predicted
+  approved
+  rejected
   failed
 }
 
@@ -594,6 +596,7 @@ model Prediction {
   instance   Instance @relation(fields: [instanceId], references: [id])
 
   status      PredictionStatus @default(pending)
+  comments    String?
   model       PredictionModel
   result      String           @default("")
   probability Float            @default(0)

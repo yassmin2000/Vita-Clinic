@@ -1,6 +1,6 @@
 'use client';
 
-import { ChangeEvent, useRef, useState } from 'react';
+import { ChangeEvent, useEffect, useRef, useState } from 'react';
 // @ts-ignore
 import cornerstone from 'cornerstone-core';
 // @ts-ignore
@@ -9,6 +9,8 @@ import cornerstoneTools from 'cornerstone-tools';
 import cornerstoneWADOImageLoader from 'cornerstone-wado-image-loader';
 import {
   AArrowUp,
+  Bot,
+  Brain,
   Brush,
   Circle,
   CircleDot,
@@ -60,6 +62,12 @@ import { SidebarTrigger } from '@/components/ui/sidebar';
 
 import useViewerStore from '@/hooks/useViewerStore';
 import { cn } from '@/lib/utils';
+import { Icons } from '@/components/Icons';
+import { Study } from '@/types/appointments.type';
+import { useMutation } from '@tanstack/react-query';
+import axios from 'axios';
+import useAccessToken from '@/hooks/useAccessToken';
+import { useToast } from '@/components/ui/use-toast';
 
 const tools = [
   // Navigation Tools
@@ -153,10 +161,27 @@ export const handleResetViewport = (viewerId: string) => {
   cornerstone.reset(element);
 };
 
-export default function ViewerToolbar() {
+function getCurrentImageIndex(viewerId: string) {
+  const element = document.getElementById(viewerId);
+  const toolState = cornerstoneTools.getToolState(element, 'stack');
+
+  if (toolState && toolState.data && toolState.data.length > 0) {
+    const stack = toolState.data[0];
+
+    return stack.currentImageIdIndex;
+  }
+
+  return -1;
+}
+
+interface ViewerToolbarProps {
+  study: Study;
+}
+
+export default function ViewerToolbar({ study }: ViewerToolbarProps) {
   const [activeTool, setActiveTool] = useState<string>('Pan');
   const [mouseWheelTool, setMouseWheelTool] = useState('StackScroll');
-  const { currentViewerId, setLayoutType } = useViewerStore();
+  const { currentViewerId, selectedSeries, setLayoutType } = useViewerStore();
 
   const inputRef = useRef<HTMLInputElement | null>(null);
 
@@ -211,33 +236,65 @@ export default function ViewerToolbar() {
     cornerstone.updateImage(element);
   };
 
-  const handleSetViewToRight = (viewerId: number) => {
-    const element = document.getElementById('viewer_' + viewerId);
-    const cornerstoneElement = cornerstone.getEnabledElement(element);
-    const viewport = cornerstoneElement.viewport;
-    const offsetLeft = cornerstoneElement.canvas.offsetLeft;
-    const offsetRight = offsetLeft + cornerstoneElement.canvas.width;
-    const position = cornerstone.pageToPixel(element, offsetRight, 0);
-    const translationX =
-      viewport.translation.x + position.x - cornerstoneElement.image.width;
-    viewport.translation.x = translationX;
-    viewport.translation.y = 0;
-    cornerstone.setViewport(element, viewport);
+  const getCurrentInstance = () => {
+    const index = getCurrentImageIndex(`viewer_${currentViewerId}`);
+    const currentSeries = selectedSeries[currentViewerId];
+
+    if (index && currentSeries) {
+      const series = study.series.find(
+        (s) => s.seriesInstanceUID === currentSeries
+      );
+
+      if (series) {
+        return series.instances[index];
+      }
+    }
+
+    return null;
   };
 
-  const handleSetViewToLeft = (viewerId: number) => {
-    const element = document.getElementById('viewer_' + viewerId);
-    const cornerstoneElement = cornerstone.getEnabledElement(element);
-    const viewport = cornerstoneElement.viewport;
-    const offsetLeft = cornerstoneElement.canvas.offsetLeft;
-    const offsetRight = offsetLeft + cornerstoneElement.canvas.width;
-    const position = cornerstone.pageToPixel(element, offsetRight, 0);
-    const translationX =
-      viewport.translation.x + position.x - cornerstoneElement.image.width;
-    viewport.translation.x = -translationX;
-    viewport.translation.y = 0;
-    cornerstone.setViewport(element, viewport);
-  };
+  const accessToken = useAccessToken();
+  const { toast } = useToast();
+  const { mutate: createPrediction, isPending } = useMutation({
+    mutationFn: async (model: string) => {
+      const instance = getCurrentInstance();
+
+      if (!instance) {
+        throw new Error('No instance found');
+      }
+
+      const body = {
+        instanceId: instance.id,
+        model,
+      };
+
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/cdss`,
+        body,
+        {
+          headers: {
+            authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      return response;
+    },
+    onError: () => {
+      return toast({
+        title: 'Failed to make a prediction',
+        description: 'An error occurred while making a prediction.',
+        variant: 'destructive',
+      });
+    },
+    onSuccess: () => {
+      return toast({
+        title: 'Prediction task created',
+        description:
+          'A prediction task has been created successfully, you will be notified when the results are ready.',
+      });
+    },
+  });
 
   return (
     <div className="sticky left-0 top-0 w-full">
@@ -394,6 +451,41 @@ export default function ViewerToolbar() {
           ))}
 
           <Separator orientation="vertical" className="mx-2 h-5" />
+
+          <DropdownMenu>
+            <Tooltip>
+              <TooltipTrigger>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="h-8 w-8 p-0">
+                    <Bot className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">AI Predictions</TooltipContent>
+            </Tooltip>
+            <DropdownMenuContent className="flex flex-col" align="end">
+              <DropdownMenuItem
+                onClick={() => {
+                  createPrediction('brain_mri');
+                }}
+              >
+                <Brain className="mr-2 h-5 w-5" /> Brain MRI Tumors
+                Classification
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  createPrediction('lung_ct');
+                }}
+              >
+                <Icons.lungs className="mr-2 h-5 w-5" /> Lung CT Cancer
+                Classification
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => {}}>
+                <Icons.mammo className="mr-2 h-5 w-5" /> Mammography Breast
+                Cancer Detection
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           <DropdownMenu>
             <Tooltip>

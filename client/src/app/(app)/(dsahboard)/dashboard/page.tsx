@@ -25,7 +25,7 @@ export default async function Home() {
           <h2 className="text-base font-medium text-muted-foreground">
             {role === 'admin'
               ? 'Here are the latest statistics for your clinic, in addition to insights about your invocies, patients, doctors, and most common services.'
-              : 'Here are the latest statistics for your patients, in addition to insights about their age, sex, and medical indofmration.'}
+              : 'Here are the latest statistics for your patients, in addition to insights about their age, sex, and medical infomration.'}
           </h2>
           {role === 'admin' ? <AdminStatistics /> : <DoctorStatistics />}
         </div>

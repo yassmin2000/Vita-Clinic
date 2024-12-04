@@ -106,6 +106,7 @@ const NotificationListItem = forwardRef<
         <Button
           size="xs"
           className={cn('self-end sm:self-center', isPopover && 'sm:self-end')}
+          disabled={isPending}
           onClick={() => {
             if (!notification.isRead) {
               markAsRead();

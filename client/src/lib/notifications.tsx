@@ -50,6 +50,7 @@ export const notificationsSchemas = [
     icon: Bot,
     message: 'Your AI analysis result for %TARGET% is ready.',
     action: 'View Analysis',
+    href: '/prediction/:id',
     textColor: 'text-yellow-700',
     backgroundColor: 'bg-yellow-700/10',
   },

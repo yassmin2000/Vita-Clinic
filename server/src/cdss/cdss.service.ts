@@ -6,8 +6,10 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import {
+  ApprovePredictionDto,
   CreatePredictionDto,
   PredictionDto,
+  RejectPredictionDto,
   UpdatePredictionResultDto,
 } from './dto/cdss.dto';
 import { HttpService } from '@nestjs/axios';
@@ -29,7 +31,19 @@ export class CdssService {
     return this.prisma.prediction.findUnique({
       where: { id: predictionId, userId },
       include: {
-        instance: true,
+        instance: {
+          include: {
+            series: {
+              include: {
+                study: {
+                  include: {
+                    scan: true,
+                  },
+                },
+              },
+            },
+          },
+        },
       },
     });
   }
@@ -165,6 +179,92 @@ export class CdssService {
       targetId: prediction.id,
       targetName: `Scan: ${prediction.instance.series.study.scan.title}, Series: ${prediction.instance.series.seriesNumber}, Instance: ${prediction.instance.instanceNumber}`,
       type: 'ai_failed',
+    });
+
+    return updatedPrediction;
+  }
+
+  async approvePrediction(
+    userId: string,
+    predictionId: string,
+    approvePredictionDto: ApprovePredictionDto,
+  ): Promise<PredictionDto> {
+    const prediction = await this.prisma.prediction.findUnique({
+      where: { id: predictionId, userId },
+      include: {
+        instance: {
+          include: {
+            series: {
+              include: {
+                study: {
+                  include: {
+                    scan: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!prediction) {
+      throw new NotFoundException('Prediction not found');
+    }
+
+    if (prediction.status !== 'predicted') {
+      throw new ConflictException('Prediction is not predicted');
+    }
+
+    const updatedPrediction = await this.prisma.prediction.update({
+      where: { id: predictionId },
+      data: {
+        status: 'approved',
+        ...approvePredictionDto,
+      },
+    });
+
+    return updatedPrediction;
+  }
+
+  async rejectPrediction(
+    userId,
+    predictionId: string,
+    rejectedPredictionDto: RejectPredictionDto,
+  ): Promise<PredictionDto> {
+    const prediction = await this.prisma.prediction.findUnique({
+      where: { id: predictionId, userId },
+      include: {
+        instance: {
+          include: {
+            series: {
+              include: {
+                study: {
+                  include: {
+                    scan: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!prediction) {
+      throw new NotFoundException('Prediction not found');
+    }
+
+    if (prediction.status !== 'predicted') {
+      throw new ConflictException('Prediction is not predicted');
+    }
+
+    const updatedPrediction = await this.prisma.prediction.update({
+      where: { id: predictionId },
+      data: {
+        status: 'rejected',
+        ...rejectedPredictionDto,
+      },
     });
 
     return updatedPrediction;

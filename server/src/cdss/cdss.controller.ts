@@ -17,8 +17,10 @@ import { JwtGuard } from 'src/auth/guards/jwt.guard';
 import { ApiDocumentation } from 'src/decorators/documentation.decorator';
 import { CdssService } from './cdss.service';
 import {
+  ApprovePredictionDto,
   CreatePredictionDto,
   PredictionDto,
+  RejectPredictionDto,
   UpdatePredictionResultDto,
 } from './dto/cdss.dto';
 import { APIKeyGuard } from 'src/auth/guards/api-key.guard';
@@ -165,5 +167,83 @@ export class CdssController {
     @Body(new ValidationPipe()) dto: UpdatePredictionResultDto,
   ): Promise<PredictionDto> {
     return this.cdssService.updatePredictionResult(predictionId, dto);
+  }
+
+  @ApiDocumentation({
+    operation: {
+      summary: 'Approve a prediction',
+      description: 'Approve a prediction',
+    },
+    params: {
+      name: 'predictionId',
+      type: String,
+      description: 'Prediction ID',
+      example: crypto.randomUUID(),
+    },
+    body: {
+      description: 'Prediction approval data',
+      type: ApprovePredictionDto,
+    },
+    consumes: 'application/json',
+    notFoundResponse: {
+      description: 'Prediction not found',
+    },
+    conflictResponse: {
+      description: 'Prediction is not pending',
+    },
+    okResponse: {
+      description: 'Prediction approved',
+      type: PredictionDto,
+    },
+  })
+  @UseGuards(JwtGuard)
+  @Patch(':predictionId/approve')
+  async approvePrediction(
+    @Param('predictionId') predictionId: string,
+    @Body() dto: ApprovePredictionDto,
+    @Req() request: Request,
+  ): Promise<PredictionDto> {
+    const user = request.user;
+
+    return this.cdssService.approvePrediction(user.id, predictionId, dto);
+  }
+
+  @ApiDocumentation({
+    operation: {
+      summary: 'Reject a prediction',
+      description: 'Reject a prediction',
+    },
+    params: {
+      name: 'predictionId',
+      type: String,
+      description: 'Prediction ID',
+      example: crypto.randomUUID(),
+    },
+    body: {
+      description: 'Prediction rejection data',
+      type: RejectPredictionDto,
+    },
+    consumes: 'application/json',
+    notFoundResponse: {
+      description: 'Prediction not found',
+    },
+    conflictResponse: {
+      description: 'Prediction is not pending',
+    },
+    okResponse: {
+      description: 'Prediction rejected',
+      type: PredictionDto,
+    },
+  })
+  @UseGuards(JwtGuard)
+  @Patch(':predictionId/reject')
+  async rejectPrediction(
+    @Param('predictionId') predictionId: string,
+    @Body() dto: RejectPredictionDto,
+    @Req() request: Request,
+  ): Promise<PredictionDto> {
+    const user = request.user;
+
+    return this.cdssService.rejectPrediction(user.id, predictionId, dto);
   }
 }

@@ -68,7 +68,7 @@ export default function ViewerPage({ params: { scanId } }: ViewerPageProps) {
     >
       <ViewerSidebar isLoading={isLoading} series={scan?.study.series || []} />
       <div className="flex w-full flex-col overflow-x-hidden overflow-y-hidden">
-        <ViewerToolbar />
+        {!isLoading && scan && <ViewerToolbar study={scan.study} />}
         {!isLoading && scan && <Viewers study={scan.study} />}
       </div>
     </SidebarProvider>
