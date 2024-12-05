@@ -37,7 +37,7 @@ export default function NotificationsList({
       queryFn: async ({ pageParam }: { pageParam: number }) => {
         await new Promise((resolve) => setTimeout(resolve, 2000));
         const response = await axios.get(
-          `http://localhost:8000/api/notifications?page=${pageParam}&limit=5&status=${isPopover ? 'all' : currentNotificationStatus}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/notifications?page=${pageParam}&limit=5&status=${isPopover ? 'all' : currentNotificationStatus}`,
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,

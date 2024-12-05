@@ -67,9 +67,12 @@ export default function NotificationsProvider({
   // Connect to WebSocket on component mount
   useEffect(() => {
     if (accessToken) {
-      const newSocket = io('http://localhost:8000/notifications', {
-        query: { token: accessToken }, // Include JWT if required
-      });
+      const newSocket = io(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/notifications`,
+        {
+          query: { token: accessToken }, // Include JWT if required
+        }
+      );
 
       setSocket(newSocket);
 
