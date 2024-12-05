@@ -103,7 +103,7 @@ def predict_brain_tumors_task(prediction_id: str, instance_url: str):
         prediction = brain_tumor_service.predict(image_bytes.getvalue())
         loop.run_until_complete(
             update_prediction_result(
-                prediction_id, prediction["prediction"], prediction["probability"]
+                prediction_id, prediction["class"], prediction["probability"]
             )
         )
 

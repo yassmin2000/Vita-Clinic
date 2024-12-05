@@ -93,15 +93,15 @@ export default function DICOMViewer({
       }
     }
 
-    if (series && series.modality === 'MG') {
-      if (series.breastLaterality === 'r') {
-        handleSetViewToRight(`viewer_${index}`);
-      }
+    // if (series && series.modality === 'MG') {
+    //   if (series.breastLaterality === 'r') {
+    //     // handleSetViewToRight(`viewer_${index}`);
+    //   }
 
-      if (series.breastLaterality === 'l') {
-        handleSetViewToLeft(`viewer_${index}`);
-      }
-    }
+    //   if (series.breastLaterality === 'l') {
+    //     handleSetViewToLeft(`viewer_${index}`);
+    //   }
+    // }
 
     setIsLoaded(true);
     setIsLoading(false);
