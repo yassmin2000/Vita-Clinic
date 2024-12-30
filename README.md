@@ -156,33 +156,7 @@ npm install
 
 9. Access the application by visintg http://localhost:3000/
 
-## Contributors
 
-<table>
-  <tr>
-    <td align="center">
-    <a href="https://github.com/Bodykudo" target="_black">
-    <img src="https://avatars.githubusercontent.com/u/17731926?v=4" width="150px;" alt="Abdallah Magdy"/>
-    <br />
-    <sub><b>Abdallah Magdy</b></sub></a>
-    <td align="center">
-    <a href="https://github.com/Hazem-Raafat" target="_black">
-    <img src="https://avatars.githubusercontent.com/u/100636693?v=4" width="150px;" alt="Hazem Raafat"/>
-    <br />
-    <sub><b>Hazem Raafat</b></sub></a>
-    </td>
-   <td align="center">
-    <a href="https://github.com/IbrahimEmad11" target="_black">
-    <img src="https://avatars.githubusercontent.com/u/110200613?v=4" width="150px;" alt="Ibrahim Emad"/>
-    <br />
-    <sub><b>Ibrahim Emad</b></sub></a>
-    </td>
-   <td align="center">
-    <a href="https://github.com/melsayed8450" target="_black">
-    <img src="https://avatars.githubusercontent.com/u/100236901?v=4" width="150px;" alt="Mohamed Elsayed"/>
-    <br />
-    <sub><b>Mohamed Elsayed</b></sub></a>
-    </td>
     </tr>
  </table>
 
